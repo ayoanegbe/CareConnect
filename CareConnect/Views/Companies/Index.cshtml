@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Company>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+		<h2>Companies</h2>
+					
+		<div class="right-wrapper text-right">
+			<ol class="breadcrumbs">
+				<li>
+					<a asp-controller="Home" asp-action="Index">
+						<i class="bx bx-home-alt"></i>
+					</a>
+				</li>
+				<li><span>Companies</span></li>
+			</ol>
+					
+			@*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+		</div>
+	</header>
+    <section class="card">
+        <header class="card-header">								
+			<h2 class="card-title">List of Companies</h2>
+		</header>
+        <div class="card-body">
+            <div class="row">
+				<div class="col-sm-9">
+					<div class="m-0">
+						<a asp-controller="Companies" asp-action="Create" class="btn btn-primary" style="background-color:cornflowerblue">Add Company<i class="fas fa-plus"></i></a>					                    
+					</div>
+				</div>
+			</div>
+			<table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.CompanyName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ShortName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.DateAdded)
+                        </th>
+                        
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model) {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CompanyName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ShortName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateAdded)
+                            </td>
+                                
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@protector.Encode(item.CompanyId.ToString())" style="color:magenta">Edit</a> |
+                                <a asp-action="HouseIndex" asp-route-id="@protector.Encode(item.CompanyId.ToString())" style="color:magenta">House</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-controller="Home" asp-action="Index"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>
+
+

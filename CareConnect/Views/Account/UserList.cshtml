@@ -1,0 +1,72 @@
+﻿@*@model IEnumerable<ApplicationUser>*@
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var users = UserManager.Users.ToList();
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Users List</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-action="Index" asp-controller="Home">
+                        <i class="bx bx-home-alt"></i>
+                    </a>
+                </li>
+                <li><span>Users List</span></li>
+            </ol>
+
+            <a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col">
+            <section class="card">
+                <header class="card-header">
+                    <h2 class="card-title">Caret Users List</h2>
+                </header>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped mb-0" id="datatable-tabletools">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                                @*<th class="d-lg-none">CSS grade</th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in users)
+                            {
+                                var role = await UserManager.GetRolesAsync(user);
+                                string userRole = role.FirstOrDefault();
+                                if (!userRole.Equals("Super Administrator"))
+                                {
+                                    <tr>
+                                        <td>@user.FullName</td>
+                                        <td>@user.UserName</td>
+                                        <td>@role.FirstOrDefault()</td>
+                                        <td><span class="badge @(user.IsActive ? "badge-success" : "badge-danger")">@user.IsActive</span></td>
+                                        <td>
+                                            <a asp-controller="Account" asp-action="DisableUser" asp-route-userName="@user.UserName" class="on-default edit-row"><i class="fa fa-pencil-alt" data-toggle="m-tooltip" title="@(user.IsActive ? "Disable this user" : "Enable this user")"></i></a>
+                                        </td>
+                                        @*<td class="center d-lg-none">X</td>*@
+                                    </tr>
+                                }
+
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>

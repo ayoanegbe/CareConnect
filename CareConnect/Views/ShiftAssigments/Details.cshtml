@@ -1,0 +1,55 @@
+﻿@model CareConnect.Models.ShiftAssigment
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+@* 
+<div>
+    <h4>ShiftAssigment</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Shift)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Shift.Duration)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AssignedTo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AssignedTo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AssignedDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AssignedDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDeclined)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsDeclined)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DateDeclined)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateDeclined)
+        </dd>
+    </dl>
+</div> *@
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ShiftAssigmentId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

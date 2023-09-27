@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>@ViewBag.Title</title>
+
+    <!-- Web Fonts  -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
+
+    <!-- Vendor CSS -->
+    <link rel="stylesheet" href="~/vendor/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/vendor/animate/animate.compat.css">
+
+    <link rel="stylesheet" href="~/vendor/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/vendor/boxicons/css/boxicons.min.css" />
+    <link rel="stylesheet" href="~/vendor/magnific-popup/magnific-popup.css" />
+    <link rel="stylesheet" href="~/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.css" />
+
+    <!-- Specific Page Vendor CSS -->
+    <link rel="stylesheet" href="~/vendor/select2/css/select2.css" />
+    <link rel="stylesheet" href="~/vendor/select2-bootstrap-theme/select2-bootstrap.min.css" />
+    <link rel="stylesheet" href="~/vendor/datatables/media/css/dataTables.bootstrap4.css" />
+
+    <!-- Specific Page Vendor CSS -->
+    <link rel="stylesheet" href="~/vendor/jquery-ui/jquery-ui.css" />
+    <link rel="stylesheet" href="~/vendor/jquery-ui/jquery-ui.theme.css" />
+    <link rel="stylesheet" href="~/vendor/bootstrap-multiselect/css/bootstrap-multiselect.css" />
+    <link rel="stylesheet" href="~/vendor/morris/morris.css" />
+    <link rel="stylesheet" href="~/vendor/fullcalendar/fullcalendar.css" />
+    <link rel="stylesheet" href="~/vendor/chartist/chartist.min.css" />   
+
+    <link rel="stylesheet" href="~/vendor/bootstrap-tagsinput/bootstrap-tagsinput.css" />
+    <link rel="stylesheet" href="~/vendor/bootstrap-colorpicker/css/bootstrap-colorpicker.css" />
+    <link rel="stylesheet" href="~/vendor/bootstrap-timepicker/css/bootstrap-timepicker.css" />
+    <link rel="stylesheet" href="~/vendor/dropzone/basic.css" />
+    <link rel="stylesheet" href="~/vendor/dropzone/dropzone.css" />
+    <link rel="stylesheet" href="~/vendor/bootstrap-markdown/css/bootstrap-markdown.min.css" />
+    <link rel="stylesheet" href="~/vendor/summernote/summernote-bs4.css" />
+    <link rel="stylesheet" href="~/vendor/codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="~/vendor/codemirror/theme/monokai.css" />
+
+
+    <!--(remove-empty-lines-end)-->
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="~/css/theme.css" />
+
+    <!-- Theme Layout -->
+    @*<link rel="stylesheet" href="~/css/layouts/modern.css" />*@
+
+    <!-- Theme Custom CSS -->
+    <link rel="stylesheet" href="~/css/custom.css">
+
+    <!-- Head Libs -->
+    <script src="~/vendor/modernizr/modernizr.js"></script>
+    @*<script src="~/master/style-switcher/style.switcher.localstorage.js"></script>*@
+</head>
+<body>
+    <section class="body">
+
+        @await Html.PartialAsync("_HeaderPartial")
+
+        <div class="inner-wrapper">
+            @await Html.PartialAsync("_SidebarPartial")
+
+            @RenderBody()
+
+        </div>
+
+        @await Html.PartialAsync("_SidebarRightPartial")
+        <footer>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; @System.DateTime.Now.Year - Localization</p>
+                </div>
+                <div class="col-md-6 text-right">
+                    @await Html.PartialAsync("_SelectLanguagePartial")
+                </div>
+            </div>
+        </footer>
+    </section>
+
+    <!-- Vendor -->
+    <script src="~/vendor/jquery/jquery.js"></script>
+    <script src="~/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
+    <script src="~/vendor/jquery-cookie/jquery.cookie.js"></script>
+    @*<script src="~/master/style-switcher/style.switcher.js"></script>*@
+    <script src="~/vendor/popper/umd/popper.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="~/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="~/vendor/common/common.js"></script>
+    <script src="~/vendor/nanoscroller/nanoscroller.js"></script>
+    <script src="~/vendor/magnific-popup/jquery.magnific-popup.js"></script>
+    <script src="~/vendor/jquery-placeholder/jquery.placeholder.js"></script>
+
+    <!-- Specific Page Vendor -->
+    <script src="~/vendor/jquery-ui/jquery-ui.js"></script>
+    <script src="~/vendor/jqueryui-touch-punch/jquery.ui.touch-punch.js"></script>
+    <script src="~/vendor/moment/moment.js"></script>
+    <script src="~/vendor/fullcalendar/fullcalendar.js"></script>
+    <script src="~/vendor/jquery-appear/jquery.appear.js"></script>
+    <script src="~/vendor/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+    <script src="~/vendor/jquery.easy-pie-chart/jquery.easypiechart.js"></script>
+    <script src="~/vendor/flot/jquery.flot.js"></script>
+    <script src="~/vendor/flot.tooltip/jquery.flot.tooltip.js"></script>
+    <script src="~/vendor/flot/jquery.flot.pie.js"></script>
+    <script src="~/vendor/flot/jquery.flot.categories.js"></script>
+    <script src="~/vendor/flot/jquery.flot.resize.js"></script>
+    <script src="~/vendor/jquery-sparkline/jquery.sparkline.js"></script>
+    <script src="~/vendor/raphael/raphael.js"></script>
+    <script src="~/vendor/morris/morris.js"></script>
+    <script src="~/vendor/gauge/gauge.js"></script>
+    <script src="~/vendor/snap.svg/snap.svg.js"></script>
+    <script src="~/vendor/liquid-meter/liquid.meter.js"></script>
+    <script src="~/vendor/jqvmap/jquery.vmap.js"></script>
+    <script src="~/vendor/jqvmap/data/jquery.vmap.sampledata.js"></script>
+    <script src="~/vendor/jqvmap/maps/jquery.vmap.world.js"></script>
+    <script src="~/vendor/jqvmap/maps/continents/jquery.vmap.africa.js"></script>
+    <script src="~/vendor/jqvmap/maps/continents/jquery.vmap.asia.js"></script>
+    <script src="~/vendor/jqvmap/maps/continents/jquery.vmap.australia.js"></script>
+    <script src="~/vendor/jqvmap/maps/continents/jquery.vmap.europe.js"></script>
+    <script src="~/vendor/jqvmap/maps/continents/jquery.vmap.north-america.js"></script>
+    <script src="~/vendor/jqvmap/maps/continents/jquery.vmap.south-america.js"></script>
+
+
+
+    <script src="~/vendor/select2/js/select2.js"></script>
+    <script src="~/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+    <script src="~/vendor/datatables/media/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.html5.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.print.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/JSZip-2.5.0/jszip.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/pdfmake-0.1.32/pdfmake.min.js"></script>
+    <script src="~/vendor/datatables/extras/TableTools/pdfmake-0.1.32/vfs_fonts.js"></script>
+
+    <script src="~/vendor/jquery-maskedinput/jquery.maskedinput.js"></script>
+    <script src="~/vendor/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+    <script src="~/vendor/bootstrap-colorpicker/js/bootstrap-colorpicker.js"></script>
+    <script src="~/vendor/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
+    <script src="~/vendor/fuelux/js/spinner.js"></script>
+    <script src="~/vendor/dropzone/dropzone.js"></script>
+    <script src="~/vendor/bootstrap-markdown/js/markdown.js"></script>
+    <script src="~/vendor/bootstrap-markdown/js/to-markdown.js"></script>
+    <script src="~/vendor/bootstrap-markdown/js/bootstrap-markdown.js"></script>
+    <script src="~/vendor/codemirror/lib/codemirror.js"></script>
+    <script src="~/vendor/codemirror/addon/selection/active-line.js"></script>
+    <script src="~/vendor/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="~/vendor/codemirror/mode/javascript/javascript.js"></script>
+    <script src="~/vendor/codemirror/mode/xml/xml.js"></script>
+    <script src="~/vendor/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="~/vendor/codemirror/mode/css/css.js"></script>
+    <script src="~/vendor/summernote/summernote-bs4.js"></script>
+    <script src="~/vendor/bootstrap-maxlength/bootstrap-maxlength.js"></script>
+    <script src="~/vendor/ios7-switch/ios7-switch.js"></script>
+    <script src="~/vendor/chartist/chartist.js"></script>
+
+    <!-- Theme Base, Components and Settings -->
+    <script src="~/js/theme.js"></script>
+
+    <!-- Theme Custom -->
+    <script src="~/js/custom.js"></script>
+
+    <!-- Theme Initialization Files -->
+    <script src="~/js/theme.init.js"></script>
+    <!-- Analytics to Track Preview Website -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-42715764-8', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('#picker').datepicker({ dateFormat: 'dd-mm-yyyy' });
+        });
+    </script>
+    <!-- Examples -->
+
+    <script src="~/js/examples/examples.dashboard.js"></script>
+    <script src="~/js/examples/examples.charts.js"></script>
+    <script src="~/js/examples/caret.calendar.js"></script>
+    <script src="~/js/examples/examples.datatables.default.js"></script>
+    <script src="~/js/examples/examples.datatables.row.with.details.js"></script>
+    <script src="~/js/examples/examples.datatables.tabletools.js"></script>
+
+    <script type="text/javascript">
+
+        $('#firstDropDownId').change(function () {
+            $(function () {
+                $.ajax({
+                    url: '@Url.Action("GetSecondData", "ShiftsController")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { 'firstData': $("#firstDropDownId").val() },
+                    success: function (data) {
+                        var options = $('#secondDropDownId');
+                        options.empty();
+                        $.each(data, function (i, item) {
+                            options.append($('<option />').val(item.Id).text(item.Display));
+                        });
+                    },
+                    error: function (response) {
+                    }
+                });
+
+            });
+        });
+        //});
+
+    </script>
+
+    <script>
+     $("#SelectedRegionID")
+            .change(function () {
+
+                var id = $(this).val();
+                $("#SelectedRegionText").attr("value", $("#SelectedRegionID option:selected").text());
+                $.getJSON('@Url.Action("GetZones", "Test")/' + id, function (data) {
+                    //delete the options of $("#SelectedZoneID") and add new options
+                    $("#SelectedZoneID").empty();
+                    $("#SelectedZoneID").append('<option value="0">select</option>');
+                     $.each(data, function (value, text) {
+                         $("#SelectedZoneID").append('<option value="' + value + '">' + text.text + '</option>');
+                });
+        });
+            });
+        $("#SelectedZoneID").change(function () {
+            $("#SelectedZoneText").attr("value", $("#SelectedZoneID option:selected").text());
+        })
+    </script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

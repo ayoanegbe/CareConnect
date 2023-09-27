@@ -1,0 +1,87 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+
+    string source = (string)ViewData["source"];
+
+}
+
+<div class="panel card-sign">
+    <div class="card-title-sign mt-3 text-right">
+        <h2 class="title text-uppercase font-weight-bold m-0"  style="background-color:navy"><i class="bx bx-user-circle mr-1 text-6 position-relative top-5"></i> Register</h2>
+    </div>
+    <div class="card-body">
+        <form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" asp-route-source="@ViewData["source"]" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" type="text" class="form-control form-control-lg" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" type="text" class="form-control form-control-lg" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" type="email" class="form-control form-control-lg" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Phone"></label>
+                <input asp-for="Phone" type="tel" class="form-control form-control-lg" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(source))
+            {
+                <div class="form-group mb-3">
+                    <label asp-for="Role"></label>
+                    <select asp-for="Role" asp-items="@Html.GetEnumSelectList<UserRole>()">
+                        <option selected="selected" value="">Select Role</option>
+                    </select>
+                </div>
+            }
+
+            <div class="form-group mb-0">
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <label asp-for="Password"></label>
+                        <input asp-for="Password" type="password" autocomplete="off" class="form-control form-control-lg" />
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label asp-for="ConfirmPassword">Password Confirmation</label>
+                        <input asp-for="ConfirmPassword" type="password" autocomplete="off" class="form-control form-control-lg" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                @if (string.IsNullOrEmpty(source))
+                {
+                    <div class="col-sm-8">
+                        <div class="checkbox-custom checkbox-default">
+                            <input id="AgreeTerms" asp-for="Condition" type="checkbox" />
+                            <label for="AgreeTerms">I agree with <a href="#">@Html.DisplayNameFor(m => m.Condition) of use</a></label>
+                        </div>
+                    </div>
+                }
+                <div class="col-sm-4 text-right">
+                    <button type="submit" class="btn btn-primary mt-2" style="background-color:cornflowerblue">Register</button>
+                </div>
+            </div>
+
+            @if (string.IsNullOrEmpty(source))
+            {
+                <p class="text-center">Already have an account? <a asp-controller="Account" asp-action="Login">Sign In!</a></p>
+            }
+
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

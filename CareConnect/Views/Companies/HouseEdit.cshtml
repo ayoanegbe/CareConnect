@@ -1,0 +1,89 @@
+﻿@model House
+
+@inject CustomIDataProtection protector;
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var company = (Company)ViewData["company"];
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Edit House - @company.CompanyName</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-home-alt"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
+                <li><span><a asp-controller="Companies" asp-action="HouseIndex" asp-route-id="@protector.Encode(company.CompanyId.ToString())">Houses</a></span></li>
+                <li><span>Edit House</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <header class="card-header">
+                    <h2 class="card-title">Edit House - @company.CompanyName</h2>
+                </header>
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                    </div>
+                }
+                <div class="card-body">
+                    @* <form asp-action="HouseEdit" asp-route-id="@protector.Encode(company.CompanyId.ToString())" asp-route-houseId="Model.HouseId">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="HouseId" />
+                        <input type="hidden" asp-for="CompanyId" />
+                        <div class="form-group row">
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Company Name</label>
+                            <div class="col-lg-4">
+                                <div class="input-group">
+                                    <input asp-for="HouseName" type="text" class="form-control" />
+                                    <span asp-validation-for="HouseName" class="text-danger" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="checkbox-custom checkbox-default">
+                                    <input  asp-for="IsActive" type="checkbox" />
+                                    <label><a>Click the box to <strong>@(Model.IsActive ? "Deactivate" : "Activate")</strong> this house</a></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Address</label>
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <input asp-for="Address" type="text" class="form-control" />
+                                    <span asp-validation-for="Address" class="text-danger" />
+                                </div>
+                            </div>
+                        </div>
+                         <footer class="card-footer">
+                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue"/>
+                            <a class="btn btn-secondary" asp-action="HouseIndex" asp-route-id="@protector.Encode(Model.CompanyId.ToString())">Cancel</a>
+                        </footer> 
+                    </form> *@
+                </div>
+                
+            </section>
+            
+            
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

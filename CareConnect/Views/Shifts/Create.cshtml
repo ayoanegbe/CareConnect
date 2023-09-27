@@ -1,0 +1,141 @@
+﻿@model Shift
+@{
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>New Shift</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-home-alt"></i>
+                    </a>
+                </li>
+                <li><span>Shifts</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <header class="card-header">
+                    <h2 class="card-title">Add New Shift</h2>
+                </header>
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                    </div>
+                }
+                @* <div class="card-body">
+                    <form asp-action="Create" class="form-horizontal form-bordered" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group row">
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Shift Date</label>
+                            <div class="col-lg-2">
+                                <div class="input-group">
+                                    <input asp-for="ShiftDate" type="date" class="form-control" />
+                                    <span asp-validation-for="ShiftDate" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <label class="control-label text-lg-right pt-2">Staff Needed</label>
+                            <div class="col-lg-1">
+                                <div class="input-group">
+                                    <input asp-for="NumbersNeeded" type="number" class="form-control" min="1" max="5" id="num" readonly/>
+                                    <span asp-validation-for="NumbersNeeded" class="text-danger" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Start Time</label>
+                            <div class="col-lg-2">
+                                <div class="input-group">
+                                    <input asp-for="StartTime" type="time" class="form-control" />
+                                    <span asp-validation-for="StartTime" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <label class="control-label text-lg-right pt-2">Duration (hh:mm)</label>
+                            <div class="col-lg-2">
+                                <div class="input-group">
+                                    <input asp-for="Duration" type="text" class="form-control"  data-plugin-masked-input data-input-mask="99:99" placeholder="00:00" />
+                                    <span asp-validation-for="Duration" class="text-danger" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Company</label>
+                            <div class="col-lg-3">
+                                <div class="input-group">
+                                    <select id="companyId" asp-for="CompanyId" asp-items="ViewBag.CompanyId" class="form-control" required>
+                                        <option selected="selected" value="">Please Select Company</option>
+                                    </select>
+                                    <span asp-validation-for="CompanyId" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <label class="control-label text-lg-right pt-2">House</label>
+                            <div class="col-lg-3">
+                                <div class="input-group">
+                                    <select id="houseId" asp-for="HouseId" asp-items="ViewBag.HouseId" class="form-control" required>
+                                        <option selected="selected" value="">Please Select House</option>
+                                    </select>
+                                    <span asp-validation-for="HouseId" class="text-danger" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Note</label>
+                            <div class="col-lg-7">
+                                <textarea asp-for="Note" class="summernote" data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }'></textarea>
+                                <span asp-validation-for="Note" class="text-danger" />
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <button type="submit" class="btn btn-dark">Submit</button>
+                        </footer>
+                        
+                    </form>
+                </div> *@
+                
+            </section>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        $("#companyId").change(function() {
+            var companyId = $(this).val();
+            console.log("touch down");
+            $.getJSON("/shifts/GetHouseList", { CompanyId: companyId }, function (data) {
+                var item = "";
+                $("#houseId").find('option').not(':first').remove();
+                item += '<option value="">Please Select House</option>'
+                $.each(data, function (i, house) {
+                    console.log("item", house);
+                    item += '<option value="' + house.value + '">' + house.text + '</option>'
+                });
+                $("#houseId").html(item);
+            });
+        });
+
+        document.getElementById("num").addEventListener("change", function() {
+            let v = parseInt(this.value);
+            if (v < 1) this.value = 1;
+            if (v > 5) this.value = 5;
+        });
+    </script>
+}
+

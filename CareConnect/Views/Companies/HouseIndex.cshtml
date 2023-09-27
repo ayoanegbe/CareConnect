@@ -1,0 +1,79 @@
+﻿@model IEnumerable<House>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Index";
+    var company = (Company)ViewData["company"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+		<h2>Houses - @company.CompanyName</h2>
+					
+		<div class="right-wrapper text-right">
+			<ol class="breadcrumbs">
+				<li>
+					<a asp-controller="Home" asp-action="Index">
+						<i class="bx bx-home-alt"></i>
+					</a>
+				</li>
+				<li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
+                <li><span>Houses</span></li>
+			</ol>
+					
+			@*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+		</div>
+	</header>
+    <section class="card">
+        <header class="card-header">								
+			<h2 class="card-title">List of Houses - @company.CompanyName</h2>
+		</header>
+        <div class="card-body">
+            <div class="row">
+				<div class="col-sm-9">
+					<div class="m-0">
+						<a asp-controller="Companies" asp-action="HouseCreate" asp-route-id="@protector.Encode(@company.CompanyId.ToString())" class="btn btn-primary" style="background-color:cornflowerblue">Add A House<i class="fas fa-plus"></i></a>					                    
+					</div>
+				</div>
+			</div>
+			<table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.HouseName)
+                        </th>                        
+                        <th>
+                            @Html.DisplayNameFor(model => model.DateAdded)
+                        </th>
+                        
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model) {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.HouseName)
+                            </td>
+                                
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateAdded)
+                            </td>
+                                
+                            <td>
+                                <a asp-action="HouseEdit" asp-route-id="@protector.Encode(item.HouseId.ToString())" style="color:magenta">Edit</a> 
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-action="Index"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>
+
+

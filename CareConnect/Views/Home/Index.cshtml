@@ -1,0 +1,270 @@
+﻿@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var shifts = (IEnumerable<Shift>)ViewData["shifts"];
+    var shifts2 = (IEnumerable<Shift>)ViewData["shifts"];
+    var statisticsData = (StatisticsDataViewModel)ViewData["statisticsData"];
+
+    int i = 1;
+
+    var strData = ViewData["strChart"];
+
+    var user = await UserManager.GetUserAsync(User);
+    var userShifts = (IEnumerable<Shift>)ViewData["userShifts"];
+}
+
+
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Dashboard</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-home-alt"></i>
+                    </a>
+                </li>
+                <li><span>Dashboard</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+
+    @if (!await UserManager.IsInRoleAsync(user, "User"))
+    {
+        <div class="row">
+            <div class="col-lg-6 mb-3">
+                <section class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="chart-data-selector" id="salesSelectorWrapper">
+                                    <h2>
+                                        Shifts
+                                    </h2>
+
+                                    <div id="salesSelectorItems" class="chart-data-selector-items mt-3">
+                                        <div class="chart chart-sm" data-sales-rel="CareConnect Admin" id="flotDashSales1" style="height: 210px;"></div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-6">
+                <div class="row mb-3">
+                    <div class="col-xl-6">
+                        <section class="card card-featured-left card-featured-primary mb-3">
+                            <div class="card-body">
+                                <div class="widget-summary">
+                                    <div class="widget-summary-col widget-summary-col-icon">
+                                        <div class="summary-icon bg-primary">
+                                            <i class="fas fa-life-ring"></i>
+                                        </div>
+                                    </div>
+                                    <div class="widget-summary-col">
+                                        <div class="summary">
+                                            <h4 class="title">Total Shifts</h4>
+                                            <div class="info">
+                                                <strong class="amount">@statisticsData.TotalShifts</strong>
+                                                @*<span class="text-primary">(14 unread)</span>*@
+                                            </div>
+                                        </div>
+                                        <div class="summary-footer">
+                                            <a class="text-muted text-uppercase" href="#">(view all)</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-xl-6">
+                        <section class="card card-featured-left card-featured-secondary">
+                            <div class="card-body">
+                                <div class="widget-summary">
+                                    <div class="widget-summary-col widget-summary-col-icon">
+                                        <div class="summary-icon bg-secondary">
+                                            <i class="fas fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <div class="widget-summary-col">
+                                        <div class="summary">
+                                            <h4 class="title">Total Assigned Shifts</h4>
+                                            <div class="info">
+                                                <strong class="amount">@statisticsData.TotalAssignedShifts</strong>
+                                            </div>
+                                        </div>
+                                        <div class="summary-footer">
+                                            <a class="text-muted text-uppercase" href="#">(view all)</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-6">
+                        <section class="card card-featured-left card-featured-tertiary mb-3">
+                            <div class="card-body">
+                                <div class="widget-summary">
+                                    <div class="widget-summary-col widget-summary-col-icon">
+                                        <div class="summary-icon bg-primary">
+                                            <i class="fas fa-adjust"></i>
+                                        </div>
+                                    </div>
+                                    <div class="widget-summary-col">
+                                        <div class="summary">
+                                            <h4 class="title">Today's Shifts</h4>
+                                            <div class="info">
+                                                <strong class="amount">@statisticsData.TodayShifts</strong>
+                                            </div>
+                                        </div>
+                                        <div class="summary-footer">
+                                            <a class="text-muted text-uppercase" href="#">(view all)</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-xl-6">
+                        <section class="card card-featured-left card-featured-quaternary">
+                            <div class="card-body">
+                                <div class="widget-summary">
+                                    <div class="widget-summary-col widget-summary-col-icon">
+                                        <div class="summary-icon bg-secondary">
+                                            <i class="fas fa-box-tissue"></i>
+                                        </div>
+                                    </div>
+                                    <div class="widget-summary-col">
+                                        <div class="summary">
+                                            <h4 class="title">Declined Shifts</h4>
+                                            <div class="info">
+                                                <strong class="amount">@statisticsData.TotalUnassignedShifts</strong>
+                                            </div>
+                                        </div>
+                                        <div class="summary-footer">
+                                            <a class="text-muted text-uppercase" href="#">(view all)</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    
+
+    <div class="row pt-4 mt-1">
+
+        <div class="col-xl-12">
+            <section class="card">
+                <header class="card-header card-header-transparent">
+                    <h2 class="card-title">Available Shifts</h2>
+                </header>
+                <div class="card-body">
+                    <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Start Date</th>
+                                <th>Start Time</th>
+                                <th>End Date</th>
+                                <th>End Time</th>
+                                <th>Staff Needed</th>
+                                <th>Note</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           @*  @foreach (var item in shifts)
+                            {
+                                <tr>
+                                    <td>@(i++)</td>
+                                    <td>@string.Format("{0:dd/MM/yyyy}", item.ShiftDate)</td>
+                                    <td>@string.Format("{0:hh:mm tt}", item.StartTime)</td>
+                                    <td>@string.Format("{0:dd/MM/yyyy}", item.EndTime)</td>
+                                    <td>@string.Format("{0:hh:mm tt}", item.EndTime)</td>
+                                    <td> @Html.DisplayFor(modelItem => item.NumbersNeeded)</td>
+                                    <td>@Html.Raw(item.Note)</td>
+                                    <td>
+                                        <a asp-action="Shift" asp-route-id="@item.ShiftId" style="color:magenta">View</a>
+                                    </td>
+                                </tr>
+                            } *@
+
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    @if (await UserManager.IsInRoleAsync(user, "User"))
+    {
+       <div class="row pt-4 mt-1">
+
+            <div class="col-xl-12">
+                <section class="card">
+                    <header class="card-header card-header-transparent">
+                        <h2 class="card-title">My Shifts</h2>
+                    </header>
+                    <div class="card-body">
+                        <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Start Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Date</th>
+                                    <th>End Time</th>
+                                    <th>Declined?</th>
+                                    <th>Note</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @* @foreach (var item in userShifts)
+                                {
+                                    <tr>
+                                        <td>@(i++)</td>
+                                        <td>@string.Format("{0:dd/MM/yyyy}", item.ShiftDate)</td>
+                                        <td>@string.Format("{0:hh:mm tt}", item.StartTime)</td>
+                                        <td>@string.Format("{0:dd/MM/yyyy}", item.EndTime)</td>
+                                        <td>@string.Format("{0:hh:mm tt}", item.EndTime)</td>
+                                        <td> @Html.DisplayFor(modelItem => item.ShiftAssigment.IsDeclined)</td>
+                                        <td>@Html.Raw(item.Note)</td>
+                                        <td>
+                                            <a asp-action="Shift" asp-route-id="@item.ShiftId">View</a>
+                                        </td>
+                                    </tr>
+                                } *@
+
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div> 
+    }
+    
+</section>
+
+<script>
+
+    var flotDashSales1Data = [{
+        data: @Html.Raw(strData),
+        color: "#0559AD"
+    }];
+
+</script>

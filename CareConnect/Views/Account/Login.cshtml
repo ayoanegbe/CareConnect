@@ -1,0 +1,68 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+
+@model LoginViewModel
+
+
+@{
+    ViewData["Title"] = "Log in";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="panel card-sign">
+    <div class="card-title-sign mt-3 text-right">
+        <h2 class="title text-uppercase font-weight-bold m-0" style="background-color:navy"><i class="bx bx-user-circle mr-1 text-6 position-relative top-5"></i> Sign In</h2>
+    </div>
+    <div class="card-body">
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="Email"></label>
+                <div class="input-group">
+                    <input asp-for="Email" type="email" class="form-control form-control-lg" autocomplete="off" />
+                    <span class="input-group-append">
+                        <span class="input-group-text">
+                            <i class="bx bx-user text-4"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="clearfix">
+                    <label asp-for="Password" class="float-left"></label>
+                    <a asp-controller="Account" asp-action="ForgotPassword" class="float-right" style="color:#808080">Forgot Password?</a>
+                </div>
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control form-control-lg" autocomplete="off" />
+                    <span class="input-group-append">
+                        <span class="input-group-text">
+                            <i class="bx bx-lock text-4"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-8">
+                    <div class="checkbox-custom checkbox-default">
+                        <input id="RememberMe" type="checkbox" asp-for="RememberMe" />
+                        <label for="RememberMe">@Html.DisplayNameFor(m => m.RememberMe)</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 text-right">
+                    <button type="submit" class="btn btn-primary mt-2" style="background-color:cornflowerblue">Sign In</button>
+                </div>
+            </div>
+
+
+
+            @*<p class="text-center">Don't have an account yet? <a asp-controller="Account" asp-action="Register">Register!</a></p>*@
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

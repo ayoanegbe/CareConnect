@@ -1,0 +1,100 @@
+﻿@model IEnumerable<Shift>
+@{
+    int i = 1;
+    var dateRange = new DateRangeViewModel();
+
+    dateRange.StartDate = DateTime.UtcNow.AddDays(-7);
+    dateRange.EndDate = DateTime.UtcNow;
+
+    
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Reports</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-home-alt"></i>
+                    </a>
+                </li>
+                <li><span>Activity Report</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <section class="card">
+        <div class="card-body">
+            <div class="row pt-4 mt-1">
+
+                <div class="col-xl-12">
+                    <section class="card">
+                        <header class="card-header card-header-transparent">
+                            <h2 class="card-title">Activity Report</h2>
+                        </header>
+                        
+                        <div class="card-body">
+                            <form asp-action="ActivityReport" asp-route-dateRange="@dateRange">
+                                <div class="form-group row">
+									<label class="col-lg-0 control-label text-lg-right pt-2">Date range</label>
+									<div class="col-lg-6">
+										<div class="input-daterange input-group">
+											@*<span class="input-group-prepend">
+												<span class="input-group-text">
+													<i class="fas fa-calendar-alt"></i>
+												</span>
+											</span>*@
+											<input type="date" class="form-control" asp-for="@dateRange.StartDate">
+											<span class="input-group-text border-left-0 border-right-0 rounded-0">
+												to
+											</span>
+											<input type="date" class="form-control" asp-for="@dateRange.EndDate">
+                                            <span class="input-group-append">
+												<button class="btn btn-success" type="submit">Go!</button>
+											</span>
+										</div>
+									</div>
+								</div>
+                            </form>
+                            @* <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Start Date</th>
+                                        <th>Start Time</th>
+                                        <th>End Date</th>
+                                        <th>End Time</th>
+                                        <th>Company</th>
+                                        <th>House</th>
+                                        <th>Worker</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@(i++)</td>
+                                            <td>@string.Format("{0:dd/MM/yyyy}", item.ShiftDate)</td>
+                                            <td>@string.Format("{0:hh:mm tt}", item.StartTime)</td>
+                                            <td>@string.Format("{0:dd/MM/yyyy}", item.EndTime)</td>
+                                            <td>@string.Format("{0:hh:mm tt}", item.EndTime)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Company.CompanyName)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.House.HouseName)</td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.ShiftAssigment.AssignedTo)
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table> *@
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
