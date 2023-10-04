@@ -59,21 +59,33 @@ namespace CareConnect.Controllers
             _emailSender = emailSender;
             _emailSettings = emailSettings;
         }
-        public async Task<IActionResult> Index(int? id) // find a way to pass organization ID
+        public async Task<IActionResult> Index(string id) // pass organization ID
         {
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
             return View(
-                await _context.Employees.Where(x => x.OrganizationId == id)
+                await _context.Employees.Where(x => x.OrganizationId == num)
                 .Include(d => d.Department)
                 .Include(j => j.JobTitle)
                 .ToListAsync());
         }
 
-        public IActionResult AddEmployee(int? id) // find a way to pass organization ID
+        public IActionResult AddEmployee(string id) //  pass organization ID
         {
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
             Employee employee = new();
 
-            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == id), "DepartmentId", "Name");
-            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == id), "JobTitleId", "Title");
+            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == num), "DepartmentId", "Name");
+            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == num), "JobTitleId", "Title");
 
             return View(employee);
         }
@@ -124,20 +136,13 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var employee = await _context.Employees.Include(m => m.Department).Include(t => t.JobTitle).FirstOrDefaultAsync(x => x.EmployeeId == decodedNumber);
+            var employee = await _context.Employees.Include(m => m.Department).Include(t => t.JobTitle).FirstOrDefaultAsync(x => x.EmployeeId == num);
             if (employee == null)
             {
                 return NotFound();
@@ -153,20 +158,13 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditEmployee(string id, [Bind("EmployeeId,DepartmentId,JobTitleId,FirstName,MiddleName,LastName,Gender,BirthDate,Address,City,PostCode,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,DateJoined,Status,ContractorType,ImmigrationStatus,SocialInsuranceNumber,LineManagerId,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber,PaymentFrequency")] Employee employee)
         {
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (decodedNumber != employee.EmployeeId)
+            if (num != employee.EmployeeId)
             {
                 return NotFound();
             }
@@ -221,12 +219,18 @@ namespace CareConnect.Controllers
             return View(await _context.Vacancies.Include(d => d.Department).Include(t => t.JobTitle).ToListAsync());
         }
         
-        public IActionResult AddVancancy(int id) // find a way to pass organization ID
+        public IActionResult AddVancancy(string id) // pass organization ID
         {
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
             Vacancy vacancy = new();
 
-            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == id), "DepartmentId", "Name");
-            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == id), "JobTitleId", "Title");
+            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == num), "DepartmentId", "Name");
+            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == num), "JobTitleId", "Title");
 
             return View(vacancy);
         }
@@ -277,20 +281,13 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var vacancy = await _context.Vacancies.Include(m => m.Department).Include(t => t.JobTitle).FirstOrDefaultAsync(x => x.VacancyId == decodedNumber);
+            var vacancy = await _context.Vacancies.Include(m => m.Department).Include(t => t.JobTitle).FirstOrDefaultAsync(x => x.VacancyId == num);
             if (vacancy == null)
             {
                 return NotFound();
@@ -306,20 +303,13 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditVacancy(string id, [Bind("VacancyId,JobTitleId,DepartmentId.JobDescription,Requirements,Status")] Vacancy vacancy)
         {
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (decodedNumber != vacancy.VacancyId)
+            if (num != vacancy.VacancyId)
             {
                 return NotFound();
             }
@@ -578,7 +568,7 @@ namespace CareConnect.Controllers
             return View(await _context.Applicants.Include(x => x.Vacancy).ToListAsync());
         }
 
-        public async Task<IActionResult> ListApplications(string searchString)
+        public async Task<IActionResult> ListApplications(string searchString) //  encrpt string
         {
             var applicants = from app in _context.Applicants
                              select app;
@@ -590,15 +580,21 @@ namespace CareConnect.Controllers
             return View(await applicants.ToListAsync());
         }
 
-        public async Task<IActionResult> ViewApplication(int? id)
+        public async Task<IActionResult> ViewApplication(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
             var applicant = await _context.Applicants
-                .FirstOrDefaultAsync(x => x.ApplicantId == id);
+                .FirstOrDefaultAsync(x => x.ApplicantId == num);
             if (applicant == null)
             {
                 return NotFound();
@@ -607,14 +603,20 @@ namespace CareConnect.Controllers
             return View(applicant);
         }
 
-        public async Task<IActionResult> Download(int? id, string fileType = null)
+        public async Task<IActionResult> Download(string id, string fileType = null)
         {
             if (id == null)
                 return Content("file name not present");
             if (fileType == null) { return Content("file type not known"); }
 
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
             var fileUpload = await _context.Applicants
-                .FirstOrDefaultAsync(m => m.ApplicantId == id);
+                .FirstOrDefaultAsync(m => m.ApplicantId == num);
             if (fileUpload == null)
             {
                 return NotFound();
@@ -701,20 +703,13 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var interview = await _context.Interviews.Include(m => m.Applicant).FirstOrDefaultAsync(x => x.InterviewId == decodedNumber);
+            var interview = await _context.Interviews.Include(m => m.Applicant).FirstOrDefaultAsync(x => x.InterviewId == num);
             if (interview == null)
             {
                 return NotFound();
@@ -729,20 +724,13 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditInterview(string id, [Bind("InterviewId,ApplicationId,InterviewDate,InterviewTime,Note")] Interview interview)
         {
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (decodedNumber != interview.InterviewId)
+            if (num != interview.InterviewId)
             {
                 return NotFound();
             }
@@ -836,20 +824,13 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var interviewer = await _context.Interviewers.Include(m => m.Employee).FirstOrDefaultAsync(x => x.InterviewId == decodedNumber);
+            var interviewer = await _context.Interviewers.Include(m => m.Employee).FirstOrDefaultAsync(x => x.InterviewId == num);
             if (interviewer == null)
             {
                 return NotFound();
@@ -864,20 +845,13 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditInterviewer(string id, [Bind("InterviewerId,InterviewId,EmployeeId,IsAvailable")] Interviewer interviewer)
         {
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (decodedNumber != interviewer.InterviewerId)
+            if (num != interviewer.InterviewerId)
             {
                 return NotFound();
             }
@@ -932,20 +906,13 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var interviewer = await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewId == decodedNumber);
+            var interviewer = await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewId == num);
             if (interviewer == null)
             {
                 return NotFound();
@@ -958,22 +925,15 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveInterviewerConfirmed(string id)
         {
-            string decodedString = string.Empty;
-            int decodedNumber = 0;
-            try
+            int num = Resolver(id);
+            if (num == 0)
             {
-                decodedString = _protector.Decode(id);
-                decodedNumber = int.Parse(decodedString);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
             var user = await _userManager.GetUserAsync(User);
 
-            var interviewer = await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewId == decodedNumber);
+            var interviewer = await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewId == num);
 
             var oldValue = JsonConvert.SerializeObject(interviewer);
 
@@ -1023,6 +983,21 @@ namespace CareConnect.Controllers
         public bool VacancyExists(int id)
         {
             return _context.Vacancies.Any(x => x.VacancyId == id);
+        }
+
+        private int Resolver(string id)
+        {
+            try
+            {
+                string decodedString = _protector.Decode(id);
+                int decodedNumber = int.Parse(decodedString);
+                return decodedNumber;
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                return 0;
+            }
         }
     }
 }
