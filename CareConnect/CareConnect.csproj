@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Setup\**" />
-    <Content Remove="Views\Setup\**" />
-    <EmbeddedResource Remove="Views\Setup\**" />
-    <None Remove="Views\Setup\**" />
-    <TypeScriptCompile Remove="Views\Setup\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="wwwroot\vendor\simple-line-icons\node_modules\less\bower.json" />
     <Content Include="wwwroot\vendor\simple-line-icons\node_modules\less\package.json" />
     <Content Include="wwwroot\vendor\simple-line-icons\node_modules\less\test\browser\css\global-vars\simple.css" />

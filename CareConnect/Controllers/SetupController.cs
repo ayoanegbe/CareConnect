@@ -43,138 +43,23 @@ namespace CareConnect.Controllers
             _audit = audit;
         }
 
-        ////Case Manager
-        //public async Task<IActionResult> ListCaseManagers()
-        //{
-        //    return View(await _context.CaseManagers.Include(m => m.Employee).ToListAsync());
-        //}
-
-        //// Case Manager
-        //public IActionResult AddCaseManager()
-        //{
-        //    CaseManager caseManager = new();
-
-        //    ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FullName");
-
-        //    return View(caseManager);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> AddCaseManager([Bind("CaseManagerId,OrganizationId,EmployeeId")] CaseManager caseManager)
-        //{
-        //    var user = await _userManager.GetUserAsync(User);
-
-        //    if (user.OrganizationId != null)
-        //    {
-        //        caseManager.OrganizationId = (int)user.OrganizationId;
-        //    }
-
-        //    caseManager.AddedBy = user.UserName;
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        await _context.AddAsync(caseManager);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(ListCaseManagers));
-        //    }
-
-        //    ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FullName", caseManager.EmployeeId);
-
-        //    return View(caseManager);
-        //}
-
-        //public async Task<IActionResult> EditCaseManager(string id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    string decodedString = string.Empty;
-        //    int decodedNumber = 0;
-        //    try
-        //    {
-        //        decodedString = _protector.Decode(id);
-        //        decodedNumber = int.Parse(decodedString);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-        //    }
-
-        //    var caseManager = await _context.CaseManagers.Include(m => m.Employee).FirstOrDefaultAsync(x => x.CaseManagerId == decodedNumber);
-        //    if (caseManager == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FullName", caseManager.EmployeeId);
-
-        //    return View(caseManager);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> EditCaseManager(string id, [Bind("CaseManagerId,OrganizationId,EmployeeId")] CaseManager caseManager)
-        //{
-        //    string decodedString = string.Empty;
-        //    int decodedNumber = 0;
-        //    try
-        //    {
-        //        decodedString = _protector.Decode(id);
-        //        decodedNumber = int.Parse(decodedString);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-        //    }
-
-        //    if (decodedNumber != caseManager.CaseManagerId)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var user = await _userManager.GetUserAsync(User);
-        //    caseManager.UpdatedBy = user.UserName;
-        //    caseManager.DateUpdated = DateTime.UtcNow;
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(caseManager);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException ex)
-        //        {
-        //            if (!CaseManagerExists(caseManager.CaseManagerId))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-        //                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(ListCaseManagers));
-        //    }
-
-        //    return View(caseManager);
-        //}
-
         // Client
         public async Task<IActionResult> ListClients()
         {
-            return View(await _context.Clients.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Clients.Include(x => x.Customer).Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
-        public IActionResult AddClient()
+        public async Task<IActionResult> AddClient()
         {
+            var user = await _userManager.GetUserAsync(User);
+
             Client client = new();
+
+            ViewData["CustomerId"] = new SelectList(_context.Customers.Where(x => x.OrganizationId == user.OrganizationId), "CustomerId", "Name");
+            ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName");
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name");
 
             return View(client);
         }
@@ -228,13 +113,18 @@ namespace CareConnect.Controllers
                             $"An error has occurred when trying to write into {client.GetType().Name} table",
                             ex);
             }
-            
+
+            ViewData["CustomerId"] = new SelectList(_context.Customers.Where(x => x.OrganizationId == user.OrganizationId), "CustomerId", "Name", client.CustomerId);
+            ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName", client.HouseId);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", client.CurrencyId);
 
             return View(client);
         }
 
         public async Task<IActionResult> EditClient(string id)
         {
+            var user = await _userManager.GetUserAsync(User);
+
             if (id == null)
             {
                 return NotFound();
@@ -258,6 +148,10 @@ namespace CareConnect.Controllers
             {
                 return NotFound();
             }
+
+            ViewData["CustomerId"] = new SelectList(_context.Customers.Where(x => x.OrganizationId == user.OrganizationId), "CustomerId", "Name", client.CustomerId);
+            ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName", client.HouseId);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", client.CurrencyId);
 
             return View(client);
         }
@@ -332,6 +226,10 @@ namespace CareConnect.Controllers
                     "Try again, and if the problem persists, " +
                     "see your system administrator.";
             }
+
+            ViewData["CustomerId"] = new SelectList(_context.Customers.Where(x => x.OrganizationId == user.OrganizationId), "CustomerId", "Name", client.CustomerId);
+            ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName", client.HouseId);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", client.CurrencyId);
 
             return View(client);
         }
@@ -463,7 +361,9 @@ namespace CareConnect.Controllers
         // Customers
         public async Task<IActionResult> ListCustomers()
         {
-            return View(await _context.Customers.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Customers.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddCustomer()
@@ -611,7 +511,9 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListDepartments()
         {
-            return View(await _context.Departments.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Departments.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddDepartment()
@@ -737,7 +639,9 @@ namespace CareConnect.Controllers
         // Houses
         public async Task<IActionResult> ListHouses()
         {
-            return View(await _context.Houses.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Houses.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddHouse()
@@ -749,7 +653,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddHouse([Bind("HouseId,HouseName,Organization,CompanyId,Address,City,PostCode,Longitude,Latitude")] House house)
+        public async Task<IActionResult> AddHouse([Bind("HouseId,HouseName,Organization,Address,City,PostCode,Longitude,Latitude")] House house)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -864,7 +768,9 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListJobTitles()
         {
-            return View(await _context.JobTitles.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.JobTitles.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddJobTile()
@@ -1115,7 +1021,9 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListPayGrades()
         {
-            return View(await _context.PayGrades.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddPayGrade()
@@ -1242,7 +1150,9 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListPayGradeLevels()
         {
-            return View(await _context.PayGradeLevels.Include(x => x.PayGrade).Include(c => c.Currency).ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.PayGradeLevels.Include(x => x.PayGrade).Include(c => c.Currency).Where(x => x.PayGrade.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddPayGradeLevel()
@@ -1276,7 +1186,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name", gradeLevel.PayGradeId);
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId), "PayGradeId", "Name", gradeLevel.PayGradeId);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", gradeLevel.CurrencyId);
 
             return View(gradeLevel);
@@ -1284,6 +1194,8 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> EditPayGradeLevel(string id)
         {
+            var user = await _userManager.GetUserAsync(User);
+
             if (id == null)
             {
                 return NotFound();
@@ -1308,7 +1220,7 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name", gradeLevel.PayGradeId);
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId), "PayGradeId", "Name", gradeLevel.PayGradeId);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", gradeLevel.CurrencyId);
 
             return View(gradeLevel);
@@ -1318,6 +1230,8 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPayGradeLevel(string id, [Bind("PayGradeLevelId,PayGradeId,Description,PayLevel,BasicSalary,HourlyRate,OvertimeRate,CurrencyId")] PayGradeLevel gradeLevel)
         {
+            var user = await _userManager.GetUserAsync(User);
+
             string decodedString = string.Empty;
             int decodedNumber = 0;
             try
@@ -1364,7 +1278,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name", gradeLevel.PayGradeId);
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId), "PayGradeId", "Name", gradeLevel.PayGradeId);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", gradeLevel.CurrencyId);
 
             return View(gradeLevel);
@@ -1758,6 +1672,14 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTenant([Bind("TenantId,Name")] Tenant tenant)
         {
+            string tenantName = Utils.RemoveSpecialCharacters2(tenant.Name);
+
+            if (_context.Tenants.Any(x => x.Name.Equals(tenantName)))
+            {
+                ViewBag.Message = "Tenant name not unique.";
+                return View(tenant);
+            }
+
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(tenant);

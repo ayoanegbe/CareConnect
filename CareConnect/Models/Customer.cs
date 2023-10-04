@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CareConnect.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CareConnect.Models
@@ -10,6 +11,9 @@ namespace CareConnect.Models
         [ForeignKey("Customer_Organization")]
         public int OrganizationId { get; set; }
         public Organization Organization { get; set; }
+        [Required]
+        [Display(Name = "Customer Type")]
+        public CustomerType CustomerType { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

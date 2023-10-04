@@ -1,0 +1,96 @@
+﻿@model Currency
+
+@{
+    ViewData["Title"] = "Add New Currency";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body card-margin">
+    <header class="page-header">
+        <h2>Add New Currency</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Setup" asp-action="ListCurrencies">
+                        <i class="bx bx-radar"></i>
+                    </a>
+                </li>
+                @* <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
+                <li><span>New Client</span></li> *@
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <header class="card-header">
+                    <h2 class="card-title">Add New Currency</h2>
+                </header>
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                    </div>
+                }
+                <div class="card-body">
+                    <form asp-action="AddCurrency" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Name"></label>
+                                <div class="input-group">
+                                    <input asp-for="Name" type="text" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Code"></label>
+                                <div class="input-group">
+                                    <div class="input-group">
+                                        <input asp-for="Code" type="text" class="form-control" />
+                                        <span asp-validation-for="Code" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Symbols"></label>
+                                <div class="input-group">
+                                    <div class="input-group">
+                                        <input asp-for="Symbols" type="text" class="form-control" />
+                                        <span asp-validation-for="Symbols" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <footer class="card-footer text-right">
+                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                            <a class="btn btn-secondary" asp-action="ListCurrencies">Cancel</a>
+                        </footer>
+                    </form>
+                </div>
+
+            </section>
+
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

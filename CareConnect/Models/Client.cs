@@ -16,6 +16,8 @@ namespace CareConnect.Models
         public Organization Organization { get; set; }
         public int? HouseId { get; set; }
         public House House { get; set; } = null;
+        [Required]
+        [Display(Name = "Residential Type")]
         public ResidentialType ResidentialType { get; set; } = ResidentialType.GroupHome;
         [Required]
         [Display(Name = "First Name")]
@@ -43,7 +45,7 @@ namespace CareConnect.Models
         [Display(Name = "Emergency Contact Address")]
         public string EmergencyContactAddress { get; set; }
         [Display(Name = "Relationship To Client")]
-        public string Relationship { get; set; }
+        public RelationshipType Relationship { get; set; }
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Guadian Phone Number")]
         public string GuadianPhoneNumber { get; set; }

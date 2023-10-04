@@ -29,6 +29,19 @@ namespace CareConnect.Services
             return sb.ToString();
         }
 
+        public static string RemoveSpecialCharacters2(string str)
+        {
+            StringBuilder sb = new();
+            foreach (char c in str)
+            {
+                if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+
         public static bool IsNumeric(this string s)
         {
             foreach (char c in s)

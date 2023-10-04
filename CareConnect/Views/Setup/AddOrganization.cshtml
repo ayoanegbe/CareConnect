@@ -1,0 +1,134 @@
+﻿@model Organization
+
+@{
+    ViewData["Title"] = "Add New Organization";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body card-margin">
+    <header class="page-header">
+        <h2>Add New Organization</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Setup" asp-action="ListOrganizations">
+                        <i class="bx bx-radar"></i>
+                    </a>
+                </li>
+                @* <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
+                <li><span>New Client</span></li> *@
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <header class="card-header">
+                    <h2 class="card-title">Add New Organization</h2>
+                </header>
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                    </div>
+                }
+                <div class="card-body">
+                    <form asp-action="AddOrganization" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="Name"></label>
+                                <div class="input-group">
+                                    <input asp-for="Name" type="text" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger" />
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Tenant"></label>
+                                <div class="input-group">
+                                    <select asp-for="Tenant" asp-items="ViewBag.TenantId" class="form-control">
+                                        <option selected="selected" value="">Please Select Tenant</option>
+                                    </select>
+                                    <span asp-validation-for="Tenant" class="text-danger" />
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="Address"></label>
+                                <div class="input-group">
+                                    <input asp-for="Address" type="text" class="form-control" />
+                                    <span asp-validation-for="Address" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Website"></label>
+                                <div class="input-group">
+                                    <input asp-for="Website" type="text" class="form-control" />
+                                    <span asp-validation-for="Website" class="text-danger" />
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Email"></label>
+                                <div class="input-group">
+                                    <input asp-for="Email" type="text" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Phone"></label>
+                                <div class="input-group">
+                                    <input asp-for="Phone" type="text" class="form-control" />
+                                    <span asp-validation-for="Phone" class="text-danger" />
+                                </div>
+                            </div>
+
+                            @*
+                            <div class="col-lg-4">
+                            <div class="checkbox-custom checkbox-default">
+                            <input asp-for="IsActive" type="checkbox" />
+                            <label><a>Click the box to <strong>@(Model.IsActive ? "Deactivate" : "Activate")</strong> this Tenant</a></label>
+                            </div>
+                            </div>
+                            *@
+                        </div>
+
+                        <footer class="card-footer text-right">
+                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                            <a class="btn btn-secondary" asp-action="ListOrganizations">Cancel</a>
+                        </footer>
+                    </form>
+                </div>
+
+            </section>
+
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
