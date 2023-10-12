@@ -38,12 +38,13 @@ namespace CareConnect.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
 
         private readonly IStringLocalizer<HomeController> _localizer;
+        private readonly ITenantContext _tenantContext;
 
-        private readonly DateTime startDate = DateTime.Today.AddDays(DATE_DEDUCT);
-        private readonly DateTime endDate = DateTime.UtcNow;
+        //private readonly DateTime startDate = DateTime.Today.AddDays(DATE_DEDUCT);
+        //private readonly DateTime endDate = DateTime.UtcNow;
 
-        [TempData]
-        private string anonymousUser { get; set; }
+        //[TempData]
+        //private string anonymousUser { get; set; }
 
         const int COUNT = 4;
 
@@ -61,7 +62,8 @@ namespace CareConnect.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
-            IStringLocalizer<HomeController> localizer
+            IStringLocalizer<HomeController> localizer,
+            ITenantContext tenantContext
             )
         {
             _context = context;
@@ -78,16 +80,17 @@ namespace CareConnect.Controllers
             _signInManager = signInManager;
             _roleManager = roleManager;
             _localizer = localizer;
+            _tenantContext = tenantContext;
         }
 
         //[Route("Home/Dashboard")]
         public IActionResult Index()
         {
-            DateRangeViewModel dateRangeView = new DateRangeViewModel()
-            {
-                StartDate = startDate,
-                EndDate = endDate
-            };
+            //DateRangeViewModel dateRangeView = new ()
+            //{
+            //    StartDate = startDate,
+            //    EndDate = endDate
+            //};
 
             //var shifts = await _context.Shifts.Where(x => x.ShiftDate >= DateTime.Today && x.StartTime >= DateTime.UtcNow).ToListAsync();
 

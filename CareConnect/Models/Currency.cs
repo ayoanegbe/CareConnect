@@ -8,10 +8,11 @@ namespace CareConnect.Models
         public int CurrencyId { get; set; }
         [Required]
         public string Code { get; set;}
+        [Required]
         public string Name { get; set;}
         public string Symbols { get; set;} = string.Empty;
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         [Display(Name = "Added By")]

@@ -43,5 +43,8 @@ namespace CareConnect.Models.AccountViewModels
         public bool Condition { get; set; } = false;
 
         public UserRole Role { get; set; } = UserRole.User;
+
+        public int OrganizationId { get; set; }
+        public Organization Organization { get; set; }
     }
 }

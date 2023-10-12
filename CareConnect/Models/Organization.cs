@@ -8,10 +8,12 @@ namespace CareConnect.Models
         [Key]
         public int OrganizationId { get; set; }
         [ForeignKey("Organization_Tenant")]
+        [Display(Name = "Tenant")]
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; }
         [Required]
         public string Name { get; set; }
+        [Required]
         public string Address { get; set; }
         [Required]
         public string Email { get; set; }
@@ -20,7 +22,7 @@ namespace CareConnect.Models
         public string Website { get; set; }
         public bool IsActive { get; set; } = true;
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         public DateTime? DateAssigned { get; set; }

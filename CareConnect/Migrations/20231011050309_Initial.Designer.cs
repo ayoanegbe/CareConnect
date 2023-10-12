@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CareConnect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230927035620_Update2")]
-    partial class Update2
+    [Migration("20231011050309_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -396,8 +396,8 @@ namespace CareConnect.Migrations
                     b.Property<string>("Psychiatrist")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Relationship")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Relationship")
+                        .HasColumnType("int");
 
                     b.Property<int>("ResidentialType")
                         .HasColumnType("int");
@@ -513,6 +513,7 @@ namespace CareConnect.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Symbols")
@@ -549,6 +550,9 @@ namespace CareConnect.Migrations
 
                     b.Property<string>("ContactPersonPhone")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -1348,6 +1352,7 @@ namespace CareConnect.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateAdded")
@@ -1934,6 +1939,9 @@ namespace CareConnect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubscriptionId"), 1L, 1);
 
+                    b.Property<bool>("AutoRenewal")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -2053,10 +2061,11 @@ namespace CareConnect.Migrations
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ApiKey")
+                    b.Property<Guid?>("ApiKey")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("DateAdded")
+                    b.Property<DateTime?>("DateAdded")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateAssigned")

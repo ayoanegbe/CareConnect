@@ -1,0 +1,114 @@
+﻿@model SubscriptionRate
+
+@{
+    ViewData["Title"] = "Add New Subscription Rate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>New Subscription Rate</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="Setup" asp-action="ListSubscriptionRates">Subscription Rates</a></span></li>
+                <li><span>New Subscription Rate</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-action="AddSubscriptionRate" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Subscription Rate</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+                    
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Type"></label>
+                                <select asp-for="Type" asp-items="Html.GetEnumSelectList<SubscriptionType>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Subscription Type</option>
+                                </select>
+                                <span asp-validation-for="Type" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Period"></label>
+                                <select asp-for="Period" asp-items="Html.GetEnumSelectList<SubscriptionPeriod>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Subscription Period</option>
+                                </select>
+                                <span asp-validation-for="Period" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Currency"></label>
+                                <select asp-for="CurrencyId" asp-items="ViewBag.CurrencyId" class="form-control">
+                                    <option selected="selected" value="">Please Select Currency</option>
+                                </select>
+                                <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Amount"></label>
+                                <input asp-for="Amount" asp-format="{0:#,#0.00}" type="text" id="amount_input" class="form-control CurrencyInput" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="NumberOfEmployees"></label>
+                                <input asp-for="NumberOfEmployees" type="number" class="form-control" />
+                                <span asp-validation-for="NumberOfEmployees" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="NumberOfClients"></label>
+                                <input asp-for="NumberOfClients" type="number" class="form-control" />
+                                <span asp-validation-for="NumberOfClients" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListSubscriptionRates">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

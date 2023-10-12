@@ -2,6 +2,8 @@
 using CareConnect.Enums;
 using CareConnect.Interfaces;
 using CareConnect.Models;
+using CareConnect.Models.CareConnectViewModels;
+using CareConnect.Models.DataViewModels;
 using CareConnect.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,11 @@ namespace CareConnect.Controllers
 {
     public class SetupController : Controller
     {
+        private const int DATE_ADD = 1;
+
+        private readonly DateTime startDate = DateTime.Now;
+        private readonly DateTime endDate = DateTime.Today.AddMonths(DATE_ADD);
+
         private readonly ApplicationDbContext _context;
         private readonly CustomIDataProtection _protector;
         private readonly ILogger<SetupController> _logger;
@@ -235,17 +242,24 @@ namespace CareConnect.Controllers
 
         public IActionResult AddCurrency()
         {
-            Currency currency = new();
+            CurrencyViewModel currency = new();
             return View(currency);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCurrency([Bind("CurrencyId,Code,Name,Symbol")] Currency currency)
+        public async Task<IActionResult> AddCurrency([Bind("CurrencyId,Code,Name,Symbols")] CurrencyViewModel currencyView)
         {
             var user = await _userManager.GetUserAsync(User);
 
-            currency.AddedBy = user.UserName;
+            Currency currency = new()
+            {
+                CurrencyId = currencyView.CurrencyId,
+                Code = currencyView.Code,
+                Name = currencyView.Name,
+                Symbols = currencyView.Symbols,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
@@ -260,7 +274,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(currency);
+            return View(currencyView);
         }
 
         public async Task<IActionResult> EditCurrency(string id)
@@ -282,12 +296,20 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(currency);
+            CurrencyViewModel currencyView = new()
+            {
+                CurrencyId = currency.CurrencyId,
+                Code = currency.Code,
+                Name = currency.Name,
+                Symbols = currency.Symbols,
+            };
+
+            return View(currencyView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCurrency(string id, [Bind("CurrencyId,Code,Name,Symbol")] Currency currency)
+        public async Task<IActionResult> EditCurrency(string id, [Bind("CurrencyId,Code,Name,Symbols")] CurrencyViewModel currencyView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -295,14 +317,20 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != currency.CurrencyId)
+            if (num != currencyView.CurrencyId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
+
+            Currency currency = await _context.Currencies.FirstOrDefaultAsync(x => x.CurrencyId == num);
+
+            currency.Code = currencyView.Code;
+            currency.Name = currencyView.Name;
+            currency.Symbols = currencyView.Symbols;
             currency.UpdatedBy = user.UserName;
-            currency.DateUpdated = DateTime.UtcNow;
+            currency.DateUpdated = DateTime.Now;
 
             if (ModelState.IsValid)
             {
@@ -310,6 +338,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(currency);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListCurrencies));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -320,10 +349,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
-                }
-                return RedirectToAction(nameof(ListCurrencies));
+                }                
             }
             else
             {
@@ -332,7 +363,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(currency);
+            return View(currencyView);
         }
 
         // Customers
@@ -825,7 +856,7 @@ namespace CareConnect.Controllers
 
         public IActionResult AddOrganization()
         {
-            Organization organization = new ();
+            OrganizationViewModel organization = new ();
 
             ViewData["TenantId"] = new SelectList(_context.Tenants, "TenantId", "Name");
 
@@ -834,8 +865,22 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrganization([Bind("OrganizationId,TenantId,Name,Address,Email,Phone,Website")] Organization organization)
+        public async Task<IActionResult> AddOrganization([Bind("OrganizationId,TenantId,Name,Address,Email,Phone,Website")] OrganizationViewModel organizationView)
         {
+            var user = await _userManager.GetUserAsync(User);
+
+            Organization organization = new()
+            {
+                OrganizationId = organizationView.OrganizationId,
+                TenantId = organizationView.TenantId,
+                Name = organizationView.Name,
+                Address = organizationView.Address,
+                Email = organizationView.Email,
+                Phone = organizationView.Phone,
+                Website = organizationView.Website,
+                AddedBy = user.UserName
+            };
+
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(organization);
@@ -851,7 +896,7 @@ namespace CareConnect.Controllers
 
             ViewData["TenantId"] = new SelectList(_context.Tenants, "TenantId", "Name", organization.TenantId);
 
-            return View(organization);
+            return View(organizationView);
         }
 
         public async Task<IActionResult> EditOrganization(string id)
@@ -873,14 +918,26 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
+            OrganizationViewModel organizationView = new()
+            {
+                OrganizationId = num,
+                TenantId = organization.TenantId,
+                Name = organization.Name,
+                Address = organization.Address,
+                Email = organization.Email,
+                Phone = organization.Phone,
+                Website = organization.Website,
+                IsActive = organization.IsActive,
+            };
+
             ViewData["TenantId"] = new SelectList(_context.Tenants, "TenantId", "Name", organization.TenantId);
 
-            return View(organization);
+            return View(organizationView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditOrganization(string id, [Bind("OrganizationId,TenantId,Name,Address,Email,Phone,Website")] Organization organization)
+        public async Task<IActionResult> EditOrganization(string id, [Bind("OrganizationId,TenantId,Name,Address,Email,Phone,Website,IsActive")] OrganizationViewModel organizationView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -888,10 +945,31 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != organization.OrganizationId)
+            if (num != organizationView.OrganizationId)
             {
                 return NotFound();
             }
+
+            if (string.IsNullOrWhiteSpace(organizationView.Name))
+            {
+                ViewBag.Message = "Organization name not given.";
+                return View(organizationView);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            Organization organization = await _context.Organizations.Include(x => x.Tenant).FirstOrDefaultAsync(x => x.OrganizationId == num);
+
+            organization.OrganizationId = organizationView.OrganizationId;
+            organization.TenantId = organizationView.TenantId;
+            organization.Name = organizationView.Name;
+            organization.Address = organizationView.Address;
+            organization.Email = organizationView.Email;
+            organization.Phone = organizationView.Phone;
+            organization.Website = organizationView.Website;
+            organization.IsActive = organizationView.IsActive;
+            organization.DateUpdated = DateTime.Now;
+            organization.UpdatedBy = user.UserName;
 
             if (ModelState.IsValid)
             {
@@ -899,6 +977,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(organization);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListOrganizations));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -909,10 +988,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListOrganizations));
+                
             }
             else
             {
@@ -923,7 +1004,7 @@ namespace CareConnect.Controllers
 
             ViewData["TenantId"] = new SelectList(_context.Tenants, "TenantId", "Name", organization.TenantId);
 
-            return View(organization);
+            return View(organizationView);
         }
 
         public async Task<IActionResult> ListPayGrades()
@@ -1314,7 +1395,12 @@ namespace CareConnect.Controllers
 
         public IActionResult AddSubscription()
         {
-            Subscription subscription = new();
+
+            Subscription subscription = new() 
+            {
+                StartDate = startDate,
+                EndDate = endDate
+            };
 
             ViewData["OrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name");
             ViewData["SubscriptionRateId"] = new SelectList(_context.SubscriptionsRates, "SubscriptionRateId", "Type");
@@ -1326,11 +1412,17 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSubscription([Bind("SubscriptionId,OrganizationId,SubscriptionRateId,StartDate,EndDate,Status")] Subscription subscription)
         {
+            if (subscription.EndDate < subscription.StartDate)
+            {
+                ViewBag.Message = "Wrong dates choices. Pleae enter dates correctly and try again.";
+                return View(subscription);
+            }
+
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(subscription);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListSubscriptionRate));
+                return RedirectToAction(nameof(ListSubscriptions));
             }
             else
             {
@@ -1404,7 +1496,7 @@ namespace CareConnect.Controllers
                         return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
                     }
                 }
-                return RedirectToAction(nameof(ListSubscriptionRate));
+                return RedirectToAction(nameof(ListSubscriptions));
             }
             else
             {
@@ -1419,7 +1511,7 @@ namespace CareConnect.Controllers
             return View(subscription);
         }
 
-        public async Task<IActionResult> ListSubscriptionRate()
+        public async Task<IActionResult> ListSubscriptionRates()
         {
             return View(await _context.SubscriptionsRates.Include(c => c.Currency).ToListAsync());
         }
@@ -1428,7 +1520,7 @@ namespace CareConnect.Controllers
         {
             SubscriptionRate subscriptionRate = new ();
 
-            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code");
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name");
 
             return View(subscriptionRate);
         }
@@ -1441,7 +1533,7 @@ namespace CareConnect.Controllers
             {
                 await _context.AddAsync(subscriptionRate);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListSubscriptionRate));
+                return RedirectToAction(nameof(ListSubscriptionRates));
             }
             else
             {
@@ -1450,7 +1542,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", subscriptionRate.CurrencyId);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", subscriptionRate.CurrencyId);
 
             return View(subscriptionRate);
         }
@@ -1474,7 +1566,7 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", subscriptionRate.CurrencyId);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", subscriptionRate.CurrencyId);
 
             return View(subscriptionRate);
         }
@@ -1500,6 +1592,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(subscriptionRate);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListSubscriptionRates));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -1510,10 +1603,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListSubscriptionRate));
+                
             }
             else
             {
@@ -1522,7 +1617,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", subscriptionRate.CurrencyId);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", subscriptionRate.CurrencyId);
 
             return View(subscriptionRate);
         }
@@ -1543,25 +1638,40 @@ namespace CareConnect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTenant([Bind("TenantId,Name")] Tenant tenant)
         {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (string.IsNullOrWhiteSpace(tenant.Name))
+            {
+                ViewBag.Message = "Tenant name not given.";
+                return View(tenant);
+            }
+
             string tenantName = Utils.RemoveSpecialCharacters2(tenant.Name);
 
             if (_context.Tenants.Any(x => x.Name.Equals(tenantName)))
             {
-                ViewBag.Message = "Tenant name not unique.";
+                ViewBag.Message = "Tenant name is not unique.";
                 return View(tenant);
             }
 
-            if (ModelState.IsValid)
+            tenant.Name = tenantName;
+            tenant.ApiKey = Guid.NewGuid();
+            tenant.DateAdded = DateTime.Now;
+            tenant.AddedBy = user.UserName;
+
+            try
             {
                 await _context.AddAsync(tenant);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ListTenants));
             }
-            else
+            catch(Exception ex)
             {
+                _logger.Log(LogLevel.Error, "An error has occurred saving item", ex);
+
                 ViewBag.Message = "Unable to save changes. " +
                     "Try again, and if the problem persists, " +
-                    "see your system administrator.";
+                    $"see your system administrator.";
             }
 
             return View(tenant);
@@ -1586,53 +1696,64 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(tenant);
+            TenantViewModel tenantView = new()
+            {
+                TenantId = tenant.TenantId,
+                Name = tenant.Name,
+                IsActive = tenant.IsActive,
+            };
+
+            return View(tenantView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditTenant(string id, [Bind("TenantId,Name")] Tenant tenant)
+        public async Task<IActionResult> EditTenant(string id, [Bind("TenantId,Name,IsActive")] TenantViewModel tenantView)
         {
+            var user = await _userManager.GetUserAsync(User);           
+
             int num = Resolver(id);
             if (num == 0)
             {
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != tenant.TenantId)
+            if (num != tenantView.TenantId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            Tenant tenant = await _context.Tenants.FirstOrDefaultAsync(x => x.TenantId == num);
+
+            tenant.TenantId = tenantView.TenantId;
+            tenant.IsActive = tenantView.IsActive;
+            tenant.DateUpdated = DateTime.Now;
+            tenant.UpdatedBy = user.UserName;
+
+
+            try
             {
-                try
-                {
-                    _context.Update(tenant);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    if (!TenantExists(tenant.TenantId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-                    }
-                }
+                _context.Update(tenant);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ListTenants));
             }
-            else
+            catch (DbUpdateConcurrencyException ex)
             {
-                ViewBag.Message = "Unable to save changes. " +
-                    "Try again, and if the problem persists, " +
-                    "see your system administrator.";
-            }
+                if (!TenantExists(tenant.TenantId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.Log(LogLevel.Error, "An error has occurred saving item", ex);
 
-            return View(tenant);
+                    ViewBag.Message = "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.";
+                }
+            }
+                            
+            return View(tenantView);
         }
 
         public async Task<IActionResult> ListVendors()

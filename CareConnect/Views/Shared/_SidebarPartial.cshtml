@@ -23,7 +23,7 @@
                 <ul class="nav nav-main">
                     <li>
                         <a class="nav-link" asp-controller="Home" asp-action="Index">
-                            <i class="bx bx-home-alt" aria-hidden="true"></i>
+                            <i class="bx bx-bar-chart-alt-2" aria-hidden="true"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>                   
@@ -36,12 +36,7 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a class="nav-link" asp-controller="Companies" asp-action="Index">
-                                <i class="bx bx-buildings" aria-hidden="true"></i>
-                                <span>Companies</span>
-                            </a>
-                        </li>
+                        
                     }
                     
                     <li>
@@ -51,7 +46,7 @@
                         </a>
                     </li>
 
-                    @if(!await UserManager.IsInRoleAsync(user, "User"))
+                    @if (!await UserManager.IsInRoleAsync(user, "Administrator"))
                     {
                         <li class="nav-parent">
                             <a class="nav-link" href="#">
@@ -97,13 +92,33 @@
                             </a>
                             <ul class="nav nav-children">
                                 <li>
-                                    <a asp-controller="Setup" asp-action="ListCaseManagers">
-                                        Case Manager
+                                    <a asp-controller="Setup" asp-action="ListHouses">
+                                        Houses
                                     </a>
                                 </li>
                                 <li>
-                                    <a asp-controller="Setup" asp-action="ListCurrencies">
-                                        Currency
+                                    <a asp-controller="Setup" asp-action="ListCustomers">
+                                        Customers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListClients">
+                                        Clients
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListDepartments">
+                                        Departments
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListJobTitles">
+                                        Job Titles
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListPayGrades">
+                                        Pay Grades
                                     </a>
                                 </li>
                             </ul>
@@ -128,6 +143,11 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a asp-controller="Setup" asp-action="ListCurrencies">
+                                        Currency
+                                    </a>
+                                </li>
+                                <li>
                                     <a asp-controller="Setup" asp-action="ListSubscriptionRates">
                                         Subscription Rate
                                     </a>
@@ -137,6 +157,7 @@
                                         Subscription
                                     </a>
                                 </li>
+                                
                             </ul>
                         </li>
                     }

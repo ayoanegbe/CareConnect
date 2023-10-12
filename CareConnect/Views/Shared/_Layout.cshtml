@@ -85,6 +85,8 @@
 
     <!-- Vendor -->
     <script src="~/vendor/jquery/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
     <script src="~/vendor/jquery-cookie/jquery.cookie.js"></script>
     @*<script src="~/master/style-switcher/style.switcher.js"></script>*@
@@ -188,7 +190,7 @@
 
     <script src="~/js/examples/examples.dashboard.js"></script>
     <script src="~/js/examples/examples.charts.js"></script>
-    <script src="~/js/examples/caret.calendar.js"></script>
+    @* <script src="~/js/examples/caret.calendar.js"></script> *@
     <script src="~/js/examples/examples.datatables.default.js"></script>
     <script src="~/js/examples/examples.datatables.row.with.details.js"></script>
     <script src="~/js/examples/examples.datatables.tabletools.js"></script>
@@ -237,6 +239,25 @@
         $("#SelectedZoneID").change(function () {
             $("#SelectedZoneText").attr("value", $("#SelectedZoneID option:selected").text());
         })
+    </script>
+
+    <script type="text/javascript">
+        $('input.CurrencyInput').on('blur', function () {
+            const value = this.value.replace(/\D+/g, '');
+            this.value = parseFloat(value).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            });
+        });
+
+        var amount_input = document.getElementById('amount_input');
+
+        amount_input.addEventListener('keypress', function (evt) {
+            if (evt.which < 48 || evt.which > 57) {
+                evt.preventDefault();
+            }
+        });
     </script>
 
     @RenderSection("Scripts", required: false)

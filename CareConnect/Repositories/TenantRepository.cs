@@ -1,5 +1,6 @@
 ﻿using CareConnect.Data;
 using CareConnect.Interfaces;
+using CareConnect.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CareConnect.Repositories
@@ -9,11 +10,13 @@ namespace CareConnect.Repositories
         private readonly IHttpContextAccessor _httpContextAccessor;
         private ISession Session => _httpContextAccessor.HttpContext.Session;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public TenantRepository(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
+        public TenantRepository(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<string> GetTenantId(Guid apiKey)
@@ -55,6 +58,35 @@ namespace CareConnect.Repositories
         public async Task<bool> IsTenant(string tenantName)
         {
             return await _context.Tenants.AnyAsync(x => x.Name.Equals(tenantName));
+        }
+
+        public async Task<Tenant> GetTenant(string tenantName)
+        {
+            return await _context.Tenants.FirstOrDefaultAsync(x => x.Name.Equals(tenantName));
+        }
+
+        public async Task<Tenant> AddDefaultTenant()
+        {
+            string tenantName = _configuration.GetValue<string>("DefaultTenant");
+
+            if (tenantName == null) { return null; }
+
+            Tenant tenant = new() 
+            { 
+                Name = "Support",
+                ApiKey = Guid.NewGuid(),
+                DateAdded = DateTime.Now,
+                AddedBy = "System"
+            };
+
+            if (!_context.Tenants.Any())
+            {
+                await _context.AddAsync(tenant);
+                await _context.SaveChangesAsync();
+                return tenant;
+            }
+
+            return null;
         }
     }
 }

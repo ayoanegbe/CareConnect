@@ -13,6 +13,8 @@ using CareConnect.Models;
 using CareConnect.Models.AccountViewModels;
 using Microsoft.EntityFrameworkCore;
 using CareConnect.Interfaces;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace CareConnect.Controllers
 {
@@ -25,6 +27,7 @@ namespace CareConnect.Controllers
         //private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
+        private readonly ITenantContext _tenantContext;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -32,7 +35,8 @@ namespace CareConnect.Controllers
             IEmailSender emailSender,
             //ISmsSender smsSender,
             ILoggerFactory loggerFactory,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            ITenantContext tenantContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -40,6 +44,7 @@ namespace CareConnect.Controllers
             //_smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _context = context;
+            _tenantContext = tenantContext;
         }
 
         //
@@ -68,8 +73,19 @@ namespace CareConnect.Controllers
             ViewData["LayoutType"] = "login-page";
             ViewData["BoxType"] = "login-box";
 
+            
             if (ModelState.IsValid)
             {
+                //var claims = new List<Claim>
+                //{
+                //    new("UserName", model.Email)
+                //};
+
+                //var identity = new ClaimsIdentity(
+                //    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                //var claimsPrincipal = new ClaimsPrincipal(identity);
+
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -137,6 +153,9 @@ namespace CareConnect.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["LayoutType"] = "register-page";
             ViewData["BoxType"] = "register-box";
+
+            ViewData["OrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name");
+
             return View();
         }
 
@@ -165,6 +184,7 @@ namespace CareConnect.Controllers
                     Phone = model.Phone,
                     ChangePassword = true
                 };
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -182,16 +202,16 @@ namespace CareConnect.Controllers
                     //    _logger.LogInformation(4, $"Set password '{password}' for default user '{model.Email}' successfully");
                     //}
 
-                    _logger.LogInformation($"Add default user '{model.Email}' to role '{model.Role}'");
+                    _logger.Log(LogLevel.Information, $"Add default user '{model.Email}' to role '{model.Role}'");
                     var ir = await _userManager.AddToRoleAsync(user, model.Role.ToString());
                     if (ir.Succeeded)
                     {
-                        _logger.LogInformation($"Added the role '{model.Role}' to default user `{model.Email}` successfully");
+                        _logger.Log(LogLevel.Information, $"Added the role '{model.Role}' to default user `{model.Email}` successfully");
                     }
                     else
                     {
                         var exception = new Exception($"The role '{model.Role}' could not be set for the user `{model.Email}`");
-                        _logger.LogDebug($"Error: {exception}" );
+                        _logger.Log(LogLevel.Debug, "An error has occurred fetching item", exception);
                         throw exception;
                     }
 
@@ -201,7 +221,7 @@ namespace CareConnect.Controllers
                 }
                 AddErrors(result);
             }
-
+            ViewData["OrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name", model.Email);
             // If we got this far, something failed, redisplay form
             return View(model);
         }
@@ -214,21 +234,26 @@ namespace CareConnect.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
-            return RedirectToAction(nameof(AccountController.Login), "Login");
+            return RedirectToAction(nameof(AccountController.Login));
         }
 
-        public IActionResult UserList()
+        public async Task<IActionResult> UserList(int organizationId)
         {
-            //var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.Users.Where(x => x.OrganizationId == organizationId).ToListAsync();
 
-            //foreach (var usr in users)
-            //{
-            //    var rol = await _userManager.GetRolesAsync(usr);
-            //    if (!rol.Equals("User"))
-            //        users.Remove(usr);
-            //}
+            foreach (var usr in users)
+            {
+                var rol = await _userManager.GetRolesAsync(usr);
+                if (rol.Equals("Super Administrator"))
+                    users.Remove(usr);
+            }
 
-            return View();
+            return View(users);
+        }
+
+        public async Task<IActionResult> GetAllUsers()
+        {
+            return View(await _userManager.Users.ToListAsync());
         }
 
         public async Task<IActionResult> DisableUser(string userName)
@@ -246,7 +271,7 @@ namespace CareConnect.Controllers
             
             await _userManager.UpdateAsync(user);
 
-            return RedirectToAction(nameof(AccountController.UserList));
+            return RedirectToAction(nameof(AccountController.UserList), new { organizationId = user.OrganizationId });
         }
 
         // GET: /Account/ConfirmEmail

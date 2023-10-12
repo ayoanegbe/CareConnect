@@ -7,12 +7,12 @@ namespace CareConnect.Models
         [Key]
         public int TenantId { get; set; }
         [Required]
-        public Guid ApiKey { get; set; } = Guid.NewGuid();
+        public Guid? ApiKey { get; set; } = null;
         [Required]
         public string Name { get; set; }
         public bool IsActive { get; set; } = true;
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime? DateAdded { get; set; } = null;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         public DateTime? DateAssigned { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace CareConnect.Interfaces
+﻿using CareConnect.Models;
+
+namespace CareConnect.Interfaces
 {
     public interface ITenantRepository
     {
@@ -8,5 +10,7 @@
         Task<string> GetTenantId(string tenantName);
         Task<string> GetTenantName(Guid tenantId);
         Task<bool> IsTenant(string tenantName);
+        Task<Tenant> GetTenant(string tenantName);
+        Task<Tenant> AddDefaultTenant();
     }
 }

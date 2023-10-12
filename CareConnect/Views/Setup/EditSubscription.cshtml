@@ -1,0 +1,125 @@
+﻿@model Subscription
+
+@{
+    ViewData["Title"] = "Edit Subscription";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body card-margin">
+    <header class="page-header">
+        <h2>Edit Subscription</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Setup" asp-action="ListSubscriptions">
+                        <i class="bx bx-radar"></i>
+                    </a>
+                </li>
+                @* <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
+                <li><span>New Client</span></li> *@
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <header class="card-header">
+                    <h2 class="card-title">Edit Subscription</h2>
+                </header>
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                    </div>
+                }
+                <div class="card-body">
+                    <form asp-action="EditSubscription" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="SubscriptionId"/>
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Organization"></label>
+                                <div class="input-group">
+                                    <select asp-for="Organization" asp-items="ViewBag.OrganizationId" class="form-control">
+                                        <option selected="selected" value="">Please Select Organization</option>
+                                    </select>
+                                    <span asp-validation-for="Organization" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="SubscriptionRate"></label>
+                                <div class="input-group">
+                                    <div class="input-group">
+                                        <select asp-for="SubscriptionRate" asp-items="ViewBag.SubscriptionRateId" class="form-control">
+                                            <option selected="selected" value="">Please Select Rate</option>
+                                        </select>
+                                        <span asp-validation-for="SubscriptionRate" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="StartDate"></label>
+                                <div class="input-group">
+                                    <input asp-for="StartDate" type="date" class="form-control" />
+                                    <span asp-validation-for="StartDate" class="text-danger" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="EndDate"></label>
+                                <div class="input-group">
+                                    <div class="input-group">
+                                        <input asp-for="EndDate" type="date" class="form-control" />
+                                        <span asp-validation-for="EndDate" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Status"></label>
+                                <div class="input-group">
+                                    <div class="input-group">
+                                        <select asp-for="Status" asp-items="Html.GetEnumSelectList<SubscriptionStatus>()" class="form-control">
+                                            <option selected="selected" value="">Please Select Status</option>
+                                        </select>
+                                        <span asp-validation-for="Status" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <footer class="card-footer text-right">
+                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                            <a class="btn btn-secondary" asp-action="ListSubscriptions">Cancel</a>
+                        </footer>
+                    </form>
+                </div>
+
+            </section>
+
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

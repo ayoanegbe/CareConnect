@@ -5,68 +5,57 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section role="main" class="content-body card-margin">
+<section role="main" class="content-body">
     <header class="page-header">
-        <h2>Add New Tenant</h2>
+        <h2>New Tenant</h2>
 
         <div class="right-wrapper text-right">
             <ol class="breadcrumbs">
                 <li>
-                    <a asp-controller="Setup" asp-action="ListTenants">
-                        <i class="bx bx-radar"></i>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
                     </a>
                 </li>
-                @* <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
-                <li><span>New Client</span></li> *@
+                <li><span><a asp-controller="Setup" asp-action="ListTenants">Tenants</a></span></li>
+                <li><span>New Tenant</span></li>
             </ol>
 
             @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
         </div>
     </header>
+
     <div class="row">
         <div class="col-lg-12">
-            <section class="card">
-                <header class="card-header">
-                    <h2 class="card-title">Add New Tenant</h2>
-                </header>
-                @if (ViewBag.Message != null)
-                {
-                    <div class="alert alert-danger alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
-                    </div>
-                }
-                <div class="card-body">
-                    <form asp-action="AddTenant" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="row form-group">
-                            <div class="col-lg-6">
-                                <label class="col-form-label" asp-for="Name"></label>
-                                <div class="input-group">
-                                    <input asp-for="Name" type="text" class="form-control" />
-                                    <span asp-validation-for="Name" class="text-danger" />
-                                </div>
-                            </div>
-@* 
-                            <div class="mb-3 hidden-lg"></div>
-
-                            <div class="col-lg-4">
-                                <div class="checkbox-custom checkbox-default">
-                                    <input asp-for="IsActive" type="checkbox" />
-                                    <label><a>Click the box to <strong>@(Model.IsActive ? "Deactivate" : "Activate")</strong> this Tenant</a></label>
-                                </div>
-                            </div>
- *@
+            <form asp-action="AddTenant" method="post">
+                <section class="card">
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Tenant</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
                         </div>
+                    }
+                    <div class="card-body">
+                    
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="row form-group">
+                                <div class="col-lg-6">
+                                    <label class="col-form-label" asp-for="Name"></label>
+                                    <input asp-for="Name" type="text" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
 
-                        <footer class="card-footer text-right">
-                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
-                            <a class="btn btn-secondary" asp-action="Index">Cancel</a>
-                        </footer>
-                    </form>
-                </div>
-
-            </section>
-
+                            </div>                         
+                    
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListTenants">Cancel</a>
+                    </footer>
+                </section>
+            </form>
 
         </div>
     </div>

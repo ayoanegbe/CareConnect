@@ -1,4 +1,5 @@
-﻿using CareConnect.Models;
+﻿using CareConnect.Interfaces;
+using CareConnect.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Data.SqlClient;
 
@@ -16,37 +17,42 @@ namespace CareConnect.Services
             _config = config;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ITenantSetter tenantSetter, ITenantRepository tenantRepo)
         {
             (string tenantName, string realPath) = GetTenantAndPathFrom(context.Request);
             var connectionString = _config.GetConnectionString("DefaultConnection");
-            if (tenantName != null)
-            {
-                var dbConnection = new SqlConnection(connectionString);
-                var tenant = new Tenant();
+
+            //Tenant tenant = await tenantRepo.GetTenant(tenantName);
+
+            //if (tenant == null)
+            //{
+            //    //context.Response.StatusCode = 404;
+            //    //return;
+            //}
+            //else
+            //{
+                //var dbConnection = new SqlConnection(connectionString);
+                //Tenant tenant = await tenantRepo.GetTenant(tenantName);
+                
                 // Retrieve the tenant data from the database
-                using (var connection = dbConnection)
-                {
-                    connection.Open();
-                    using var command = new SqlCommand("SELECT Name FROM Tenants WHERE Name = @Name", connection);
-                    command.Parameters.AddWithValue("@Name", tenantName);
-                    using var reader = command.ExecuteReader();
-                    if (reader.Read())
-                    {
-
-                        tenant.Name = reader["Name"].ToString();
-                        tenant.TenantId = int.Parse(reader["TenantId"].ToString());
-
-                    }
-                }
-
-                //if (tenant == null)
+                //using var connection = dbConnection;
+                //connection.Open();
+                //using var command = new SqlCommand("SELECT Name FROM Tenants WHERE Name = @Name", connection);
+                //command.Parameters.AddWithValue("@Name", tenantName);
+                //using var reader = command.ExecuteReader();
+                //if (reader.Read())
                 //{
-                //    context.Response.StatusCode = 404;
-                //    return;
-                //}
-            }
 
+                //    tenant.Name = reader["Name"].ToString();
+                //    tenant.TenantId = int.Parse(reader["TenantId"].ToString());
+
+                //}               
+
+                //context.Request.PathBase = $"/{tenant.Name}";
+                //context.Request.Path = realPath;
+                //tenantSetter.CurrentTenant = tenant;
+                
+            //}
 
             await _next(context);
         }

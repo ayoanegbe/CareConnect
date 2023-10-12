@@ -1,6 +1,7 @@
 using CareConnect.Data;
 using CareConnect.Interfaces;
 using CareConnect.Models;
+using CareConnect.Repositories;
 using CareConnect.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -53,6 +54,18 @@ namespace CareConnect
             builder.Services.Configure<RecaptchaSettings>(builder.Configuration.GetSection("GoogleRecaptchaV3"));
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
+            builder.Services.AddScoped<TenantContext>();
+            builder.Services.AddScoped<ITenantContext>(provider =>
+                provider.GetRequiredService<TenantContext>());
+            builder.Services.AddScoped<ITenantSetter>(provider =>
+                provider.GetRequiredService<TenantContext>());
+            builder.Services.AddScoped<TenantRepository>();
+            builder.Services.AddScoped<ITenantRepository>(provider =>
+                provider.GetRequiredService<TenantRepository>());
+            builder.Services.AddScoped<OrganizationRepository>();
+            builder.Services.AddScoped<IOrganizationRepository>(provider =>
+                provider.GetRequiredService<OrganizationRepository>());
+
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddTransient<IAuditTrailService, AuditTrailService>();
             builder.Services.AddTransient<IFileService, FileService>();
@@ -90,9 +103,11 @@ namespace CareConnect
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                    var defaultTenant = services.GetRequiredService<ITenantRepository>();
+                    var defaultOrganization = services.GetRequiredService<IOrganizationRepository>();
 
                     var dbInitializerLogger = services.GetRequiredService<ILogger<DbInitializer>>();
-                    DbInitializer.Initialize(context, userManager, roleManager, dbInitializerLogger).Wait();
+                    DbInitializer.Initialize(context, userManager, roleManager, dbInitializerLogger, defaultTenant, defaultOrganization).Wait();
                 }
                 catch (Exception ex)
                 {
@@ -148,7 +163,7 @@ namespace CareConnect
 
             app.UseSession();
 
-            app.UseTenant();
+            //app.UseTenant();
 
             app.Use(async (context, next) =>
             {

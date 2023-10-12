@@ -1,12 +1,11 @@
 ﻿@model IEnumerable<Shift>
 @{
-    int i = 1;
+
     var dateRange = new DateRangeViewModel();
 
     dateRange.StartDate = DateTime.UtcNow.AddDays(-7);
     dateRange.EndDate = DateTime.UtcNow;
-
-    
+ 
 }
 
 <section role="main" class="content-body">

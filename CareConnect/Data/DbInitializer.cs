@@ -1,4 +1,5 @@
-﻿using CareConnect.Models;
+﻿using CareConnect.Interfaces;
+using CareConnect.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace CareConnect.Data
@@ -8,7 +9,9 @@ namespace CareConnect.Data
         public static async Task Initialize(ApplicationDbContext context,
                                             UserManager<ApplicationUser> userManager,
                                             RoleManager<IdentityRole> roleManager,
-                                            ILogger<DbInitializer> logger)
+                                            ILogger<DbInitializer> logger,
+                                            ITenantRepository tenant,
+                                            IOrganizationRepository organization)
         {
             context.Database.EnsureCreated();
 
@@ -18,17 +21,21 @@ namespace CareConnect.Data
                 return; // DB has been seeded
             }
 
-            await CreateDefaultUserAndRoleForApplication(userManager, roleManager, logger);
+            await CreateDefaultUserAndRoleForApplication(userManager, roleManager, logger, tenant, organization);
 
         }
 
-        private static async Task CreateDefaultUserAndRoleForApplication(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<DbInitializer> logger)
+        private static async Task CreateDefaultUserAndRoleForApplication(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<DbInitializer> logger, ITenantRepository tenant, IOrganizationRepository organization)
         {
-            const string superAdminRole = "Super Administrator";
-            const string email = "ayo.anegbe@gmail.com";
+            Tenant defaultTenant = await tenant.AddDefaultTenant();
+
+            Organization defaultOrganization =  await organization.AddDefaultOrganization(defaultTenant.TenantId);
+
+            string superAdminRole = "Super Administrator";
+            string email = "ayo.anegbe@gmail.com";
 
             await CreateDefaultAdministratorRole(roleManager, logger, superAdminRole);
-            var user = await CreateDefaultUser(userManager, logger, email);
+            var user = await CreateDefaultUser(userManager, logger, email, defaultOrganization.OrganizationId);
             await SetPasswordForDefaultUser(userManager, logger, email, user);
             await AddDefaultRoleToDefaultUser(userManager, logger, email, superAdminRole, user);
             await AddDefaultRoles(roleManager, logger);
@@ -54,11 +61,14 @@ namespace CareConnect.Data
 
         }
 
-        private static async Task<ApplicationUser> CreateDefaultUser(UserManager<ApplicationUser> userManager, ILogger<DbInitializer> logger, string email)
+        private static async Task<ApplicationUser> CreateDefaultUser(UserManager<ApplicationUser> userManager, ILogger<DbInitializer> logger, string email, int defaultOrganizationId)
         {
             logger.LogInformation($"Create default user with email '{email}' for application");
 
-            var user = new ApplicationUser(email, "Super Administrator", "CareConnect", "08023194115");
+            var user = new ApplicationUser(email, "Super Administrator", "CareConnect", "08023194115")
+            {
+                OrganizationId = defaultOrganizationId
+            };
 
             var ir = await userManager.CreateAsync(user);
             if (ir.Succeeded)

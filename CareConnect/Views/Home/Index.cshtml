@@ -1,16 +1,16 @@
 ﻿@inject UserManager<ApplicationUser> UserManager
 
 @{
-    var shifts = (IEnumerable<Shift>)ViewData["shifts"];
-    var shifts2 = (IEnumerable<Shift>)ViewData["shifts"];
-    var statisticsData = (StatisticsDataViewModel)ViewData["statisticsData"];
+    // var shifts = (IEnumerable<Shift>)ViewData["shifts"];
+    // var shifts2 = (IEnumerable<Shift>)ViewData["shifts"];
+    // var statisticsData = (StatisticsDataViewModel)ViewData["statisticsData"];
 
-    int i = 1;
+    // int i = 1;
 
-    var strData = ViewData["strChart"];
+    // var strData = ViewData["strChart"];
 
-    var user = await UserManager.GetUserAsync(User);
-    var userShifts = (IEnumerable<Shift>)ViewData["userShifts"];
+    // var user = await UserManager.GetUserAsync(User);
+    // var userShifts = (IEnumerable<Shift>)ViewData["userShifts"];
 }
 
 
@@ -33,8 +33,8 @@
         </div>
     </header>
 
-    @if (!await UserManager.IsInRoleAsync(user, "User"))
-    {
+    @* @if (!await UserManager.IsInRoleAsync(user, "User")) *@
+    @* { *@
         <div class="row">
             <div class="col-lg-6 mb-3">
                 <section class="card">
@@ -73,7 +73,7 @@
                                         <div class="summary">
                                             <h4 class="title">Total Shifts</h4>
                                             <div class="info">
-                                                <strong class="amount">@statisticsData.TotalShifts</strong>
+                                                @* <strong class="amount">@statisticsData.TotalShifts</strong> *@
                                                 @*<span class="text-primary">(14 unread)</span>*@
                                             </div>
                                         </div>
@@ -98,7 +98,7 @@
                                         <div class="summary">
                                             <h4 class="title">Total Assigned Shifts</h4>
                                             <div class="info">
-                                                <strong class="amount">@statisticsData.TotalAssignedShifts</strong>
+                                                @* <strong class="amount">@statisticsData.TotalAssignedShifts</strong> *@
                                             </div>
                                         </div>
                                         <div class="summary-footer">
@@ -124,7 +124,7 @@
                                         <div class="summary">
                                             <h4 class="title">Today's Shifts</h4>
                                             <div class="info">
-                                                <strong class="amount">@statisticsData.TodayShifts</strong>
+                                                @* <strong class="amount">@statisticsData.TodayShifts</strong> *@
                                             </div>
                                         </div>
                                         <div class="summary-footer">
@@ -148,7 +148,7 @@
                                         <div class="summary">
                                             <h4 class="title">Declined Shifts</h4>
                                             <div class="info">
-                                                <strong class="amount">@statisticsData.TotalUnassignedShifts</strong>
+                                                @* <strong class="amount">@statisticsData.TotalUnassignedShifts</strong> *@
                                             </div>
                                         </div>
                                         <div class="summary-footer">
@@ -162,7 +162,7 @@
                 </div>
             </div>
         </div>
-    }
+    @* } *@
     
 
     <div class="row pt-4 mt-1">
@@ -210,8 +210,8 @@
         </div>
     </div>
 
-    @if (await UserManager.IsInRoleAsync(user, "User"))
-    {
+    @* @if (await UserManager.IsInRoleAsync(user, "User")) *@
+    @* { *@
        <div class="row pt-4 mt-1">
 
             <div class="col-xl-12">
@@ -256,15 +256,15 @@
                 </section>
             </div>
         </div> 
-    }
+    @* } *@
     
 </section>
 
-<script>
+@* <script>
 
     var flotDashSales1Data = [{
         data: @Html.Raw(strData),
         color: "#0559AD"
     }];
 
-</script>
+</script> *@
