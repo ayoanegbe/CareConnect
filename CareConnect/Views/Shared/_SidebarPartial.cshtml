@@ -46,7 +46,30 @@
                         </a>
                     </li>
 
-                    @if (!await UserManager.IsInRoleAsync(user, "Administrator"))
+                    @if (await UserManager.IsInRoleAsync(user, "Super Administrator"))
+                    {
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                <i class="bx bx-user" aria-hidden="true"></i>
+                                <span>User Management</span>
+                            </a>
+                            <ul class="nav nav-children">
+                                <li>
+                                    <a asp-controller="Account" asp-action="Register" asp-route-source="superAdmin">
+                                        New User
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Account" asp-action="GetAllUsers">
+                                        Users List
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    }
+
+                    @if (await UserManager.IsInRoleAsync(user, "Administrator"))
                     {
                         <li class="nav-parent">
                             <a class="nav-link" href="#">

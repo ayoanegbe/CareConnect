@@ -1,18 +1,14 @@
 ﻿using CareConnect.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CareConnect.Models
+namespace CareConnect.Models.CareConnectViewModels
 {
-    public class Client
+    public class ClientViewModel
     {
-        [Key]
         public int ClientId { get; set; }
-        [ForeignKey("Client_Customer")]
         [Display(Name = "Customer")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
-        [ForeignKey("Client_Organization")]
         public int OrganizationId { get; set; }
         public Organization Organization { get; set; }
         [Display(Name = "House")]
@@ -42,9 +38,11 @@ namespace CareConnect.Models
         public string Phone { get; set; }
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
+        [Required]
         [DataType(DataType.PhoneNumber)]
-        [Display(Name = "Emergency Contact Phone")]
+        [Display(Name = "Emergency Contact Phone")]        
         public string EmergencyContactPhone { get; set; }
+        [Required]
         [Display(Name = "Emergency Contact Address")]
         public string EmergencyContactAddress { get; set; }
         [Display(Name = "Relationship To Client")]
@@ -67,21 +65,10 @@ namespace CareConnect.Models
         [Required]
         [Display(Name = "Budget End Date")]
         [DataType(DataType.Date)]
-        public DateTime BudgetEndDate { get;set; }
-        
+        public DateTime BudgetEndDate { get; set; }
+
         [DataType(DataType.Html)]
         public string Notes { get; set; }
         public string Comment { get; set; }
-
-        public string FullName => $"{this.LastName}, {this.FirstName} {this.MiddleName}";
-
-        [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
-        [Display(Name = "Date Updated")]
-        public DateTime? DateUpdated { get; set; }
-        [Display(Name = "Added By")]
-        public string AddedBy { get; set; }
-        [Display(Name = "Updated By")]
-        public string UpdatedBy { get; set; }
     }
 }

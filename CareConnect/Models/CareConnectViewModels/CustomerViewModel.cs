@@ -1,14 +1,13 @@
 ﻿using CareConnect.Enums;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace CareConnect.Models
+namespace CareConnect.Models.CareConnectViewModels
 {
-    public class Customer
+    public class CustomerViewModel
     {
-        [Key]
         public int CustomerId { get; set; }
-        [ForeignKey("Customer_Organization")]
+        [Display(Name = "Organization")]
         public int OrganizationId { get; set; }
         public Organization Organization { get; set; }
         [Required]
@@ -29,16 +28,7 @@ namespace CareConnect.Models
         [Display(Name = "Contact Person's Phone")]
         public string ContactPersonPhone { get; set; }
         [DataType(DataType.Html)]
-        public string Notes { get; set; }       
+        public string Notes { get; set; }
         public string Comment { get; set; }
-
-        [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.Now;
-        [Display(Name = "Date Updated")]
-        public DateTime? DateUpdated { get; set; }
-        [Display(Name = "Added By")]
-        public string AddedBy { get; set; }
-        [Display(Name = "Updated By")]
-        public string UpdatedBy { get; set; }
     }
 }

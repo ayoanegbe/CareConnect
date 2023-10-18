@@ -42,6 +42,16 @@
                         <option selected="selected" value="">Select Role</option>
                     </select>
                 </div>
+
+                if (source.Equals("superAdmin"))
+                {
+                    <div class="form-group mb-3">
+                        <label asp-for="Organization"></label>
+                        <select asp-for="OrganizationId" asp-items="ViewBag.OrganizationId" class="form-control">
+                            <option selected="selected" value="">Please Select Organization</option>
+                        </select>
+                    </div>
+                }
             }
 
             <div class="form-group mb-0">
@@ -66,17 +76,18 @@
                             <label for="AgreeTerms">I agree with <a href="#">@Html.DisplayNameFor(m => m.Condition) of use</a></label>
                         </div>
                     </div>
+
+                    <p class="text-center">Already have an account? <a asp-controller="Account" asp-action="Login">Sign In!</a></p>
                 }
-                <div class="col-sm-4 text-right">
-                    <button type="submit" class="btn btn-primary mt-2" style="background-color:cornflowerblue">Register</button>
-                </div>
+                                
             </div>
-
-            @if (string.IsNullOrEmpty(source))
-            {
-                <p class="text-center">Already have an account? <a asp-controller="Account" asp-action="Login">Sign In!</a></p>
-            }
-
+            <footer class="row">
+                <div class="mb-1 text-center">
+                    <button type="submit" class="btn btn-primary mb-3 ml-1 mr-1" style="background-color:cornflowerblue">Register</button>
+                    <a class="btn btn-secondary mb-3 ml-1 mr-1" asp-controller="Home" asp-action="Index">Cancel</a>
+                </div>
+            </footer>
+            
 
         </form>
     </div>

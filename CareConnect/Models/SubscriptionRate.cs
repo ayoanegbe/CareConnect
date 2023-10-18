@@ -22,5 +22,7 @@ namespace CareConnect.Models
         public int? NumberOfEmployees { get; set; }
         [Display(Name = "Number Of Clients")]
         public int? NumberOfClients { get; set; }
+
+        public string Description => $"{Type} - {Period}";
     }
 }

@@ -15,6 +15,8 @@ namespace CareConnect.Services
     {
 
         private const string keyString = "c55d79f3f4184e2f8f3c979b367821b1";
+        private const string ClientKey = "-@!8A0P.!nm099(+";
+        private const string ClientSalt = "i+!_Ay(1_9-*!71O";
 
         public static string RemoveSpecialCharacters(string str)
         {
@@ -126,6 +128,110 @@ namespace CareConnect.Services
                     return result;
                 }
             }
+        }
+
+        public static string DecryptStringAES(string cipherText)
+        {
+            try
+            {
+                var secretkey = Encoding.UTF8.GetBytes(ClientKey);
+                var ivKey = Encoding.UTF8.GetBytes(ClientSalt);
+
+                var encrypted = Convert.FromBase64String(cipherText);
+                var decriptedFromJavascript = DecryptStringFromBytes(encrypted, secretkey, ivKey);
+                return decriptedFromJavascript;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        public static string EncryptStringAES(string plainText)
+        {
+            try
+            {
+                var secretkey = Encoding.UTF8.GetBytes(ClientKey);
+                var ivKey = Encoding.UTF8.GetBytes(ClientSalt);
+
+                var plainBytes = Encoding.UTF8.GetBytes(plainText);
+                // var encrypted = Convert.ToBase64String(plainBytes);
+                var encryptedFromJavascript = EncryptStringToBytes(plainText, secretkey, ivKey);
+                // _logger.LogWarning($" decriptedFromJavascript: {encryptedFromJavascript}");
+                return encryptedFromJavascript;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string EncryptStringToBytes(string plainText, byte[] key, byte[] iv)
+        {
+
+            byte[] encrypted;
+            // Create a RijndaelManaged object
+            // with the specified key and IV.
+            using (var rijAlg = new RijndaelManaged())
+            {
+                rijAlg.Mode = CipherMode.CBC;
+                rijAlg.Padding = PaddingMode.PKCS7;
+                rijAlg.FeedbackSize = 128;
+                rijAlg.Key = key;
+                rijAlg.IV = iv;
+                // Create a decrytor to perform the stream transform.
+                var encryptor = rijAlg.CreateEncryptor(rijAlg.Key, rijAlg.IV);
+                // Create the streams used for encryption.
+                using var msEncrypt = new MemoryStream();
+                using var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
+                using (var swEncrypt = new StreamWriter(csEncrypt))
+                {
+                    //Write all data to the stream.
+                    swEncrypt.Write(plainText);
+                }
+                encrypted = msEncrypt.ToArray();
+            }
+            //Convert.ToBase64String(encrypted);
+            // Return the encrypted bytes from the memory stream.
+            return Convert.ToBase64String(encrypted);
+        }
+
+        private static string DecryptStringFromBytes(byte[] cipherText, byte[] key, byte[] iv)
+        {
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+            // Create an RijndaelManaged object
+            // with the specified key and IV.
+            using (var rijAlg = new RijndaelManaged())
+            {
+                //Settings
+                rijAlg.Mode = CipherMode.CBC;
+                rijAlg.Padding = PaddingMode.PKCS7;
+                // rijAlg.FeedbackSize = 128;
+                rijAlg.Key = key;
+                rijAlg.IV = iv;
+                // Create a decrytor to perform the stream transform.
+                var decryptor = rijAlg.CreateDecryptor(rijAlg.Key, rijAlg.IV);
+
+                try
+                {
+                    // Create the streams used for decryption.
+                    using var msDecrypt = new MemoryStream(cipherText);
+                    using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+                    using var srDecrypt = new StreamReader(csDecrypt);
+                    // Read the decrypted bytes from the decrypting stream
+                    // and place them in a string.
+                    plaintext = srDecrypt.ReadToEnd();
+                }
+                catch (Exception)
+                {
+                    plaintext = "keyError";
+                }
+            }
+
+            return plaintext;
         }
 
         public static async Task<IpInfo> GetUserLocationByIp(string ip)

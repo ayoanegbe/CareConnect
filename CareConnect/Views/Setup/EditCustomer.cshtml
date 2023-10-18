@@ -1,23 +1,25 @@
-﻿@model Customer
+﻿@model CustomerViewModel
+
+@inject CustomIDataProtection protector;
 
 @{
     ViewData["Title"] = "Edit Customer";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section role="main" class="content-body card-margin">
+<section role="main" class="content-body">
     <header class="page-header">
-        <h2>Add New Customer</h2>
+        <h2>Edit Customer</h2>
 
         <div class="right-wrapper text-right">
             <ol class="breadcrumbs">
                 <li>
-                    <a asp-controller="Setup" asp-action="ListCustomers">
-                        <i class="bx bx-radar"></i>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
                     </a>
                 </li>
-                @* <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
-                <li><span>New Client</span></li> *@
+                <li><span><a asp-controller="Setup" asp-action="ListCustomers">Customers</a></span></li>
+                <li><span>Edit Customer</span></li>
             </ol>
 
             @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
@@ -26,36 +28,34 @@
     <div class="row">
         <div class="col-lg-12">
             <section class="card">
-                <header class="card-header">
-                    <h2 class="card-title">Edit Customer</h2>
-                </header>
-                @if (ViewBag.Message != null)
-                {
-                    <div class="alert alert-danger alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
-                    </div>
-                }
-                <div class="card-body">
-                    <form asp-action="EditCustomer" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="CustomerId" />
+                <form asp-action="EditCustomer" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input id="customerId" type="hidden" asp-for="CustomerId" />
+                    <input type="hidden" asp-for="OrganizationId" />
+                    <header class="card-header">
+                        <h2 class="card-title">Edit Customer</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+                    
                         <div class="row form-group">
                             <div class="col-lg-6">
                                 <label class="col-form-label" asp-for="Name"></label>
-                                <div class="input-group">
-                                    <input asp-for="Name" type="text" class="form-control" />
-                                    <span asp-validation-for="Name" class="text-danger" />
-                                </div>
+                                <input asp-for="Name" type="text" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-6">
                                 <label class="col-form-label" asp-for="Address"></label>
-                                <div class="input-group">
-                                    <input asp-for="Address" type="text" class="form-control" />
-                                    <span asp-validation-for="Address" class="text-danger" />
-                                </div>
+                                <input asp-for="Address" type="text" class="form-control" />
+                                <span asp-validation-for="Address" class="text-danger"></span>
                             </div>
 
                         </div>
@@ -64,83 +64,119 @@
 
                             <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="Phone"></label>
-                                <div class="input-group">
-                                    <input asp-for="Phone" type="text" class="form-control" />
-                                    <span asp-validation-for="Phone" class="text-danger" />
-                                </div>
+                                <input asp-for="Phone" type="text" class="form-control" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="Email"></label>
-                                <div class="input-group">
-                                    <input asp-for="Email" type="text" class="form-control" />
-                                    <span asp-validation-for="Email" class="text-danger" />
-                                </div>
+                                <input asp-for="Email" type="text" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="CustomerType"></label>
-                                <div class="input-group">
-                                    <select asp-for="CustomerType" asp-items="Html.GetEnumSelectList<CustomerType>()" class="form-control">
-                                        <option selected="selected" value="">Please Select Customer Type</option>
-                                    </select>
-                                    <span asp-validation-for="CustomerType" class="text-danger" />
-                                </div>
+                                <select asp-for="CustomerType" asp-items="Html.GetEnumSelectList<CustomerType>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Customer Type</option>
+                                </select>
+                                <span asp-validation-for="CustomerType" class="text-danger"></span>
                             </div>
-
                         </div>
 
                         <div class="row form-group">
                             <div class="col-lg-8">
                                 <label class="col-form-label" asp-for="ContactPersonName"></label>
-                                <div class="input-group">
-                                    <input asp-for="ContactPersonName" type="text" class="form-control" />
-                                    <span asp-validation-for="ContactPersonName" class="text-danger" />
-                                </div>
+                                <input asp-for="ContactPersonName" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPersonName" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="ContactPersonPhone"></label>
-                                <div class="input-group">
-                                    <input asp-for="ContactPersonPhone" type="text" class="form-control" />
-                                    <span asp-validation-for="ContactPersonPhone" class="text-danger" />
-                                </div>
+                                <input asp-for="ContactPersonPhone" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPersonPhone" class="text-danger"></span>
                             </div>
 
                         </div>
 
                         <div class="form-group row">
                             <label class="col-lg-2 control-label text-lg-right pt-2">Note</label>
-                            <div class="col-lg-6">
+                            <div class="col-lg-8">
                                 <textarea asp-for="Notes" class="summernote" displayReadonly data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }' data-plugin></textarea>
-                                <span asp-validation-for="Notes" class="text-danger" />
+                                <a class="modal-with-form btn btn-default" href="#modalForm">Add Note</a>
+                                
                             </div>
+
                         </div>
-
-                        <footer class="card-footer text-right">
-                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
-                            <a class="btn btn-secondary" asp-action="ListCustomers">Cancel</a>
-                        </footer>
-                    </form>
-                </div>
-
+                  
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue"/>
+                        <a class="btn btn-secondary" asp-action="ListCustomers">Cancel</a>
+                    </footer>
+                </form>
             </section>
-
-
         </div>
     </div>
+    <div id="modalForm" class="modal-block modal-block-primary mfp-hide">
+        <section class="card">
+            <form>
+                <header class="card-header">
+                    <h2 class="card-title">Additional Note</h2>
+                </header>
+                <div class="card-body">
 
+                    <div class="form-row">
+                        <div class="col-lg-12">
+                            <textarea id="comment" asp-for="Comment" class="summernote" displayReadonly data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }' data-plugin></textarea>
+                        </div>
+
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button id="addNote" class="btn btn-primary modal-confirm">Submit</button>
+                            <button class="btn btn-default modal-dismiss">Cancel</button>
+                        </div>
+                    </div>
+                </footer>
+            </form>
+        </section>
+    </div>
 </section>
+
 
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        
+        <script type="text/javascript">
+            $('.summernote').summernote('disable');            
+
+            $("#addNote").on('click', function () {
+                // alert($("#customerId").val());
+
+                let sourceId = _encryptAES($("#customerId").val());
+                let comment = _encryptAES($("#comment").val());
+
+                // alert(customerId);
+
+                $.ajax({
+                    type: 'POST',
+                    url: "/setup/AddNote",
+                    data: { SourceId: sourceId, Comment: comment, Source: 2 },
+                    async: true,
+                    success: function () { location.reload(); },
+                    error: function () { alert("Failed"); }
+                });
+            });
+        </script>
     }
 }

@@ -169,6 +169,13 @@ namespace CareConnect.Controllers
             if (!string.IsNullOrEmpty(source))
             {
                 ViewData["source"] = source;
+
+                if (source.Equals("admin"))
+                {
+                    var user = await _userManager.GetUserAsync(User);
+
+                    model.OrganizationId = (int)user.OrganizationId;
+                }
             }
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -182,7 +189,8 @@ namespace CareConnect.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Phone = model.Phone,
-                    ChangePassword = true
+                    ChangePassword = true,
+                    OrganizationId = model.OrganizationId
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -253,7 +261,7 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> GetAllUsers()
         {
-            return View(await _userManager.Users.ToListAsync());
+            return View(await _userManager.Users.Include(x => x.Organization).ToListAsync());
         }
 
         public async Task<IActionResult> DisableUser(string userName)
@@ -270,6 +278,11 @@ namespace CareConnect.Controllers
             }
             
             await _userManager.UpdateAsync(user);
+
+            if (await _userManager.IsInRoleAsync(user, "Super Administrator"))
+            {
+                return RedirectToAction(nameof(AccountController.GetAllUsers));
+            }
 
             return RedirectToAction(nameof(AccountController.UserList), new { organizationId = user.OrganizationId });
         }

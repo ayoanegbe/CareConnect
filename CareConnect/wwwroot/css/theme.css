@@ -22,6 +22,10 @@ body {
 	font-size: 13px;
 }
 
+textarea {
+	overflow-y: scroll;
+}
+
 a {
 	color: #CCC;
 }

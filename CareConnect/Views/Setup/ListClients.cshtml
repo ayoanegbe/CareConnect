@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Clients List";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
 }
 
 <section role="main" class="content-body">
@@ -14,7 +15,7 @@
             <ol class="breadcrumbs">
                 <li>
                     <a asp-controller="Home" asp-action="Index">
-                        <i class="bx bx-home-alt"></i>
+                        <i class="bx bx-bar-chart-alt-2"></i>
                     </a>
                 </li>
                 <li><span>Clients</span></li>
@@ -38,6 +39,7 @@
             <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>
                             @Html.DisplayNameFor(model => model.FullName)
                         </th>
@@ -57,6 +59,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
+                            <td>@(i++)</td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.FullName)
                             </td>

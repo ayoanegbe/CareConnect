@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Text;
 
@@ -62,7 +63,13 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            Client client = new();
+            ClientViewModel client = new()
+            {
+                BirthDate = DateTime.Now.AddYears(-10),
+                DateJoined = DateTime.Now,
+                BudgetStartDate = DateTime.Now,
+                BudgetEndDate = DateTime.Now.AddYears(1),
+            };
 
             ViewData["CustomerId"] = new SelectList(_context.Customers.Where(x => x.OrganizationId == user.OrganizationId), "CustomerId", "Name");
             ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName");
@@ -73,26 +80,54 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddClient([Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddieName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes,Comment")] Client client)
+        public async Task<IActionResult> AddClient([Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddieName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes")] ClientViewModel clientView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                client.OrganizationId = (int)user.OrganizationId;
+                clientView.OrganizationId = (int)user.OrganizationId;
             }
 
-            client.AddedBy = user.UserName;
-
-            if (client.Notes != null)
+            if (clientView.Notes != null)
             {
                 StringBuilder stringBuilder = new();
-                stringBuilder = stringBuilder.Append($"[{DateTime.UtcNow}] ==> {user.UserName}");
-                stringBuilder = stringBuilder.Append($"<p>{client.Comment}</p>");
+                stringBuilder = stringBuilder.AppendLine($"[{DateTime.Now}] ==> {user.UserAlias}");
+                stringBuilder = stringBuilder.Append($"{clientView.Notes}");
+                stringBuilder = stringBuilder.AppendLine();
                 stringBuilder = stringBuilder.Append(new string('-', 50));
 
-                client.Notes = stringBuilder.ToString();
+                clientView.Notes = stringBuilder.ToString();
             }
+
+            Client client = new()
+            {
+                CustomerId = clientView.CustomerId,
+                OrganizationId = clientView.OrganizationId,
+                HouseId = clientView.HouseId,
+                ResidentialType = clientView.ResidentialType,
+                FirstName = clientView.FirstName,
+                MiddleName = clientView.MiddleName,
+                LastName = clientView.LastName,
+                Gender = clientView.Gender,
+                DateJoined = clientView.DateJoined,
+                BirthDate = clientView.BirthDate,
+                Phone = clientView.Phone,
+                Email = clientView.Email,
+                EmergencyContactAddress = clientView.EmergencyContactAddress,
+                EmergencyContactPhone = clientView.EmergencyContactPhone,
+                Relationship = clientView.Relationship,
+                GuadianPhoneNumber = clientView.GuadianPhoneNumber,
+                FamilyPhysician = clientView.FamilyPhysician,
+                Psychiatrist = clientView.Psychiatrist,
+                Budget = clientView.Budget,
+                CurrencyId = clientView.CurrencyId,
+                BudgetStartDate = clientView.BudgetStartDate,
+                BudgetEndDate = clientView.BudgetEndDate,
+                Notes = clientView.Notes,
+                AddedBy = user.UserName,
+                DateAdded = DateTime.Now
+            };
 
             try
             {
@@ -125,7 +160,7 @@ namespace CareConnect.Controllers
             ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName", client.HouseId);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", client.CurrencyId);
 
-            return View(client);
+            return View(clientView);
         }
 
         public async Task<IActionResult> EditClient(string id)
@@ -180,17 +215,6 @@ namespace CareConnect.Controllers
             client.UpdatedBy = user.UserName;
             client.DateUpdated = DateTime.UtcNow;
 
-            if (client.Notes != null)
-            {
-                StringBuilder stringBuilder = new();
-                stringBuilder = stringBuilder.Append(Environment.NewLine);
-                stringBuilder = stringBuilder.Append($"[{DateTime.UtcNow}] ==> {user.UserName}");
-                stringBuilder = stringBuilder.Append($"<p>{client.Comment}</p>");
-                stringBuilder = stringBuilder.Append(new string('-', 50));
-
-                client.Notes += stringBuilder.ToString();
-            }
-
             var oldValue = JsonConvert.SerializeObject(await _context.Clients.FirstOrDefaultAsync(x => x.ClientId == client.ClientId));
 
             if (ModelState.IsValid)
@@ -203,6 +227,8 @@ namespace CareConnect.Controllers
                     var newValue = JsonConvert.SerializeObject(client);
 
                     await _audit.UpdateAuditTrail((int)user.OrganizationId, client.GetType().Name, UpdateAction.Update, oldValue, newValue, user.UserName);
+
+                    return RedirectToAction(nameof(ListClients));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -213,10 +239,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListClients));
+                
             }
             else
             {
@@ -231,8 +259,6 @@ namespace CareConnect.Controllers
 
             return View(client);
         }
-
-
 
         // Currency
         public async Task<IActionResult> ListCurrencies()
@@ -376,39 +402,57 @@ namespace CareConnect.Controllers
 
         public IActionResult AddCustomer()
         {
-            Customer customer = new();
+            CustomerViewModel customer = new();
 
             return View(customer);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCustomer([Bind("CustomerId,OrganizationId,Name,Address,Phone,Email,ContactPersonName,ContactPersonPhone,Notes,Comment")] Customer customer)
+        public async Task<IActionResult> AddCustomer([Bind("CustomerId,OrganizationId,Name,CustomerType,Address,Phone,Email,ContactPersonName,ContactPersonPhone,Notes,Comment")] CustomerViewModel customerView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                customer.OrganizationId = (int)user.OrganizationId;
-            }
+                customerView.OrganizationId = (int)user.OrganizationId;
+            }            
 
-            customer.AddedBy = user.UserName;
-
-            if (customer.Notes != null)
+            if (customerView.Notes != null)
             {
                 StringBuilder stringBuilder = new();
-                stringBuilder = stringBuilder.Append($"[{DateTime.UtcNow}] ==> {user.UserName}");
-                stringBuilder = stringBuilder.Append($"<p>{customer.Comment}</p>");
+                stringBuilder = stringBuilder.AppendLine($"[{DateTime.Now}] ==> {user.UserAlias}");
+                stringBuilder = stringBuilder.Append($"{customerView.Notes}");
+                stringBuilder = stringBuilder.AppendLine();
                 stringBuilder = stringBuilder.Append(new string('-', 50));
 
-                customer.Notes = stringBuilder.ToString();
+                customerView.Notes = stringBuilder.ToString();
             }
+
+            Customer customer = new()
+            {
+                OrganizationId = customerView.OrganizationId,
+                Name = customerView.Name,
+                CustomerType = customerView.CustomerType,
+                Address = customerView.Address,
+                Phone = customerView.Phone,
+                Email = customerView.Email,
+                ContactPersonName = customerView.ContactPersonName,
+                ContactPersonPhone = customerView.ContactPersonPhone,
+                Notes = customerView.Notes,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(customer);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListClients));
+
+                var newValue = JsonConvert.SerializeObject(customer);
+
+                await _audit.UpdateAuditTrail((int)user.OrganizationId, customer.GetType().Name, UpdateAction.Create, newValue, user.UserName);
+
+                return RedirectToAction(nameof(ListCustomers));
             }
             else
             {
@@ -417,7 +461,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(customer);
+            return View(customerView);
         }
 
         public async Task<IActionResult> EditCustomer(string id)
@@ -439,12 +483,27 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(customer);
+            CustomerViewModel customerView = new()
+            {
+                CustomerId = customer.CustomerId,
+                OrganizationId = customer.OrganizationId,
+                CustomerType = customer.CustomerType,
+                Name = customer.Name,
+                Address = customer.Address,
+                Phone = customer.Phone,
+                Email = customer.Email,
+                ContactPersonName = customer.ContactPersonName,
+                ContactPersonPhone = customer.ContactPersonPhone,
+                Notes = customer.Notes,
+                Comment = customer.Comment
+            };
+
+            return View(customerView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCustomer(string id, [Bind("CustomerId,OrganizationId,Name,Address,Phone,Email,ContactPersonName,ContactPersonPhone,Notes")] Customer customer)
+        public async Task<IActionResult> EditCustomer(string id, [Bind("CustomerId,OrganizationId,Name,CustomerType,Address,Phone,Email,ContactPersonName,ContactPersonPhone,Notes")] CustomerViewModel customerView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -452,25 +511,28 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != customer.CustomerId)
+            if (num != customerView.CustomerId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            customer.UpdatedBy = user.UserName;
-            customer.DateUpdated = DateTime.UtcNow;
 
-            if (customer.Notes != null)
+            Customer customer = new()
             {
-                StringBuilder stringBuilder = new();
-                stringBuilder = stringBuilder.Append(Environment.NewLine);
-                stringBuilder = stringBuilder.Append($"[{DateTime.UtcNow}] ==> {user.UserName}");
-                stringBuilder = stringBuilder.Append($"<p>{customer.Comment}</p>");
-                stringBuilder = stringBuilder.Append(new string('-', 50));
-
-                customer.Notes += stringBuilder.ToString();
-            }
+                CustomerId = customerView.CustomerId,
+                OrganizationId = customerView.OrganizationId,
+                Name = customerView.Name,
+                CustomerType = customerView.CustomerType,
+                Address = customerView.Address,
+                Phone = customerView.Phone,
+                Email = customerView.Email,
+                ContactPersonName = customerView.ContactPersonName,
+                ContactPersonPhone = customerView.ContactPersonPhone,
+                Notes = customerView.Notes,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             if (ModelState.IsValid)
             {
@@ -478,6 +540,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(customer);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListCustomers));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -488,10 +551,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListCustomers));
+                
             }
             else
             {
@@ -500,7 +565,50 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(customer);
+            return View(customerView);
+        }
+
+        public async Task<IActionResult> AddNote(NoteViewModel noteView)
+        {
+            string decodedNum = JsonConvert.DeserializeObject<string>(Utils.DecryptStringAES(noteView.SourceId));
+            int num = int.Parse(decodedNum);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            string decodedComment = JsonConvert.DeserializeObject<string>(Utils.DecryptStringAES(noteView.Comment));
+
+            StringBuilder stringBuilder = new();
+            stringBuilder = stringBuilder.Append(Environment.NewLine);
+            stringBuilder = stringBuilder.AppendLine($"[{DateTime.Now}] ==> {user.UserAlias}");
+            stringBuilder = stringBuilder.Append($"{decodedComment}");
+            stringBuilder = stringBuilder.AppendLine();
+            stringBuilder = stringBuilder.Append(new string('-', 50));
+
+            if (noteView.Soure == NoteSource.Customer)
+            {
+                Customer customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId == num);
+                customer.Notes += stringBuilder.ToString();
+
+                _context.Update(customer);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(EditCustomer), new { id = _protector.Encode(num.ToString()) });
+            }
+            else
+            {
+                Client client = await _context.Clients.FirstOrDefaultAsync(x => x.ClientId == num);
+                client.Notes += stringBuilder.ToString();
+
+                _context.Update(client);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(EditClient), new { id = _protector.Encode(num.ToString()) });
+            }
+            
         }
 
         public async Task<IActionResult> ListDepartments()
@@ -626,29 +734,39 @@ namespace CareConnect.Controllers
 
         public IActionResult AddHouse()
         {
-            House house = new();
+            HouseViewModel house = new();
 
             return View(house);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddHouse([Bind("HouseId,HouseName,Organization,Address,City,PostCode,Longitude,Latitude")] House house)
+        public async Task<IActionResult> AddHouse([Bind("HouseId,HouseName,OrganizationId,Address,City,PostCode,Longitude,Latitude")] HouseViewModel houseView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                house.OrganizationId = (int)user.OrganizationId;
+                houseView.OrganizationId = (int)user.OrganizationId;
             }
 
-            house.AddedBy = user.UserName;
+            House house = new()
+            {
+                HouseName = houseView.HouseName,
+                OrganizationId = houseView.OrganizationId,
+                Address = houseView.Address,
+                City = houseView.City,
+                PostCode = houseView.PostCode,
+                Longitude = houseView.Longitude,
+                Latitude = houseView.Latitude,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(house);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListClients));
+                return RedirectToAction(nameof(ListHouses));
             }
             else
             {
@@ -657,7 +775,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(house);
+            return View(houseView);
         }
 
         public async Task<IActionResult> EditHouse(string id)
@@ -679,12 +797,24 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(house);
+            HouseViewModel houseView = new()
+            {
+                HouseId = house.HouseId,
+                HouseName = house.HouseName,
+                OrganizationId = house.OrganizationId,
+                Address = house.Address,
+                City = house.City,
+                PostCode = house.PostCode,
+                Longitude = house.Longitude,
+                Latitude = house.Latitude,
+            };
+
+            return View(houseView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditHouse(string id, [Bind("HouseId,HouseName,Organization,CompanyId,Address,City,PostCode,Longitude,Latitude")] House house)
+        public async Task<IActionResult> EditHouse(string id, [Bind("HouseId,HouseName,OrganizationId,CompanyId,Address,City,PostCode,Longitude,Latitude")] HouseViewModel houseView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -692,14 +822,27 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != house.HouseId)
+            if (num != houseView.HouseId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            house.UpdatedBy = user.UserName;
-            house.DateUpdated = DateTime.UtcNow;
+
+            House house = new()
+            {
+                HouseId = houseView.HouseId,
+                HouseName = houseView.HouseName,
+                OrganizationId = houseView.OrganizationId,
+                Address = houseView.Address,
+                City = houseView.City,
+                PostCode = houseView.PostCode,
+                Longitude = houseView.Longitude,
+                Latitude = houseView.Latitude,
+                IsActive = houseView.IsActive,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now,
+            };
 
             if (ModelState.IsValid)
             {
@@ -707,6 +850,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(house);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListHouses));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -717,10 +861,13 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListHouses));
+                
             }
             else
             {
@@ -729,7 +876,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(house);
+            return View(houseView);
         }
 
         public async Task<IActionResult> ListJobTitles()
