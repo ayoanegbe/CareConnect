@@ -70,6 +70,33 @@ namespace CareConnect.Services
             return true;
         }
 
+        public async Task<string> SaveFile2(IFormFile file, string subDirectory)
+        {
+            subDirectory ??= string.Empty;
+            var filePath = string.Empty;
+
+            try
+            {
+                string imagesPath = Path.Combine(_environment.WebRootPath, "documents");
+
+                string target = Path.Combine(imagesPath, subDirectory);
+
+                Directory.CreateDirectory(target);
+
+                filePath = Path.Combine(target, file.FileName);
+                using FileStream stream = new(filePath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"File upload error: {ex}");
+                return null;
+            }
+
+            return filePath;
+        }
+
         public (string fileType, byte[] archiveData, string archiveName) FetechFiles(string subDirectory)
         {
             string zipName = $"archive-{DateTime.Now:yyyy_MM_dd-HH_mm_ss}.zip";

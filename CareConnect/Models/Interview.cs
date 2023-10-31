@@ -11,16 +11,18 @@ namespace CareConnect.Models
         public int OrganizationId { get; set; }
         public Organization Organization { get; set; }
         [ForeignKey("Interview_Applicant")]
+        [Display(Name = "Applicant")]
         public int ApplicantId { get; set; }
         public Applicant Applicant { get; set; }
         [DataType(DataType.Date)]
+        [Display(Name = "Interview Date")]
         public DateTime InterviewDate { get; set; }
         [DataType(DataType.Time)]
+        [Display(Name = "Interview Time")]
         public DateTime InterviewTime { get; set;}
-        public List<Interviewer> Interviewers { get; set; }
         public string Note { get; set; }
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         [Display(Name = "Added By")]

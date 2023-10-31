@@ -26,17 +26,123 @@
                             <i class="bx bx-bar-chart-alt-2" aria-hidden="true"></i>
                             <span>Dashboard</span>
                         </a>
-                    </li>                   
-                    @if(!await UserManager.IsInRoleAsync(user, "User"))
+                    </li>
+                    @if (await UserManager.IsInRoleAsync(user, "Administrator"))
                     {
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                <i class="bx bx-cog" aria-hidden="true"></i>
+                                <span>Setup</span>
+                            </a>
+                            <ul class="nav nav-children">
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListHouses">
+                                        Houses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListCustomers">
+                                        Customers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListClients">
+                                        Clients
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListDepartments">
+                                        Departments
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListJobTitles">
+                                        Job Titles
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListPayGrades">
+                                        Pay Grades
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListVendors">
+                                        Vendors
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (await UserManager.IsInRoleAsync(user, "Super Administrator"))
+                    {
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                <i class="bx bx-cog" aria-hidden="true"></i>
+                                <span>Setup</span>
+                            </a>
+                            <ul class="nav nav-children">
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListTenants">
+                                        Tenant
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListOrganizations">
+                                        Organization
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListCurrencies">
+                                        Currency
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListSubscriptionRates">
+                                        Subscription Rate
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Setup" asp-action="ListSubscriptions">
+                                        Subscription
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    }
+                    @if (await UserManager.IsInRoleAsync(user, "Administrator"))
+                    {
+ 
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                <i class="bx bx-target-lock" aria-hidden="true"></i>
+                                <span>Employee Management</span>
+                            </a>
+                            <ul class="nav nav-children">
+                                <li>
+                                    <a asp-controller="EmployeeManagement" asp-action="ListVacancies">
+                                        Vacancy
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="EmployeeManagement" asp-action="ListInterviews">
+                                        Interview
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="EmployeeManagement" asp-action="ListEmployees">
+                                        Employee
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                         <li>
                             <a class="nav-link" asp-controller="Shifts" asp-action="Create">
                                 <i class="bx bx-loader-circle" aria-hidden="true"></i>
                                 <span>Add New Shift</span>
                             </a>
                         </li>
-
-                        
                     }
                     
                     <li>
@@ -106,84 +212,7 @@
                             </ul>
                         </li>
                     }
-                    @if (await UserManager.IsInRoleAsync(user, "Administrator"))
-                    {
-                        <li class="nav-parent">
-                            <a class="nav-link" href="#">
-                                <i class="bx bx-user" aria-hidden="true"></i>
-                                <span>Setup</span>
-                            </a>
-                            <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListHouses">
-                                        Houses
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListCustomers">
-                                        Customers
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListClients">
-                                        Clients
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListDepartments">
-                                        Departments
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListJobTitles">
-                                        Job Titles
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListPayGrades">
-                                        Pay Grades
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    }
-                    @if (await UserManager.IsInRoleAsync(user, "Super Administrator"))
-                    {
-                        <li class="nav-parent">
-                            <a class="nav-link" href="#">
-                                <i class="bx bx-user" aria-hidden="true"></i>
-                                <span>Setup</span>
-                            </a>
-                            <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListTenants">
-                                        Tenant
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListOrganizations">
-                                        Organization
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListCurrencies">
-                                        Currency
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListSubscriptionRates">
-                                        Subscription Rate
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListSubscriptions">
-                                        Subscription
-                                    </a>
-                                </li>
-                                
-                            </ul>
-                        </li>
-                    }
+                    
                 </ul>
             </nav>
 

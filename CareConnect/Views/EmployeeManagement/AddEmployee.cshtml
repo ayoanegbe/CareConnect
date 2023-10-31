@@ -1,0 +1,320 @@
+﻿@model EmployeeViewModel
+
+@{
+    ViewData["Title"] = "Add New Employee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Add New Employee</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="EmployeeManagement" asp-action="ListEmployees">Employees</a></span></li>
+                <li><span>New Employee</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-action="AddEmployee" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Employee</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="LastName"></label>
+                                <input asp-for="LastName" type="text" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="MiddleName"></label>
+                                <input asp-for="MiddleName" type="text" class="form-control" />
+                                <span asp-validation-for="MiddleName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="FirstName"></label>
+                                <input asp-for="FirstName" type="text" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="DepartmentId"></label>
+                                <select data-plugin-selectTwo asp-for="DepartmentId" asp-items="ViewBag.DepartmentId" class="form-control">
+                                    <option selected="" value="">Please Select Department</option>
+                                </select>
+                                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="PayGradeLevelId"></label>
+                                <select data-plugin-selectTwo asp-for="PayGradeLevelId" asp-items="ViewBag.PayGradeLevelId" class="form-control">
+                                    <option selected="" value="">Please Select Pay Grade Level</option>
+                                </select>
+                                <span asp-validation-for="PayGradeLevelId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="LineManagerId"></label>
+                                <select data-plugin-selectTwo asp-for="LineManagerId" asp-items="ViewBag.EmployeeId" class="form-control">
+                                    <option selected="" value="">Please Select Line Manager</option>
+                                </select>
+                                <span asp-validation-for="LineManagerId" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="Address"></label>
+                                <input asp-for="Address" type="text" class="form-control" />
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="City"></label>
+                                <input asp-for="City" type="text" class="form-control" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="PostCode"></label>
+                                <input asp-for="PostCode" type="text" class="form-control" />
+                                <span asp-validation-for="PostCode" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Gender"></label>
+                                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Gender</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="BirthDate"></label>
+                                <input asp-for="BirthDate" type="date" class="form-control" />
+                                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="DateJoined"></label>
+                                <input asp-for="DateJoined" type="date" class="form-control" />
+                                <span asp-validation-for="DateJoined" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        
+                        <div class="row form-group">
+                            
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Email"></label>
+                                <input asp-for="Email" type="email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Phone"></label>
+                                <input asp-for="Phone" type="tel" class="form-control" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="ImmigrationStatus"></label>
+                                <select asp-for="ImmigrationStatus" asp-items="Html.GetEnumSelectList<ImmigrationStatus>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Gender</option>
+                                </select>
+                                <span asp-validation-for="ImmigrationStatus" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="SocialInsuranceNumber"></label>
+                                <input asp-for="SocialInsuranceNumber" type="text" class="form-control" />
+                                <span asp-validation-for="SocialInsuranceNumber" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="EmergencyContactAddress"></label>
+                                <input asp-for="EmergencyContactAddress" type="text" class="form-control" />
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="EmergencyContactPhone"></label>
+                                <input asp-for="EmergencyContactPhone" type="tel" class="form-control" />
+                                <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Relationship"></label>
+                                <input asp-for="Relationship" type="text" class="form-control" />
+                                <span asp-validation-for="Relationship" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Status"></label>
+                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<EmployeeType>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Gender</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="ContractorType"></label>
+                                <select asp-for="ContractorType" asp-items="Html.GetEnumSelectList<ContractorType>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Contract Type</option>
+                                </select>
+                                <span asp-validation-for="ContractorType" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="PaymentMethod"></label>
+                                <select asp-for="PaymentMethod" id="paymentMethod" asp-items="Html.GetEnumSelectList<PaymentMethod>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Payment Method</option>
+                                </select>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        
+
+                        <div class="row form-group" id="bankInfo">
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="BankName"></label>
+                                <input asp-for="BankName" type="text" id="bankName" class="form-control" />
+                                <span asp-validation-for="BankName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="BankCode"></label>
+                                <input asp-for="BankCode" type="number" id="bankCode" class="form-control" />
+                                <span asp-validation-for="BankCode" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="TransitCode"></label>
+                                <input asp-for="TransitCode" type="number" id="transitCode" class="form-control" />
+                                <span asp-validation-for="TransitCode" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="AccountNumber"></label>
+                                <input asp-for="AccountNumber" type="number" id="accountNumber" class="form-control" />
+                                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListEmployees">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        <style>
+            /* Chrome, Safari, Edge, Opera */
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            /* Firefox */
+            input[type=number] {
+                -moz-appearance: textfield;
+            }
+        </style>
+
+        <script type="text/javascript">
+            $('#paymentMethod').bind('change', function () {
+
+                if ($("#paymentMethod").val() != "2") {
+                    $("#bankInfo").hide();
+                }
+                else {
+                    $("#bankInfo").show();
+                }
+            });
+        </script>
+    }
+}

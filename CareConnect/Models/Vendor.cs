@@ -22,28 +22,26 @@ namespace CareConnect.Models
         [Required]
         public string Address { get; set; }
         public string City { get; set; }
+        [Display(Name = "Post Code")]
         public string PostCode { get; set; }
+        [Display(Name = "Contact Person")]
         public string ContactPerson { get; set; }
 
         #region Bank Details
         [Display(Name = "Payment Method")]
         public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.DirectDeposit;
-        [Required]
         [Display(Name = "Bank Name")]
         public string BankName { get; set; }
-        [Required]
         [Display(Name = "Bank Code")]
         public string BankCode { get; set; }
-        [Required]
         [Display(Name = "Transit Code")]
         public string TransitCode { get; set; }
-        [Required]
         [Display(Name = "Account Number")]
         public string AccountNumber { get; set; }
         #endregion
 
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         [Display(Name = "Added By")]

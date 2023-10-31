@@ -23,33 +23,30 @@ var _decryptAES = function (ciphertext) {
 
 $('input.CurrencyInput').on('blur', function () {
 
-    let num = this.value;
-    if (isNaN(num))
-        num = "0";
-    let sign = (num == (num = Math.abs(num)));
-    num = Math.floor(num * 100 + 0.50000000001);
-    let cents = num % 100;
-    num = Math.floor(num / 100).toString();
-    if (cents < 10)
-        cents = "0" + cents;
-    for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++)
-        num = num.substring(0, num.length - (4 * i + 3)) + ',' +
-            num.substring(num.length - (4 * i + 3));
+    let value = this.value;
+    if (isNaN(value))
+        value = "0";
+    let sign = (value == (value = Math.abs(value)));
+    value = Math.floor(value * 100 + 0.50000000001);
+    let dec = value % 100;
+    value = Math.floor(value / 100).toString();
+    if (dec < 10)
+        dec = "0" + dec;
+    for (var i = 0; i < Math.floor((value.length - (1 + i)) / 3); i++)
+        value = value.substring(0, value.length - (4 * i + 3)) + ',' + value.substring(value.length - (4 * i + 3));
     let sg = sign ? '' : '-';
-    this.value = sg + num + '.' + cents;
+    this.value = sg + value + '.' + dec;
 });
 
-const items = [43, 45, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
+const items = ['-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 var number_input = document.getElementById('number_input');
 
 number_input.addEventListener('keypress', function (evt) {
-    // if (evt.which < 48 || evt.which > 57)  {
-    //     evt.preventDefault();
-    // }
 
-    if (!items.includes(evt.which)) {
+    if (!items.includes(evt.key)) {
         evt.preventDefault();
     }
 });
+
 

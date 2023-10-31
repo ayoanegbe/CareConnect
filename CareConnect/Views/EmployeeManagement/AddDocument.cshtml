@@ -1,0 +1,96 @@
+﻿@model EmployeeDocumentViewModel
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Add New Document";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Add New Document</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="EmployeeManagement" asp-action="ListEmployees">Employees</a></span></li>
+                <li><span><a asp-action="EmployeeDocs" asp-route-id="@protector.Encode(Model.EmployeeId.ToString())">Documents</a></span></li>
+                <li><span>New Document</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-controller="EmployeeManagement" asp-action="AddDocument" method="post">
+                    <input asp-for="EmployeeId" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Vacancy</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="DocumentName"></label>
+                                <input asp-for="DocumentName" type="text" class="form-control" />
+                                <span asp-validation-for="DocumentName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 control-label text-lg-right pt-2">File Upload</label>
+                                <div class="col-lg-6">
+                                    <div class="fileupload fileupload-new" data-provides="fileupload">
+                                        <div class="input-append">
+                                            <div class="uneditable-input">
+                                                <i class="fas fa-file fileupload-exists"></i>
+                                                <span class="fileupload-preview"></span>
+                                            </div>
+                                            <span class="btn btn-default btn-file">
+                                                <span class="fileupload-exists">Change</span>
+                                                <span class="fileupload-new">Select file</span>
+                                                <input asp-for="File" type="file" />
+                                                <span asp-validation-for="File" class="text-danger"></span>
+                                            </span>
+                                            <a href="#" class="btn btn-default fileupload-exists" data-dismiss="fileupload">Remove</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="EmployeeDocs" asp-route-id="@protector.Encode(Model.EmployeeId.ToString())">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

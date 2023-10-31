@@ -73,6 +73,7 @@ namespace CareConnect.Models
         public string Notes { get; set; }
         public string Comment { get; set; }
 
+        [Display(Name = "Full Name")]
         public string FullName => $"{this.LastName}, {this.FirstName} {this.MiddleName}";
 
         [Display(Name = "Date Added")]

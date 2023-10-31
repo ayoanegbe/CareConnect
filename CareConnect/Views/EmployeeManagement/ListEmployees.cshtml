@@ -1,0 +1,100 @@
+﻿@model IEnumerable<Employee>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Employees List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Employees</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span>Employees</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <section class="card">
+        <header class="card-header">
+            <h2 class="card-title">List of Employees</h2>
+        </header>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="m-0">
+                        <a asp-controller="EmployeeManagement" asp-action="AddEmployee" class="btn btn-primary" style="background-color:cornflowerblue">Add Employee<i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.FullName)
+                        </th>
+                        <th>
+                            Department
+                        </th>
+                        <th>
+                            Job Title
+                        </th>
+                        <th>
+                            Pay Grade Level
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Status)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.DateJoined)
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FullName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Department.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.JobTitle.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PayGradeLevel.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateJoined)
+                            </td>
+                            <td>
+                                <a asp-action="EditEmployee" asp-route-id="@protector.Encode(item.EmployeeId.ToString())" style="color:magenta">Edit</a> |
+                                <a asp-action="EmployeeDocs" asp-route-id="@protector.Encode(item.EmployeeId.ToString())" style="color:darkblue">Documents</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-controller="Home" asp-action="Index"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>

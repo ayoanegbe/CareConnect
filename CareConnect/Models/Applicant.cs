@@ -9,6 +9,7 @@ namespace CareConnect.Models
         [Key]
         public int ApplicantId { get; set; }
         [ForeignKey("Applicant_Vacancy")]
+        [Display(Name = "Vacancy")]
         public int VacancyId { get; set; }
         public Vacancy Vacancy { get; set;}
         [ForeignKey("Applicant_Organization")]
@@ -35,6 +36,7 @@ namespace CareConnect.Models
         [Display(Name = "Date Applied")]
         public DateTime DateApplied { get; set; } = DateTime.UtcNow;
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Fresh;
+        [Display(Name = "Full Name")]
         public string FullName => $"{this.LastName}, {this.FirstName} {this.MiddleName}";
     }
 }

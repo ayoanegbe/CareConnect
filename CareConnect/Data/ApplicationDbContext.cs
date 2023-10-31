@@ -12,15 +12,16 @@ namespace CareConnect.Data
         }
 
         public DbSet<Alert> Alerts { get; set; }
+        public DbSet<Allowance> Allowances { get; set; }
         public DbSet<Applicant> Applicants { get; set; }
         public DbSet<ApplicantDocument> ApplicantDocuments { get; set; }
         public DbSet<AuditTrail> AuditTrails { get; set; }
-        public DbSet<CaseManager> CaseManagers { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<ClientBudgetHistory> ClientBudgetHistories { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Deduction> Deductions { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmergencyClockOut> EmergencyClockOuts { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -41,7 +42,9 @@ namespace CareConnect.Data
         public DbSet<OvertimeComment> OvertimeComments { get; set; }
         public DbSet<PayGrade> PayGrades { get; set; }
         public DbSet<PayGradeLevel> PayGradeLevels { get; set; }
-        public DbSet<PayGradeLevelDeduction> PayGradeLevelDeductions { get; set; }
+        public DbSet<Payroll> Payrolls { get; set; }
+        public DbSet<PayrollAllowance> PayrollAllowances { get; set; }
+        public DbSet<PayrollDeduction> PayrollDeductions { get; set; }
         public DbSet<PayrollHistory> PayrollHistories { get; set; }
         public DbSet<Respite> Respites { get; set; }
         public DbSet<RespiteAssignment> RespiteAssignments { get; set; }

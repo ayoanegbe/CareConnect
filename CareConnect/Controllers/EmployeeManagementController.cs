@@ -29,7 +29,6 @@ namespace CareConnect.Controllers
         private readonly IFileService _fileService;
         private readonly IWebHostEnvironment _environment;
         private readonly IEmailSender _emailSender;
-        private readonly EmailSettings _emailSettings;
 
         public EmployeeManagementController(
             ILogger<EmployeeManagementController> logger,
@@ -42,8 +41,7 @@ namespace CareConnect.Controllers
             RecaptchaService recaptchaService,
             IFileService fileService,
             IWebHostEnvironment environment,
-            IEmailSender emailSender,
-            EmailSettings emailSettings
+            IEmailSender emailSender
             )
         {
             _logger = logger;
@@ -57,7 +55,6 @@ namespace CareConnect.Controllers
             _fileService = fileService;
             _environment = environment;
             _emailSender = emailSender;
-            _emailSettings = emailSettings;
         }
         public async Task<IActionResult> Index(string id) // pass organization ID
         {
@@ -74,34 +71,83 @@ namespace CareConnect.Controllers
                 .ToListAsync());
         }
 
-        public IActionResult AddEmployee(string id) //  pass organization ID
+        public async Task<IActionResult> ListEmployees()
         {
-            int num = Resolver(id);
-            if (num == 0)
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(
+                await _context.Employees
+                .Where(x => x.OrganizationId == user.OrganizationId)
+                .Include(d => d.Department)
+                .Include(g => g.JobTitle)
+                .Include(p => p.PayGradeLevel)
+                .ToListAsync()
+                );
+        }
+
+        public async Task<IActionResult> AddEmployee()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            EmployeeViewModel employee = new()
             {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
+                BirthDate = DateTime.Now.AddYears(-10),
+                Documents = new List<EmployeeDocument>()
+            };
 
-            Employee employee = new();
-
-            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == num), "DepartmentId", "Name");
-            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == num), "JobTitleId", "Title");
+            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == user.OrganizationId), "DepartmentId", "Name");
+            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == user.OrganizationId), "JobTitleId", "Title");
+            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels.Where(x => x.PayGrade.OrganizationId == user.OrganizationId), "PayGradeLevelId", "Description");
+            ViewData["EmployeeId"] = new SelectList(_context.Employees.Where(x => x.OrganizationId == user.OrganizationId), "EmployeeId", "FullName");
 
             return View(employee);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddEmployee([Bind("EmployeeId,DepartmentId,JobTitleId,FirstName,MiddleName,LastName,Gender,BirthDate,Address,City,PostCode,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,DateJoined,Status,ContractorType,ImmigrationStatus,SocialInsuranceNumber,LineManagerId,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber,PaymentFrequency")] Employee employee)
+        public async Task<IActionResult> AddEmployee([Bind("EmployeeId,DepartmentId,JobTitleId,PayGradeLevelId,FirstName,MiddleName,LastName,Gender,BirthDate,Address,City,PostCode,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,DateJoined,Status,ContractorType,ImmigrationStatus,SocialInsuranceNumber,LineManagerId,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber,PaymentFrequency,Documents")] EmployeeViewModel employeeView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                employee.OrganizationId = (int)user.OrganizationId;
+                employeeView.OrganizationId = (int)user.OrganizationId;
             }
 
-            employee.AddedBy = user.UserName;
+            Employee employee = new()
+            {
+                OrganizationId = employeeView.OrganizationId,
+                DepartmentId = employeeView.DepartmentId,
+                JobTitleId = employeeView.JobTitleId,
+                PayGradeLevelId = employeeView.PayGradeLevelId,
+                FirstName = employeeView.FirstName,
+                MiddleName = employeeView.LastName,
+                LastName = employeeView.LastName,
+                Gender = employeeView.Gender,
+                BirthDate = employeeView.BirthDate,
+                Address = employeeView.Address,
+                City = employeeView.City,
+                PostCode = employeeView.PostCode,
+                Phone = employeeView.Phone,
+                Email = employeeView.Email,
+                EmergencyContactPhone = employeeView.EmergencyContactPhone,
+                EmergencyContactAddress = employeeView.EmergencyContactAddress,
+                Relationship = employeeView.Relationship,
+                DateJoined = employeeView.DateJoined,
+                Status = employeeView.Status,
+                ContractorType = employeeView.ContractorType,
+                ImmigrationStatus = employeeView.ImmigrationStatus,
+                SocialInsuranceNumber = employeeView.SocialInsuranceNumber,
+                LineManagerId = employeeView.LineManagerId,
+                PaymentMethod = employeeView.PaymentMethod,
+                BankName = employeeView.BankName,
+                BankCode = employeeView.BankCode,
+                TransitCode = employeeView.TransitCode,
+                AccountNumber = employeeView.AccountNumber,
+                PaymentFrequency = employeeView.PaymentFrequency,
+                AddedBy = user.UserName,
+                DateAdded = DateTime.Now
+            };
 
             if (ModelState.IsValid)
             {
@@ -123,8 +169,10 @@ namespace CareConnect.Controllers
 
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", employee.DepartmentId);
             ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", employee.JobTitleId);
+            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels.Where(x => x.PayGrade.OrganizationId == user.OrganizationId), "PayGradeLevelId", "Description", employee.PayGradeLevelId);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees.Where(x => x.OrganizationId == user.OrganizationId && x.EmployeeId != employeeView.EmployeeId), "EmployeeId", "FullName", employee.LineManagerId);
 
-            return View(employee);
+            return View(employeeView);
         }
 
         public async Task<IActionResult> EditEmployee(string id)
@@ -142,21 +190,57 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var employee = await _context.Employees.Include(m => m.Department).Include(t => t.JobTitle).FirstOrDefaultAsync(x => x.EmployeeId == num);
+            var employee = await _context.Employees.Include(m => m.Department).Include(t => t.JobTitle).Include(p => p.PayGradeLevel).FirstOrDefaultAsync(x => x.EmployeeId == num);
             if (employee == null)
             {
                 return NotFound();
             }
 
+            EmployeeViewModel employeeView = new()
+            {
+                EmployeeId = employee.EmployeeId,
+                OrganizationId = employee.OrganizationId,
+                DepartmentId = employee.DepartmentId,
+                JobTitleId = employee.JobTitleId,
+                PayGradeLevelId = employee.PayGradeLevelId,
+                FirstName = employee.FirstName,
+                MiddleName = employee.LastName,
+                LastName = employee.LastName,
+                Gender = employee.Gender,
+                BirthDate = employee.BirthDate,
+                Address = employee.Address,
+                City = employee.City,
+                PostCode = employee.PostCode,
+                Phone = employee.Phone,
+                Email = employee.Email,
+                EmergencyContactPhone = employee.EmergencyContactPhone,
+                EmergencyContactAddress = employee.EmergencyContactAddress,
+                Relationship = employee.Relationship,
+                DateJoined = employee.DateJoined,
+                Status = employee.Status,
+                ContractorType = employee.ContractorType,
+                ImmigrationStatus = employee.ImmigrationStatus,
+                SocialInsuranceNumber = employee.SocialInsuranceNumber,
+                LineManagerId = employee.LineManagerId,
+                PaymentMethod = employee.PaymentMethod,
+                BankName = employee.BankName,
+                BankCode = employee.BankCode,
+                TransitCode = employee.TransitCode,
+                AccountNumber = employee.AccountNumber,
+                PaymentFrequency = employee.PaymentFrequency,
+            };
+
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", employee.DepartmentId);
             ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", employee.JobTitleId);
+            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels.Where(x => x.PayGrade.OrganizationId == user.OrganizationId), "PayGradeLevelId", "Description", employee.PayGradeLevelId);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees.Where(x => x.OrganizationId == user.OrganizationId && x.EmployeeId != employeeView.EmployeeId), "EmployeeId", "FullName", employee.LineManagerId);
 
-            return View(employee);
+            return View(employeeView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditEmployee(string id, [Bind("EmployeeId,DepartmentId,JobTitleId,FirstName,MiddleName,LastName,Gender,BirthDate,Address,City,PostCode,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,DateJoined,Status,ContractorType,ImmigrationStatus,SocialInsuranceNumber,LineManagerId,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber,PaymentFrequency")] Employee employee)
+        public async Task<IActionResult> EditEmployee(string id, [Bind("EmployeeId,OrganizationId,DepartmentId,JobTitleId,PayGradeLevelId,FirstName,MiddleName,LastName,Gender,BirthDate,Address,City,PostCode,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,DateJoined,Status,ContractorType,ImmigrationStatus,SocialInsuranceNumber,LineManagerId,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber,PaymentFrequency,FormFiles")] EmployeeViewModel employeeView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -164,14 +248,47 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != employee.EmployeeId)
+            if (num != employeeView.EmployeeId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            employee.UpdatedBy = user.UserName;
-            employee.DateUpdated = DateTime.UtcNow;
+
+            Employee employee = new()
+            {
+                OrganizationId = employeeView.OrganizationId,
+                DepartmentId = employeeView.DepartmentId,
+                JobTitleId = employeeView.JobTitleId,
+                PayGradeLevelId = employeeView.PayGradeLevelId,
+                FirstName = employeeView.FirstName,
+                MiddleName = employeeView.LastName,
+                LastName = employeeView.LastName,
+                Gender = employeeView.Gender,
+                BirthDate = employeeView.BirthDate,
+                Address = employeeView.Address,
+                City = employeeView.City,
+                PostCode = employeeView.PostCode,
+                Phone = employeeView.Phone,
+                Email = employeeView.Email,
+                EmergencyContactPhone = employeeView.EmergencyContactPhone,
+                EmergencyContactAddress = employeeView.EmergencyContactAddress,
+                Relationship = employeeView.Relationship,
+                DateJoined = employeeView.DateJoined,
+                Status = employeeView.Status,
+                ContractorType = employeeView.ContractorType,
+                ImmigrationStatus = employeeView.ImmigrationStatus,
+                SocialInsuranceNumber = employeeView.SocialInsuranceNumber,
+                LineManagerId = employeeView.LineManagerId,
+                PaymentMethod = employeeView.PaymentMethod,
+                BankName = employeeView.BankName,
+                BankCode = employeeView.BankCode,
+                TransitCode = employeeView.TransitCode,
+                AccountNumber = employeeView.AccountNumber,
+                PaymentFrequency = employeeView.PaymentFrequency,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             var oldValue = JsonConvert.SerializeObject(await _context.Employees.FirstOrDefaultAsync(x => x.EmployeeId == employee.EmployeeId));
 
@@ -179,12 +296,15 @@ namespace CareConnect.Controllers
             {
                 try
                 {
+                    _context.ChangeTracker.Clear();
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
 
                     var newValue = JsonConvert.SerializeObject(employee);
 
                     await _audit.UpdateAuditTrail((int)user.OrganizationId, employee.GetType().Name, UpdateAction.Update, oldValue, newValue, user.UserName);
+
+                    return RedirectToAction(nameof(ListEmployees));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -195,10 +315,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             else 
             {
@@ -209,44 +331,201 @@ namespace CareConnect.Controllers
 
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", employee.DepartmentId);
             ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", employee.JobTitleId);
+            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels.Where(x => x.PayGrade.OrganizationId == user.OrganizationId), "PayGradeLevelId", "Description", employee.PayGradeLevelId);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees.Where(x => x.OrganizationId == user.OrganizationId && x.EmployeeId != employeeView.EmployeeId), "EmployeeId", "FullName", employee.LineManagerId);
 
-            return View(employee);
+            return View(employeeView);
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> ListVacancies()
+        public async Task<IActionResult> EmployeeDocs(string id)
         {
-            return View(await _context.Vacancies.Include(d => d.Department).Include(t => t.JobTitle).ToListAsync());
-        }
-        
-        public IActionResult AddVancancy(string id) // pass organization ID
-        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             int num = Resolver(id);
             if (num == 0)
             {
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            Vacancy vacancy = new();
+            Employee employee = await _context.Employees.FirstOrDefaultAsync(x => x.EmployeeId == num);
+            List<EmployeeDocument> docs = new();
 
-            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == num), "DepartmentId", "Name");
-            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == num), "JobTitleId", "Title");
+            EmployeeViewModel employeeView = new()
+            {
+                EmployeeId = employee.EmployeeId,
+                OrganizationId = employee.OrganizationId,
+                DepartmentId = employee.DepartmentId,
+                JobTitleId = employee.JobTitleId,
+                PayGradeLevelId = employee.PayGradeLevelId,
+                FirstName = employee.FirstName,
+                MiddleName = employee.LastName,
+                LastName = employee.LastName,
+                Gender = employee.Gender,
+                BirthDate = employee.BirthDate,
+                Address = employee.Address,
+                City = employee.City,
+                PostCode = employee.PostCode,
+                Phone = employee.Phone,
+                Email = employee.Email,
+                EmergencyContactPhone = employee.EmergencyContactPhone,
+                EmergencyContactAddress = employee.EmergencyContactAddress,
+                Relationship = employee.Relationship,
+                DateJoined = employee.DateJoined,
+                Status = employee.Status,
+                ContractorType = employee.ContractorType,
+                ImmigrationStatus = employee.ImmigrationStatus,
+                SocialInsuranceNumber = employee.SocialInsuranceNumber,
+                LineManagerId = employee.LineManagerId,
+                PaymentMethod = employee.PaymentMethod,
+                BankName = employee.BankName,
+                BankCode = employee.BankCode,
+                TransitCode = employee.TransitCode,
+                AccountNumber = employee.AccountNumber,
+                Documents = docs
+            };
 
-            return View(vacancy);
+            return View(employeeView);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddVacancy([Bind("VacancyId,JobTitleId,DepartmentId.JobDescription,Requirements,Status")] Vacancy vacancy)
+        public async Task<IActionResult> AddDocument(string id)
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            EmployeeDocument document = new()
+            {
+                EmployeeId = num
+            };
+
+            return View(document);
+        }
+
+        public async Task<IActionResult> AddDocument(string id, [Bind("EmployeeDocumentId,EmployeeId,DocumentName,FilePath,File")] EmployeeDocumentViewModel documentView)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var filePath = string.Empty;
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            var fileName = Path.GetFileName(documentView.File.FileName);
+
+            if ((documentView.File.Length > 0) && ((fileName.EndsWith(".doc")) || (fileName.EndsWith(".docx")) || (fileName.EndsWith(".pdf"))))
+            {
+                filePath = await _fileService.SaveFile2(documentView.File, "Employees");
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    ViewBag.Message = "File could not be saved. If problem persists, please consult your Administrator!";
+                    return View(documentView);
+                }                 
+            }
+            else
+            {
+                ViewBag.Message = "File empty or file type not supported!";
+                return View(documentView);
+            }
+
+            EmployeeDocument employeeDocument = new()
+            {
+                EmployeeId = documentView.EmployeeId,
+                DocumentName = documentView.DocumentName,
+                FilePath = filePath,
+                AddedBy = user.UserName,
+                DateAdded = DateTime.Now
+            };
+
+            if (ModelState.IsValid)
+            {
+                await _context.AddAsync(employeeDocument);
+                await _context.SaveChangesAsync();
+
+                var newValue = JsonConvert.SerializeObject(employeeDocument);
+
+                await _audit.UpdateAuditTrail((int)user.OrganizationId, employeeDocument.GetType().Name, UpdateAction.Create, newValue, user.UserName);
+
+                return RedirectToAction(nameof(EmployeeDocs), new {id = _protector.Encode(documentView.EmployeeId.ToString())});
+            }
+            else
+            {
+                ViewBag.Message = "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.";
+            }
+
+            return View(documentView);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> ListVacancies()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Vacancies.Where(x => x.OrganizationId == user.OrganizationId).Include(d => d.Department).Include(t => t.JobTitle).ToListAsync());
+        }
+        
+        public async Task<IActionResult> AddVacancy()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            VacancyViewModel vacancy = new();
 
             if (user.OrganizationId != null)
             {
                 vacancy.OrganizationId = (int)user.OrganizationId;
             }
 
-            vacancy.AddedBy = user.UserName;
+            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == user.OrganizationId), "DepartmentId", "Name");
+            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == user.OrganizationId), "JobTitleId", "Title");
+
+            return View(vacancy);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddVacancy([Bind("VacancyId,JobTitleId,DepartmentId,JobDescription,Requirements,Status")] VacancyViewModel vacancyView)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.OrganizationId != null)
+            {
+                vacancyView.OrganizationId = (int)user.OrganizationId;
+            }
+
+            Vacancy vacancy = new()
+            {
+                VacancyId = vacancyView.VacancyId,
+                OrganizationId = vacancyView.OrganizationId,
+                JobDescription = vacancyView.JobDescription,
+                JobTitleId = vacancyView.JobTitleId,
+                DepartmentId = vacancyView.DepartmentId,
+                Requirements = vacancyView.Requirements,
+                Status = vacancyView.Status,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
@@ -257,7 +536,7 @@ namespace CareConnect.Controllers
 
                 await _audit.UpdateAuditTrail((int)user.OrganizationId, vacancy.GetType().Name, UpdateAction.Create, newValue, user.UserName);
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListVacancies));
             }
             else
             {
@@ -269,7 +548,7 @@ namespace CareConnect.Controllers
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", vacancy.DepartmentId);
             ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", vacancy.JobTitleId);
 
-            return View(vacancy);
+            return View(vacancyView);
         }
 
         public async Task<IActionResult> EditVacancy(string id)
@@ -293,15 +572,26 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
+            VacancyViewModel vacancyViewModel = new()
+            {
+                VacancyId = vacancy.VacancyId,
+                OrganizationId = vacancy.OrganizationId,
+                JobDescription = vacancy.JobDescription,
+                JobTitleId = vacancy.JobTitleId,
+                DepartmentId = vacancy.DepartmentId,
+                Requirements = vacancy.Requirements,
+                Status = vacancy.Status,
+            };
+
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", vacancy.DepartmentId);
             ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", vacancy.JobTitleId);
 
-            return View(vacancy);
+            return View(vacancyViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditVacancy(string id, [Bind("VacancyId,JobTitleId,DepartmentId.JobDescription,Requirements,Status")] Vacancy vacancy)
+        public async Task<IActionResult> EditVacancy(string id, [Bind("VacancyId,JobTitleId,OrganizationId,DepartmentId,JobDescription,Requirements,Status")] VacancyViewModel vacancyView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -309,14 +599,25 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != vacancy.VacancyId)
+            if (num != vacancyView.VacancyId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            vacancy.UpdatedBy = user.UserName;
-            vacancy.DateUpdated = DateTime.UtcNow;
+
+            Vacancy vacancy = new()
+            {
+                VacancyId = vacancyView.VacancyId,
+                OrganizationId = vacancyView.OrganizationId,
+                JobDescription = vacancyView.JobDescription,
+                JobTitleId = vacancyView.JobTitleId,
+                DepartmentId = vacancyView.DepartmentId,
+                Requirements = vacancyView.Requirements,
+                Status = vacancyView.Status,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             var oldValue = JsonConvert.SerializeObject(await _context.Vacancies.FirstOrDefaultAsync(x => x.VacancyId == vacancy.VacancyId));
 
@@ -324,12 +625,15 @@ namespace CareConnect.Controllers
             {
                 try
                 {
+                    _context.ChangeTracker.Clear();
                     _context.Update(vacancy);
                     await _context.SaveChangesAsync();
 
                     var newValue = JsonConvert.SerializeObject(vacancy);
 
                     await _audit.UpdateAuditTrail((int)user.OrganizationId, vacancy.GetType().Name, UpdateAction.Update, oldValue, newValue, user.UserName);
+
+                    return RedirectToAction(nameof(ListVacancies));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -343,7 +647,7 @@ namespace CareConnect.Controllers
                         return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             else
             {
@@ -355,7 +659,7 @@ namespace CareConnect.Controllers
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", vacancy.DepartmentId);
             ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", vacancy.JobTitleId);
 
-            return View(vacancy);
+            return View(vacancyView);
         }
 
         [AllowAnonymous]
@@ -649,38 +953,68 @@ namespace CareConnect.Controllers
             return View(await _context.Interviews.Include(x => x.Applicant).ToListAsync());
         }
 
-        public IActionResult AddInterview(int id)
-        {
-            Interview interview = new();
-
-            ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == id), "ApplicantId", "FullName");
-
-            return View(interview);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddInterview([Bind("InterviewId,ApplicationId,InterviewDate,InterviewTime,Note")] Interview interview)
+        public async Task<IActionResult> AddInterview()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            InterviewViewModel interview = new() { InterviewDate = DateTime.Today };
 
             if (user.OrganizationId != null)
             {
                 interview.OrganizationId = (int)user.OrganizationId;
             }
 
-            interview.AddedBy = user.UserName;
+            ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == (int)user.OrganizationId), "ApplicantId", "FullName");
+            ViewData["EmployeeId"] = new SelectList(_context.Employees.Where(x => x.OrganizationId == (int)user.OrganizationId), "EmployeeId", "FullName");
+
+            return View(interview);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddInterview([Bind("InterviewId,ApplicationId,InterviewDate,InterviewTime,Note,InterviewersLists")] InterviewViewModel interviewView)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.OrganizationId != null)
+            {
+                interviewView.OrganizationId = (int)user.OrganizationId;
+            }
+
+            Interview interview = new()
+            {
+                ApplicantId = interviewView.ApplicantId,
+                InterviewDate = interviewView.InterviewDate,
+                InterviewTime = interviewView.InterviewDate,
+                Note = interviewView.Note,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(interview);
                 await _context.SaveChangesAsync();
 
+                foreach(var emp in interviewView.InterviewersLists)
+                {
+                    Interviewer interviewer = new()
+                    {
+                        InterviewId = interview.InterviewId,
+                        EmployeeId = emp.EmployeeId,
+                        DateAdded = DateTime.Now
+                    };
+
+                    await _context.AddAsync(interviewer);
+                    await _context.SaveChangesAsync();
+
+                    //ToDo: implement sent notification to interviewer
+                }
+
                 var newValue = JsonConvert.SerializeObject(interview);
                 
                 await _audit.UpdateAuditTrail((int)user.OrganizationId, interview.GetType().Name, UpdateAction.Create, newValue, user.UserName);
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListInterviews));
             }
             else
             {
@@ -715,6 +1049,29 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
+            InterviewViewModel interviewView = new()
+            {
+                InterviewId = interview.InterviewId,
+                ApplicantId = interview.ApplicantId,
+                InterviewDate = interview.InterviewDate,
+                InterviewTime = interview.InterviewDate,
+                Note = interview.Note,
+                Interviewers = await _context.Interviewers.Where(x => x.InterviewId == interview.InterviewId).ToListAsync(),
+                InterviewersLists = new List<InterviewersList>()
+            };
+
+            foreach(var interviewer in interviewView.Interviewers)
+            {
+                Employee employee = await _context.Employees.FirstOrDefaultAsync(x => x.EmployeeId == interviewer.EmployeeId);
+                InterviewersList interviewersList = new()
+                {
+                    EmployeeId = interviewer.EmployeeId,
+                    FullName = employee.FullName
+                };
+
+                interviewView.InterviewersLists.Add(interviewersList);
+            }
+
             ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == (int)user.OrganizationId), "ApplicantId", "FullName", interview.ApplicantId);
 
             return View(interview);
@@ -722,7 +1079,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditInterview(string id, [Bind("InterviewId,ApplicationId,InterviewDate,InterviewTime,Note")] Interview interview)
+        public async Task<IActionResult> EditInterview(string id, [Bind("InterviewId,ApplicationId,InterviewDate,InterviewTime,Note,InterviewersLists")] InterviewViewModel interviewView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -730,14 +1087,23 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != interview.InterviewId)
+            if (num != interviewView.InterviewId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            interview.UpdatedBy = user.UserName;
-            interview.DateUpdated = DateTime.UtcNow;
+
+            Interview interview = new()
+            {
+                InterviewId = interviewView.InterviewId,
+                ApplicantId = interviewView.ApplicantId,
+                InterviewDate = interviewView.InterviewDate,
+                InterviewTime = interviewView.InterviewDate,
+                Note = interviewView.Note,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             var oldValue = JsonConvert.SerializeObject(await _context.Vacancies.FirstOrDefaultAsync(x => x.VacancyId == interview.InterviewId));
 
@@ -745,12 +1111,46 @@ namespace CareConnect.Controllers
             {
                 try
                 {
+                    _context.ChangeTracker.Clear();
                     _context.Update(interview);
                     await _context.SaveChangesAsync();
+
+                    List<Interviewer> interviewers = await _context.Interviewers.Where(x => x.InterviewId == interview.InterviewId).ToListAsync();
+
+                    foreach(var emp in interviewView.InterviewersLists)
+                    {
+                        if (!interviewers.Any(x => x.EmployeeId == emp.EmployeeId))
+                        {
+                            Interviewer interviewer = new()
+                            {
+                                InterviewId = interview.InterviewId,
+                                EmployeeId = emp.EmployeeId,
+                                DateAdded = DateTime.Now
+                            };
+
+                            await _context.AddAsync(interviewer);
+                            await _context.SaveChangesAsync();
+
+                            //ToDo: implement sent notification to interviewer
+                        }
+                    }
+
+                    foreach(var interviewer in interviewers)
+                    {
+                        if (!interviewView.InterviewersLists.Any(x => x.EmployeeId == interviewer.EmployeeId))
+                        {
+                            _context.Remove(interviewer);
+                            await _context.SaveChangesAsync();
+
+                            //ToDo: implement sent notification to interviewer -- removal
+                        }
+                    }
 
                     var newValue = JsonConvert.SerializeObject(interview);
 
                     await _audit.UpdateAuditTrail((int)user.OrganizationId, interview.GetType().Name, UpdateAction.Update, oldValue, newValue, user.UserName);
+
+                    return RedirectToAction(nameof(ListInterviews));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -761,10 +1161,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again. And if the problem persists, " +
+                            "contact your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             else
             {
@@ -775,157 +1177,15 @@ namespace CareConnect.Controllers
 
             ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == (int)user.OrganizationId), "ApplicantId", "FullName", interview.ApplicantId);
 
-            return View(interview);
-        }
-
-        public IActionResult AddInterviewer()
-        {
-            Interviewer interviewer = new ();
-
-            return View(interviewer);
+            return View(interviewView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddInterviewer([Bind("InterviewerId,InterviewId,EmployeeId")] Interviewer interviewer)
+        public async Task<IActionResult> AddNote(NoteViewModel noteView)
         {
-            var user = await _userManager.GetUserAsync(User);
-
-            interviewer.AddedBy = user.UserName;
-            interviewer.IsAvailable = true;
-
-            if (ModelState.IsValid)
-            {
-                await _context.AddAsync(interviewer);
-                await _context.SaveChangesAsync();
-
-                var newValue = JsonConvert.SerializeObject(interviewer);
-
-                await _audit.UpdateAuditTrail((int)user.OrganizationId, interviewer.GetType().Name, UpdateAction.Create, newValue, user.UserName);
-
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                ViewBag.Message = "Unable to save changes. " +
-                    "Try again. And if the problem persists, " +
-                    "see your system administrator.";
-            }
-
-            return View(interviewer);
-        }
-
-        public async Task<IActionResult> EditInterviewer(string id)
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            int num = Resolver(id);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
-
-            var interviewer = await _context.Interviewers.Include(m => m.Employee).FirstOrDefaultAsync(x => x.InterviewId == num);
-            if (interviewer == null)
-            {
-                return NotFound();
-            }
-
-            //ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == (int)user.OrganizationId), "ApplicantId", "FullName", interview.ApplicantId);
-
-            return View(interviewer);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditInterviewer(string id, [Bind("InterviewerId,InterviewId,EmployeeId,IsAvailable")] Interviewer interviewer)
-        {
-            int num = Resolver(id);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
-
-            if (num != interviewer.InterviewerId)
-            {
-                return NotFound();
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            interviewer.UpdatedBy = user.UserName;
-            interviewer.DateUpdated = DateTime.UtcNow;
-
-            var oldValue = JsonConvert.SerializeObject(await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewerId == interviewer.InterviewerId));
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(interviewer);
-                    await _context.SaveChangesAsync();
-
-                    var newValue = JsonConvert.SerializeObject(interviewer);
-
-                    await _audit.UpdateAuditTrail((int)user.OrganizationId, interviewer.GetType().Name, UpdateAction.Update, oldValue, newValue, user.UserName);
-                }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    if (!InterviewerExists(interviewer.InterviewerId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                ViewBag.Message = "Unable to save changes. " +
-                    "Try again. And if the problem persists, " +
-                    "contact your system administrator.";
-            }
-
-            //ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == (int)user.OrganizationId), "ApplicantId", "FullName", interview.ApplicantId);
-
-            return View(interviewer);
-        }
-
-        public async Task<IActionResult> RemoveInterviewer(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            int num = Resolver(id);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
-
-            var interviewer = await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewId == num);
-            if (interviewer == null)
-            {
-                return NotFound();
-            }
-
-            return View(interviewer);
-        }
-
-        [HttpPost, ActionName("Remove")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveInterviewerConfirmed(string id)
-        {
-            int num = Resolver(id);
+            string decodedNum = JsonConvert.DeserializeObject<string>(Utils.DecryptStringAES(noteView.SourceId));
+            int num = int.Parse(decodedNum);
             if (num == 0)
             {
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
@@ -933,16 +1193,23 @@ namespace CareConnect.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
-            var interviewer = await _context.Interviewers.FirstOrDefaultAsync(x => x.InterviewId == num);
+            string decodedComment = JsonConvert.DeserializeObject<string>(Utils.DecryptStringAES(noteView.Comment));
 
-            var oldValue = JsonConvert.SerializeObject(interviewer);
+            StringBuilder stringBuilder = new();
+            stringBuilder = stringBuilder.Append(Environment.NewLine);
+            stringBuilder = stringBuilder.AppendLine($"[{DateTime.Now}] ==> {user.UserAlias}");
+            stringBuilder = stringBuilder.Append($"{decodedComment}");
+            stringBuilder = stringBuilder.AppendLine();
+            stringBuilder = stringBuilder.Append(new string('-', 50));
 
-            _context.Interviewers.Remove(interviewer);
-            await _context.SaveChangesAsync();            
+            Client client = await _context.Clients.FirstOrDefaultAsync(x => x.ClientId == num);
+            client.Notes += stringBuilder.ToString();
 
-            await _audit.UpdateAuditTrail((int)user.OrganizationId, interviewer.GetType().Name, UpdateAction.Delete, oldValue, null, user.UserName);
+            _context.Update(client);
+            await _context.SaveChangesAsync();
 
-            return View(interviewer);
+            return RedirectToAction(nameof(EditInterview), new { id = _protector.Encode(num.ToString()) });
+
         }
 
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret, ILogger logger)

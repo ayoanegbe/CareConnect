@@ -9,6 +9,7 @@ namespace CareConnect.Models
         [Key]
         public int PayGradeLevelId { get; set; }
         [ForeignKey("PayGradeLevel_PayGrade")]
+        [Display(Name = "Pay Grade")]
         public int PayGradeId { get; set; }
         public PayGrade PayGrade { get; set; }
         [Required]
@@ -17,13 +18,13 @@ namespace CareConnect.Models
         [Range(1, 9)]
         public int Level { get; set; }
         [Display(Name = "Basic Salary")]
-        public double BasicSalary { get; set; } = 0.00;
-        [Required]
+        public double BasicSalary { get; set; }
         [Display(Name = "Hourly Rate")]
         public double? HourlyRate { get; set; }
         [Display(Name = "Overtime Rate")]
         public double? OvertimeRate { get; set; }
         [ForeignKey("PayGradeLevel_Currency")]
+        [Display(Name = "Currency")]
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
         [Display(Name = "Date Added")]

@@ -1,0 +1,90 @@
+﻿@model IEnumerable<PayGradeLevel>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Pay Grade Level List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+
+    var gradeId = ViewData["gradeId"];
+    var gradeName = ViewData["gradeName"];
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Pay Grade Levels - @gradeName</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span>Pay Grade Levels</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <section class="card">
+        <header class="card-header">
+            <h2 class="card-title">List of Pay Grade Levels</h2>
+        </header>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="m-0">
+                        <a asp-controller="Setup" asp-action="AddPayGradeLevel" asp-route-gradeId="@protector.Encode(gradeId.ToString())" class="btn btn-primary" style="background-color:cornflowerblue">Add Pay Grade Level<i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            Grade
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Level)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Description)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.DateAdded)
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PayGrade.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Level)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateAdded)
+                            </td>
+                            <td>
+                                <a asp-action="EditPayGradeLevel" asp-route-id="@protector.Encode(item.PayGradeLevelId.ToString())" asp-route-gradeId="@protector.Encode(gradeId.ToString())" style="color:magenta">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-controller="Setup" asp-action="ListPayGrades"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>

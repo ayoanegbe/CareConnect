@@ -80,7 +80,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddClient([Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddieName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes")] ClientViewModel clientView)
+        public async Task<IActionResult> AddClient([Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddleName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes")] ClientViewModel clientView)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -193,7 +193,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditClient(string id, [Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddieName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes,Comment")] Client client)
+        public async Task<IActionResult> EditClient(string id, [Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddleName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes,Comment")] ClientViewModel clientView)
         {
             if (id == null)
             {
@@ -206,21 +206,50 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != client.ClientId)
+            if (num != clientView.ClientId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            client.UpdatedBy = user.UserName;
-            client.DateUpdated = DateTime.UtcNow;
 
-            var oldValue = JsonConvert.SerializeObject(await _context.Clients.FirstOrDefaultAsync(x => x.ClientId == client.ClientId));
+            Client client = new()
+            {
+                ClientId = clientView.ClientId,
+                CustomerId = clientView.CustomerId,
+                OrganizationId = clientView.OrganizationId,
+                HouseId = clientView.HouseId,
+                ResidentialType = clientView.ResidentialType,
+                FirstName = clientView.FirstName,
+                MiddleName = clientView.MiddleName,
+                LastName = clientView.LastName,
+                Gender = clientView.Gender,
+                DateJoined = clientView.DateJoined,
+                BirthDate = clientView.BirthDate,
+                Phone = clientView.Phone,
+                Email = clientView.Email,
+                EmergencyContactAddress = clientView.EmergencyContactAddress,
+                EmergencyContactPhone = clientView.EmergencyContactPhone,
+                Relationship = clientView.Relationship,
+                GuadianPhoneNumber = clientView.GuadianPhoneNumber,
+                FamilyPhysician = clientView.FamilyPhysician,
+                Psychiatrist = clientView.Psychiatrist,
+                Budget = clientView.Budget,
+                CurrencyId = clientView.CurrencyId,
+                BudgetStartDate = clientView.BudgetStartDate,
+                BudgetEndDate = clientView.BudgetEndDate,
+                Notes = clientView.Notes,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
+
+            var oldValue = JsonConvert.SerializeObject(await _context.Clients.FirstOrDefaultAsync(x => x.ClientId == clientView.ClientId));
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    _context.ChangeTracker.Clear();
                     _context.Update(client);
                     await _context.SaveChangesAsync();
 
@@ -257,7 +286,7 @@ namespace CareConnect.Controllers
             ViewData["HouseId"] = new SelectList(_context.Houses.Where(x => x.OrganizationId == user.OrganizationId), "HouseId", "HouseName", client.HouseId);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Name", client.CurrencyId);
 
-            return View(client);
+            return View(clientView);
         }
 
         // Currency
@@ -534,12 +563,21 @@ namespace CareConnect.Controllers
                 DateUpdated = DateTime.Now
             };
 
+            var oldValue = JsonConvert.SerializeObject(await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId == customerView.CustomerId));
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    _context.ChangeTracker.Clear();
+
                     _context.Update(customer);
                     await _context.SaveChangesAsync();
+
+                    var newValue = JsonConvert.SerializeObject(customer);
+
+                    await _audit.UpdateAuditTrail((int)user.OrganizationId, customer.GetType().Name, UpdateAction.Update, oldValue, newValue, user.UserName);
+
                     return RedirectToAction(nameof(ListCustomers));
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -568,6 +606,8 @@ namespace CareConnect.Controllers
             return View(customerView);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNote(NoteViewModel noteView)
         {
             string decodedNum = JsonConvert.DeserializeObject<string>(Utils.DecryptStringAES(noteView.SourceId));
@@ -588,17 +628,7 @@ namespace CareConnect.Controllers
             stringBuilder = stringBuilder.AppendLine();
             stringBuilder = stringBuilder.Append(new string('-', 50));
 
-            if (noteView.Soure == NoteSource.Customer)
-            {
-                Customer customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId == num);
-                customer.Notes += stringBuilder.ToString();
-
-                _context.Update(customer);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(EditCustomer), new { id = _protector.Encode(num.ToString()) });
-            }
-            else
+            if (noteView.Source == NoteSource.Client)
             {
                 Client client = await _context.Clients.FirstOrDefaultAsync(x => x.ClientId == num);
                 client.Notes += stringBuilder.ToString();
@@ -607,6 +637,17 @@ namespace CareConnect.Controllers
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(EditClient), new { id = _protector.Encode(num.ToString()) });
+                
+            }
+            else
+            {
+                Customer customer = await _context.Customers.FirstOrDefaultAsync(x => x.CustomerId == num);
+                customer.Notes += stringBuilder.ToString();
+
+                _context.Update(customer);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(EditCustomer), new { id = _protector.Encode(num.ToString()) });
             }
             
         }
@@ -620,21 +661,28 @@ namespace CareConnect.Controllers
 
         public IActionResult AddDepartment()
         {
-            Department department = new();
+            DepartmentViewModel department = new();
 
             return View(department);
         }
 
-        public async Task<IActionResult> AddDepartment([Bind("DepartmentId,Name")] Department department)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddDepartment([Bind("DepartmentId,Name")] DepartmentViewModel departmentView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                department.OrganizationId = (int)user.OrganizationId;
+                departmentView.OrganizationId = (int)user.OrganizationId;
             }
 
-            department.AddedBy = user.UserName;
+            Department department = new()
+            {
+                Name = departmentView.Name,
+                OrganizationId = departmentView.OrganizationId,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
@@ -649,7 +697,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(department);
+            return View(departmentView);
         }
 
         public async Task<IActionResult> EditDepartment(string id)
@@ -671,12 +719,19 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(department);
+            DepartmentViewModel departmentView = new()
+            {
+                DepartmentId = department.DepartmentId,
+                OrganizationId = department.OrganizationId,
+                Name = department.Name,
+            };
+
+            return View(departmentView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditDepartment(string id, [Bind("DepartmentId,Name")] Department department)
+        public async Task<IActionResult> EditDepartment(string id, [Bind("DepartmentId,OrganizationId,Name")] DepartmentViewModel departmentView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -684,14 +739,21 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != department.DepartmentId)
+            if (num != departmentView.DepartmentId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            department.UpdatedBy = user.UserName;
-            department.DateUpdated = DateTime.UtcNow;
+
+            Department department = new()
+            {
+                DepartmentId = departmentView.DepartmentId,
+                OrganizationId = departmentView.OrganizationId,
+                Name = departmentView.Name,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             if (ModelState.IsValid)
             {
@@ -699,6 +761,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(department);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListDepartments));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -709,10 +772,11 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
-                }
-                return RedirectToAction(nameof(ListDepartments));
+                }                
             }
             else
             {
@@ -721,7 +785,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(department);
+            return View(departmentView);
         }
 
         // Houses
@@ -886,9 +950,9 @@ namespace CareConnect.Controllers
             return View(await _context.JobTitles.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
         }
 
-        public IActionResult AddJobTile()
+        public IActionResult AddJobTitle()
         {
-            JobTitle jobTitle = new ();
+            JobTitleViewModel jobTitle = new ();
 
             return View(jobTitle);
 
@@ -896,16 +960,22 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddJobTitle([Bind("JobTitleId,Title,Description")] JobTitle jobTitle)
+        public async Task<IActionResult> AddJobTitle([Bind("JobTitleId,Title,Description")] JobTitleViewModel jobTitleView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                jobTitle.OrganizationId = (int)user.OrganizationId;
+                jobTitleView.OrganizationId = (int)user.OrganizationId;
             }
 
-            jobTitle.AddedBy = user.UserName;
+            JobTitle jobTitle = new()
+            {
+                OrganizationId = jobTitleView.OrganizationId,
+                Title = jobTitleView.Title,
+                Description = jobTitleView.Description,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
@@ -920,10 +990,10 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(jobTitle);
+            return View(jobTitleView);
         }
 
-        public async Task<IActionResult> EditJobTile(string id)
+        public async Task<IActionResult> EditJobTitle(string id)
         {
             if (id == null)
             {
@@ -942,12 +1012,20 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(jobTitle);
+            JobTitleViewModel jobTitleView = new()
+            {
+                JobTitleId = jobTitle.JobTitleId,
+                OrganizationId = jobTitle.OrganizationId,
+                Title = jobTitle.Title,
+                Description = jobTitle.Description
+            };
+
+            return View(jobTitleView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditJobTile(string id, [Bind("JobTitleId,Title,Description")] JobTitle jobTitle)
+        public async Task<IActionResult> EditJobTitle(string id, [Bind("JobTitleId,OrganizationId,Title,Description")] JobTitleViewModel jobTitleView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -955,14 +1033,22 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != jobTitle.JobTitleId)
+            if (num != jobTitleView.JobTitleId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            jobTitle.UpdatedBy = user.UserName;
-            jobTitle.DateUpdated = DateTime.UtcNow;
+
+            JobTitle jobTitle = new()
+            {
+                JobTitleId = jobTitleView.JobTitleId,
+                OrganizationId = jobTitleView.OrganizationId,
+                Title = jobTitleView.Title,
+                Description = jobTitleView.Description,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             if (ModelState.IsValid)
             {
@@ -970,6 +1056,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(jobTitle);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListJobTitles));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -980,10 +1067,11 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
-                }
-                return RedirectToAction(nameof(ListJobTitles));
+                }                
             }
             else
             {
@@ -992,7 +1080,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(jobTitle);
+            return View(jobTitleView);
         }
 
         // Organization
@@ -1163,23 +1251,29 @@ namespace CareConnect.Controllers
 
         public IActionResult AddPayGrade()
         {
-            PayGrade payGrade = new ();
+            PayGradeViewModel payGrade = new ();
 
             return View(payGrade);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddPayGrade([Bind("PayGradeId,OrganizationId,Name,Description")] PayGrade payGrade)
+        public async Task<IActionResult> AddPayGrade([Bind("PayGradeId,OrganizationId,Name,Description")] PayGradeViewModel payGradeView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                payGrade.OrganizationId = (int)user.OrganizationId;
+                payGradeView.OrganizationId = (int)user.OrganizationId;
             }
 
-            payGrade.AddedBy = user.UserName;
+            PayGrade payGrade = new()
+            {
+                OrganizationId = payGradeView.OrganizationId,
+                Name = payGradeView.Name,
+                Description = payGradeView.Description,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
@@ -1194,7 +1288,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(payGrade);
+            return View(payGradeView);
         }
 
         public async Task<IActionResult> EditPayGrade(string id)
@@ -1216,12 +1310,20 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(payGrade);
+            PayGradeViewModel payGradeView = new()
+            {
+                PayGradeId = payGrade.PayGradeId,
+                OrganizationId = payGrade.OrganizationId,
+                Name = payGrade.Name,
+                Description = payGrade.Description
+            };
+
+            return View(payGradeView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPayGrade(string id, [Bind("PayGradeId,OrganizationId,Name,Description")] PayGrade payGrade)
+        public async Task<IActionResult> EditPayGrade(string id, [Bind("PayGradeId,OrganizationId,Name,Description")] PayGradeViewModel payGradeView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -1229,14 +1331,22 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != payGrade.PayGradeId)
+            if (num != payGradeView.PayGradeId)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            payGrade.UpdatedBy = user.UserName;
-            payGrade.DateUpdated = DateTime.UtcNow;
+
+            PayGrade payGrade = new()
+            {
+                PayGradeId = payGradeView.PayGradeId,
+                OrganizationId = payGradeView.OrganizationId,
+                Name = payGradeView.Name,
+                Description = payGradeView.Description,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             if (ModelState.IsValid)
             {
@@ -1244,6 +1354,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(payGrade);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListPayGrades));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -1254,10 +1365,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListPayGrades));
+                
             }
             else
             {
@@ -1266,7 +1379,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(payGrade);
+            return View(payGradeView);
         }
 
         public async Task<IActionResult> ListPayGradeLevels(string gradeId)
@@ -1277,10 +1390,14 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
+            PayGrade payGrade = await _context.PayGrades.FirstOrDefaultAsync(x => x.PayGradeId == num);
+
+            ViewData["gradeId"] = num;
+            ViewData["gradeName"] = payGrade.Name;
             return View(await _context.PayGradeLevels.Include(x => x.PayGrade).Include(c => c.Currency).Where(x => x.PayGradeId == num).ToListAsync());
         }
 
-        public IActionResult AddPayGradeLevel(string gradeId)
+        public async Task<IActionResult> AddPayGradeLevel(string gradeId)
         {
             int num = Resolver(gradeId);
             if (num == 0)
@@ -1288,9 +1405,10 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            PayGradeLevel gradeLevel = new () { PayGradeId = num };
+            PayGrade payGrade = await _context.PayGrades.FirstOrDefaultAsync(x => x.PayGradeId == num);
+            PayGradeLevelViewModel gradeLevel = new () { PayGradeId = num, PayGrade = payGrade };
 
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades.Where(x => x.PayGradeId == num), "PayGradeId", "Name");
+            ViewData["gradeId"] = num;
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code");
 
             return View(gradeLevel);
@@ -1298,29 +1416,46 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddPayGradeLevel([Bind("PayGradeLevelId,PayGradeId,Description,PayLevel,BasicSalary,HourlyRate,OvertimeRate,CurrencyId")] PayGradeLevel gradeLevel)
+        public async Task<IActionResult> AddPayGradeLevel([Bind("PayGradeLevelId,PayGradeId,PayGrade,Description,Level,BasicSalary,HourlyRate,OvertimeRate,CurrencyId,Currency")] PayGradeLevelViewModel payGradeLevelView)
         {
+ 
             var user = await _userManager.GetUserAsync(User);
 
-            gradeLevel.AddedBy = user.UserName;
+            ViewData["gradeId"] = payGradeLevelView.PayGradeId;
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", payGradeLevelView.CurrencyId);
+
+            if (_context.PayGradeLevels.Any(x => x.PayGradeId == payGradeLevelView.PayGradeId && x.Level == payGradeLevelView.Level))
+            {
+                ViewBag.Message = "Pay grade level can't be duplicated. ";
+                return View(payGradeLevelView);
+            }
+
+            PayGradeLevel gradeLevel = new()
+            {
+                PayGradeId = payGradeLevelView.PayGradeId,
+                Description = payGradeLevelView.Description,
+                Level = payGradeLevelView.Level,
+                BasicSalary = payGradeLevelView.BasicSalary,
+                HourlyRate = payGradeLevelView.HourlyRate,
+                OvertimeRate = payGradeLevelView.OvertimeRate,
+                CurrencyId = payGradeLevelView.CurrencyId,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
                 await _context.AddAsync(gradeLevel);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListPayGradeLevels));
+                return RedirectToAction(nameof(ListPayGradeLevels), new { gradeId = _protector.Encode(payGradeLevelView.PayGradeId.ToString()) });
             }
             else
             {
                 ViewBag.Message = "Unable to save changes. " +
                     "Try again, and if the problem persists, " +
                     "see your system administrator.";
-            }
+            }          
 
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId), "PayGradeId", "Name", gradeLevel.PayGradeId);
-            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", gradeLevel.CurrencyId);
-
-            return View(gradeLevel);
+            return View(payGradeLevelView);
         }
 
         public async Task<IActionResult> EditPayGradeLevel(string id, string gradeId)
@@ -1350,15 +1485,29 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId), "PayGradeId", "Name", gradeLevel.PayGradeId);
+            PayGradeLevelViewModel payGradeLevelView = new()
+            {
+                PayGradeLevelId = num,
+                PayGradeId = num2,
+                Description = gradeLevel.Description,
+                Level = gradeLevel.Level,
+                BasicSalary = gradeLevel.BasicSalary,
+                HourlyRate = gradeLevel.HourlyRate,
+                OvertimeRate = gradeLevel.OvertimeRate,
+                CurrencyId = gradeLevel.CurrencyId,
+                PayGrade = gradeLevel.PayGrade,
+                Currency = gradeLevel.Currency,
+            };
+
+            ViewData["gradeId"] = num2;
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "CurrencyId", "Code", gradeLevel.CurrencyId);
 
-            return View(gradeLevel);
+            return View(payGradeLevelView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPayGradeLevel(string id, [Bind("PayGradeLevelId,PayGradeId,Description,PayLevel,BasicSalary,HourlyRate,OvertimeRate,CurrencyId")] PayGradeLevel gradeLevel)
+        public async Task<IActionResult> EditPayGradeLevel(string id, [Bind("PayGradeLevelId,PayGradeId,Description,Level,BasicSalary,HourlyRate,OvertimeRate,CurrencyId")] PayGradeLevelViewModel payGradeLevelView)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -1368,10 +1517,24 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != gradeLevel.PayGradeLevelId)
+            if (num != payGradeLevelView.PayGradeLevelId)
             {
                 return NotFound();
             }
+
+            PayGradeLevel gradeLevel = new()
+            {
+                PayGradeLevelId = payGradeLevelView.PayGradeLevelId,
+                PayGradeId = payGradeLevelView.PayGradeId,
+                Description = payGradeLevelView.Description,
+                Level = payGradeLevelView.Level,
+                BasicSalary = payGradeLevelView.BasicSalary,
+                HourlyRate = payGradeLevelView.HourlyRate,
+                OvertimeRate = payGradeLevelView.OvertimeRate,
+                CurrencyId = payGradeLevelView.CurrencyId,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now,
+            };
 
             if (ModelState.IsValid)
             {
@@ -1379,6 +1542,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(gradeLevel);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListPayGradeLevels), new { gradeId = _protector.Encode(payGradeLevelView.PayGradeId.ToString()) });
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -1389,10 +1553,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListPayGradeLevels));
+                
             }
             else
             {
@@ -1407,133 +1573,133 @@ namespace CareConnect.Controllers
             return View(gradeLevel);
         }
 
-        public async Task<IActionResult> ListPayGradeLevelDeductions(string levelId)
-        {
-            int num = Resolver(levelId);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
+        //public async Task<IActionResult> ListPayGradeLevelDeductions(string levelId)
+        //{
+        //    int num = Resolver(levelId);
+        //    if (num == 0)
+        //    {
+        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+        //    }
 
-            return View(await _context.PayGradeLevelDeductions.Include(x => x.PayGradeLevel).Where(x => x.PayGradeLevelId == num).ToListAsync());
-        }
+        //    return View(await _context.PayGradeLevelDeductions.Include(x => x.PayGradeLevel).Where(x => x.PayGradeLevelId == num).ToListAsync());
+        //}
 
-        public IActionResult AddPayGradeLevelDeduction(string levelId)
-        {
-            int num = Resolver(levelId);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
+        //public IActionResult AddPayGradeLevelDeduction(string levelId)
+        //{
+        //    int num = Resolver(levelId);
+        //    if (num == 0)
+        //    {
+        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+        //    }
 
-            PayGradeLevelDeduction payGradeLevelDeduction = new() { PayGradeLevelId = num };
+        //    PayGradeLevelDeduction payGradeLevelDeduction = new() { PayGradeLevelId = num };
 
-            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels, "PayGradeLevelId", "Description");
+        //    ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels, "PayGradeLevelId", "Description");
 
-            return View(payGradeLevelDeduction);
-        }
+        //    return View(payGradeLevelDeduction);
+        //}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddPayGradeLevelDeduction(string levelId, [Bind("PayGradeLevelDeductionId,PayGradeLevelId,TaxRate,HealthInsurance,RetirementContribution")] PayGradeLevelDeduction gradeLevelDeduction)
-        {
-            int num = Resolver(levelId);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> AddPayGradeLevelDeduction(string levelId, [Bind("PayGradeLevelDeductionId,PayGradeLevelId,TaxRate,HealthInsurance,RetirementContribution")] PayGradeLevelDeduction gradeLevelDeduction)
+        //{
+        //    int num = Resolver(levelId);
+        //    if (num == 0)
+        //    {
+        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+        //    }
 
-            var user = await _userManager.GetUserAsync(User);
+        //    var user = await _userManager.GetUserAsync(User);
 
-            gradeLevelDeduction.AddedBy = user.UserName;
+        //    gradeLevelDeduction.AddedBy = user.UserName;
 
-            if (ModelState.IsValid)
-            {
-                await _context.AddAsync(gradeLevelDeduction);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListPayGradeLevelDeductions));
-            }
-            else
-            {
-                ViewBag.Message = "Unable to save changes. " +
-                    "Try again, and if the problem persists, " +
-                    "see your system administrator.";
-            }
+        //    if (ModelState.IsValid)
+        //    {
+        //        await _context.AddAsync(gradeLevelDeduction);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(ListPayGradeLevelDeductions));
+        //    }
+        //    else
+        //    {
+        //        ViewBag.Message = "Unable to save changes. " +
+        //            "Try again, and if the problem persists, " +
+        //            "see your system administrator.";
+        //    }
 
-            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels.Where(x => x.PayGradeLevelId == num), "PayGradeLevelId", "Description", gradeLevelDeduction.PayGradeLevelId);
+        //    ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels.Where(x => x.PayGradeLevelId == num), "PayGradeLevelId", "Description", gradeLevelDeduction.PayGradeLevelId);
 
-            return View(gradeLevelDeduction);
-        }
+        //    return View(gradeLevelDeduction);
+        //}
 
-        public async Task<IActionResult> EditPayGradeLevelDeduction(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> EditPayGradeLevelDeduction(string id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            int num = Resolver(id);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
+        //    int num = Resolver(id);
+        //    if (num == 0)
+        //    {
+        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+        //    }
 
-            var gradeLevelDeduction = await _context.PayGradeLevelDeductions.Include(g => g.PayGradeLevel).FirstOrDefaultAsync(x => x.PayGradeLevelDeductionId == num);
-            if (gradeLevelDeduction == null)
-            {
-                return NotFound();
-            }
+        //    var gradeLevelDeduction = await _context.PayGradeLevelDeductions.Include(g => g.PayGradeLevel).FirstOrDefaultAsync(x => x.PayGradeLevelDeductionId == num);
+        //    if (gradeLevelDeduction == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels, "PayGradeLevelId", "Description", gradeLevelDeduction.PayGradeLevelId);
+        //    ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels, "PayGradeLevelId", "Description", gradeLevelDeduction.PayGradeLevelId);
 
-            return View(gradeLevelDeduction);
-        }
+        //    return View(gradeLevelDeduction);
+        //}
 
-        public async Task<IActionResult> EditPayGradeLevelDeduction(string id, [Bind("PayGradeLevelDeductionId,PayGradeLevelId,TaxRate,HealthInsurance,RetirementContribution")] PayGradeLevelDeduction gradeLevelDeduction)
-        {
-            int num = Resolver(id);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
+        //public async Task<IActionResult> EditPayGradeLevelDeduction(string id, [Bind("PayGradeLevelDeductionId,PayGradeLevelId,TaxRate,HealthInsurance,RetirementContribution")] PayGradeLevelDeduction gradeLevelDeduction)
+        //{
+        //    int num = Resolver(id);
+        //    if (num == 0)
+        //    {
+        //        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+        //    }
 
-            if (num != gradeLevelDeduction.PayGradeLevelDeductionId)
-            {
-                return NotFound();
-            }
+        //    if (num != gradeLevelDeduction.PayGradeLevelDeductionId)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(gradeLevelDeduction);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    if (!PayGradeLevelDeductionExists(gradeLevelDeduction.PayGradeLevelDeductionId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-                    }
-                }
-                return RedirectToAction(nameof(ListPayGradeLevelDeductions));
-            }
-            else
-            {
-                ViewBag.Message = "Unable to save changes. " +
-                    "Try again, and if the problem persists, " +
-                    "see your system administrator.";
-            }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(gradeLevelDeduction);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException ex)
+        //        {
+        //            if (!PayGradeLevelDeductionExists(gradeLevelDeduction.PayGradeLevelDeductionId))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+        //                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(ListPayGradeLevelDeductions));
+        //    }
+        //    else
+        //    {
+        //        ViewBag.Message = "Unable to save changes. " +
+        //            "Try again, and if the problem persists, " +
+        //            "see your system administrator.";
+        //    }
 
-            ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels, "PayGradeLevelId", "Description", gradeLevelDeduction.PayGradeLevelId);
+        //    ViewData["PayGradeLevelId"] = new SelectList(_context.PayGradeLevels, "PayGradeLevelId", "Description", gradeLevelDeduction.PayGradeLevelId);
 
-            return View(gradeLevelDeduction);
-        }
+        //    return View(gradeLevelDeduction);
+        //}
 
         public async Task<IActionResult> ListSubscriptions()
         {
@@ -1910,22 +2076,66 @@ namespace CareConnect.Controllers
 
         public IActionResult AddVendor()
         {
-            Vendor vendor = new();
+            VendorViewModel vendor = new();
             return View(vendor);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddVendor([Bind("VendorId,OrganizationId,Name,Email,Phone,Address,City,PostCode,ContactPerson,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber")] Vendor vendor)
+        public async Task<IActionResult> AddVendor([Bind("VendorId,OrganizationId,Name,Email,Phone,Address,City,PostCode,ContactPerson,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber")] VendorViewModel vendorView)
         {
             var user = await _userManager.GetUserAsync(User);
 
             if (user.OrganizationId != null)
             {
-                vendor.OrganizationId = (int)user.OrganizationId;
+                vendorView.OrganizationId = (int)user.OrganizationId;
             }
 
-            vendor.AddedBy = user.UserName;
+            if (vendorView.PaymentMethod == PaymentMethod.DirectDeposit)
+            {
+                if (string.IsNullOrEmpty(vendorView.BankName))
+                {
+                    ViewBag.Message = "Bank name is required for a direct deposit.";
+                    return View(vendorView);
+                }
+
+                if (string.IsNullOrEmpty(vendorView.BankCode))
+                {
+                    ViewBag.Message = "Bank code is required for a direct deposit.";
+                    return View(vendorView);
+                }
+
+                if (string.IsNullOrEmpty(vendorView.TransitCode))
+                {
+                    ViewBag.Message = "Transit code is required for a direct deposit.";
+                    return View(vendorView);
+                }
+
+                if (string.IsNullOrEmpty(vendorView.AccountNumber))
+                {
+                    ViewBag.Message = "Account number is required for a direct deposit.";
+                    return View(vendorView);
+                }
+            }
+
+            Vendor vendor = new()
+            {
+                VendorId = vendorView.VendorId,
+                OrganizationId = vendorView.OrganizationId,
+                Name = vendorView.Name,
+                Email = vendorView.Email,
+                Phone = vendorView.Phone,
+                Address = vendorView.Address,
+                City = vendorView.City,
+                PostCode = vendorView.PostCode,
+                ContactPerson = vendorView.ContactPerson,
+                PaymentMethod = vendorView.PaymentMethod,
+                BankCode = vendorView.BankCode,
+                BankName = vendorView.BankName,
+                TransitCode = vendorView.TransitCode,
+                AccountNumber = vendorView.AccountNumber,
+                AddedBy = user.UserName
+            };
 
             if (ModelState.IsValid)
             {
@@ -1940,7 +2150,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(vendor);
+            return View(vendorView);
         }
 
         public async Task<IActionResult> EditVendor(string id)
@@ -1962,12 +2172,30 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
-            return View(vendor);
+            VendorViewModel vendorView = new()
+            {
+                VendorId = vendor.VendorId,
+                OrganizationId = vendor.OrganizationId,
+                Name = vendor.Name,
+                Email = vendor.Email,
+                Phone = vendor.Phone,
+                Address = vendor.Address,
+                City = vendor.City,
+                PostCode = vendor.PostCode,
+                ContactPerson = vendor.ContactPerson,
+                PaymentMethod = vendor.PaymentMethod,
+                BankCode = vendor.BankCode,
+                BankName = vendor.BankName,
+                TransitCode = vendor.TransitCode,
+                AccountNumber = vendor.AccountNumber
+            };
+
+            return View(vendorView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditVendor(string id, [Bind("VendorId,OrganizationId,Name,Email,Phone,Address,City,PostCode,ContactPerson,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber")] Vendor vendor)
+        public async Task<IActionResult> EditVendor(string id, [Bind("VendorId,OrganizationId,Name,Email,Phone,Address,City,PostCode,ContactPerson,PaymentMethod,BankName,BankCode,TransitCode,AccountNumber")] VendorViewModel vendorView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -1975,14 +2203,59 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            if (num != vendor.VendorId)
+            if (num != vendorView.VendorId)
             {
                 return NotFound();
             }
 
+            if (vendorView.PaymentMethod == PaymentMethod.DirectDeposit)
+            {
+                if (string.IsNullOrEmpty(vendorView.BankName))
+                {
+                    ViewBag.Message = "Bank name is required for a direct deposit.";
+                    return View(vendorView);
+                }
+
+                if (string.IsNullOrEmpty(vendorView.BankCode))
+                {
+                    ViewBag.Message = "Bank code is required for a direct deposit.";
+                    return View(vendorView);
+                }
+
+                if (string.IsNullOrEmpty(vendorView.TransitCode))
+                {
+                    ViewBag.Message = "Transit code is required for a direct deposit.";
+                    return View(vendorView);
+                }
+
+                if (string.IsNullOrEmpty(vendorView.AccountNumber))
+                {
+                    ViewBag.Message = "Account number is required for a direct deposit.";
+                    return View(vendorView);
+                }
+            }
+
             var user = await _userManager.GetUserAsync(User);
-            vendor.UpdatedBy = user.UserName;
-            vendor.DateUpdated = DateTime.UtcNow;
+
+            Vendor vendor = new()
+            {
+                VendorId = vendorView.VendorId,
+                OrganizationId = vendorView.OrganizationId,
+                Name = vendorView.Name,
+                Email = vendorView.Email,
+                Phone = vendorView.Phone,
+                Address = vendorView.Address,
+                City = vendorView.City,
+                PostCode = vendorView.PostCode,
+                ContactPerson = vendorView.ContactPerson,
+                PaymentMethod = vendorView.PaymentMethod,
+                BankCode = vendorView.BankCode,
+                BankName = vendorView.BankName,
+                TransitCode = vendorView.TransitCode,
+                AccountNumber = vendorView.AccountNumber,
+                UpdatedBy = user.UserName,
+                DateUpdated = DateTime.Now
+            };
 
             if (ModelState.IsValid)
             {
@@ -1990,6 +2263,7 @@ namespace CareConnect.Controllers
                 {
                     _context.Update(vendor);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListVendors));
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -2000,10 +2274,12 @@ namespace CareConnect.Controllers
                     else
                     {
                         _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
-                        return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
                     }
                 }
-                return RedirectToAction(nameof(ListVendors));
+                
             }
             else
             {
@@ -2012,7 +2288,7 @@ namespace CareConnect.Controllers
                     "see your system administrator.";
             }
 
-            return View(vendor);
+            return View(vendorView);
         }
 
         public async Task<IActionResult> SmtpSettings(string id)
@@ -2120,11 +2396,6 @@ namespace CareConnect.Controllers
             return View(smtp);
         }
 
-        private bool CaseManagerExists(int id)
-        {
-            return _context.CaseManagers.Any(c => c.CaseManagerId == id);
-        }
-
         private bool ClientExists(int id)
         {
             return _context.Clients.Any(c => c.ClientId == id);
@@ -2167,11 +2438,6 @@ namespace CareConnect.Controllers
         private bool PayGradeLevelExists(int id)
         {
             return _context.PayGradeLevels.Any(g => g.PayGradeLevelId == id);
-        }
-
-        private bool PayGradeLevelDeductionExists(int id)
-        {
-            return _context.PayGradeLevelDeductions.Any(d => d.PayGradeLevelDeductionId == id);
         }
 
         private bool SubscriptionExists(int id)

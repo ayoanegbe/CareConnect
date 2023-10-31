@@ -54,6 +54,35 @@ namespace CareConnect.Migrations
                     b.ToTable("Alerts");
                 });
 
+            modelBuilder.Entity("CareConnect.Models.Allowance", b =>
+                {
+                    b.Property<int>("AllowanceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AllowanceId"), 1L, 1);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PayGradeLevelId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AllowanceId");
+
+                    b.HasIndex("PayGradeLevelId");
+
+                    b.ToTable("Allowances");
+                });
+
             modelBuilder.Entity("CareConnect.Models.Applicant", b =>
                 {
                     b.Property<int>("ApplicantId")
@@ -303,7 +332,7 @@ namespace CareConnect.Migrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("CaseManagers");
+                    b.ToTable("CaseManager");
                 });
 
             modelBuilder.Entity("CareConnect.Models.Client", b =>
@@ -586,6 +615,35 @@ namespace CareConnect.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("CareConnect.Models.Deduction", b =>
+                {
+                    b.Property<int>("DeductionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeductionId"), 1L, 1);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PayGradeLevelId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DeductionId");
+
+                    b.HasIndex("PayGradeLevelId");
+
+                    b.ToTable("Deductions");
+                });
+
             modelBuilder.Entity("CareConnect.Models.Department", b =>
                 {
                     b.Property<int>("DepartmentId")
@@ -745,6 +803,9 @@ namespace CareConnect.Migrations
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PayGradeLevelId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PaymentFrequency")
                         .HasColumnType("int");
 
@@ -780,6 +841,8 @@ namespace CareConnect.Migrations
                     b.HasIndex("JobTitleId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PayGradeLevelId");
 
                     b.ToTable("Employees");
                 });
@@ -1483,7 +1546,6 @@ namespace CareConnect.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("HourlyRate")
-                        .IsRequired()
                         .HasColumnType("float");
 
                     b.Property<int>("Level")
@@ -1507,52 +1569,13 @@ namespace CareConnect.Migrations
                     b.ToTable("PayGradeLevels");
                 });
 
-            modelBuilder.Entity("CareConnect.Models.PayGradeLevelDeduction", b =>
+            modelBuilder.Entity("CareConnect.Models.Payroll", b =>
                 {
-                    b.Property<int>("PayGradeLevelDeductionId")
+                    b.Property<int>("PayrollId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayGradeLevelDeductionId"), 1L, 1);
-
-                    b.Property<string>("AddedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("HealthInsurance")
-                        .HasColumnType("float");
-
-                    b.Property<int>("PayGradeLevelId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("RetirementContribution")
-                        .HasColumnType("float");
-
-                    b.Property<double>("TaxRate")
-                        .HasColumnType("float");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PayGradeLevelDeductionId");
-
-                    b.HasIndex("PayGradeLevelId");
-
-                    b.ToTable("PayGradeLevelDeductions");
-                });
-
-            modelBuilder.Entity("CareConnect.Models.PayrollHistory", b =>
-                {
-                    b.Property<int>("PayrollHistoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayrollHistoryId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayrollId"), 1L, 1);
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -1584,11 +1607,74 @@ namespace CareConnect.Migrations
                     b.Property<double?>("TotalDeduction")
                         .HasColumnType("float");
 
-                    b.HasKey("PayrollHistoryId");
+                    b.HasKey("PayrollId");
 
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.ToTable("Payrolls");
+                });
+
+            modelBuilder.Entity("CareConnect.Models.PayrollAllowance", b =>
+                {
+                    b.Property<string>("PayrollAllowanceId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AllowanceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PayrollId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PayrollAllowanceId");
+
+                    b.HasIndex("AllowanceId");
+
+                    b.HasIndex("PayrollId");
+
+                    b.ToTable("PayrollAllowances");
+                });
+
+            modelBuilder.Entity("CareConnect.Models.PayrollDeduction", b =>
+                {
+                    b.Property<string>("PayrollDeductionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("DeductionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PayrollId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PayrollDeductionId");
+
+                    b.HasIndex("DeductionId");
+
+                    b.HasIndex("PayrollId");
+
+                    b.ToTable("PayrollDeductions");
+                });
+
+            modelBuilder.Entity("CareConnect.Models.PayrollHistory", b =>
+                {
+                    b.Property<int>("PayrollHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayrollHistoryId"), 1L, 1);
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PayrollId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PayrollHistoryId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PayrollId");
 
                     b.ToTable("PayrollHistories");
                 });
@@ -2184,7 +2270,6 @@ namespace CareConnect.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VendorId"), 1L, 1);
 
                     b.Property<string>("AccountNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddedBy")
@@ -2195,11 +2280,9 @@ namespace CareConnect.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BankCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BankName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
@@ -2236,7 +2319,6 @@ namespace CareConnect.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TransitCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -2415,6 +2497,17 @@ namespace CareConnect.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("CareConnect.Models.Allowance", b =>
+                {
+                    b.HasOne("CareConnect.Models.PayGradeLevel", "PayGradeLevel")
+                        .WithMany()
+                        .HasForeignKey("PayGradeLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PayGradeLevel");
+                });
+
             modelBuilder.Entity("CareConnect.Models.Applicant", b =>
                 {
                     b.HasOne("CareConnect.Models.Organization", "Organization")
@@ -2547,6 +2640,17 @@ namespace CareConnect.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("CareConnect.Models.Deduction", b =>
+                {
+                    b.HasOne("CareConnect.Models.PayGradeLevel", "PayGradeLevel")
+                        .WithMany()
+                        .HasForeignKey("PayGradeLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PayGradeLevel");
+                });
+
             modelBuilder.Entity("CareConnect.Models.Department", b =>
                 {
                     b.HasOne("CareConnect.Models.Organization", "Organization")
@@ -2597,11 +2701,19 @@ namespace CareConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CareConnect.Models.PayGradeLevel", "PayGradeLevel")
+                        .WithMany()
+                        .HasForeignKey("PayGradeLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Department");
 
                     b.Navigation("JobTitle");
 
                     b.Navigation("Organization");
+
+                    b.Navigation("PayGradeLevel");
                 });
 
             modelBuilder.Entity("CareConnect.Models.EmployeeAttendance", b =>
@@ -2799,7 +2911,7 @@ namespace CareConnect.Migrations
                         .IsRequired();
 
                     b.HasOne("CareConnect.Models.Interview", "Interview")
-                        .WithMany("Interviewers")
+                        .WithMany()
                         .HasForeignKey("InterviewId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2889,18 +3001,7 @@ namespace CareConnect.Migrations
                     b.Navigation("PayGrade");
                 });
 
-            modelBuilder.Entity("CareConnect.Models.PayGradeLevelDeduction", b =>
-                {
-                    b.HasOne("CareConnect.Models.PayGradeLevel", "PayGradeLevel")
-                        .WithMany()
-                        .HasForeignKey("PayGradeLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PayGradeLevel");
-                });
-
-            modelBuilder.Entity("CareConnect.Models.PayrollHistory", b =>
+            modelBuilder.Entity("CareConnect.Models.Payroll", b =>
                 {
                     b.HasOne("CareConnect.Models.Employee", "Employee")
                         .WithMany()
@@ -2917,6 +3018,63 @@ namespace CareConnect.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("CareConnect.Models.PayrollAllowance", b =>
+                {
+                    b.HasOne("CareConnect.Models.Allowance", "Allowance")
+                        .WithMany()
+                        .HasForeignKey("AllowanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.Models.Payroll", "Payroll")
+                        .WithMany()
+                        .HasForeignKey("PayrollId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Allowance");
+
+                    b.Navigation("Payroll");
+                });
+
+            modelBuilder.Entity("CareConnect.Models.PayrollDeduction", b =>
+                {
+                    b.HasOne("CareConnect.Models.Deduction", "Deduction")
+                        .WithMany()
+                        .HasForeignKey("DeductionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.Models.Payroll", "Payroll")
+                        .WithMany()
+                        .HasForeignKey("PayrollId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Deduction");
+
+                    b.Navigation("Payroll");
+                });
+
+            modelBuilder.Entity("CareConnect.Models.PayrollHistory", b =>
+                {
+                    b.HasOne("CareConnect.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.Models.Payroll", "Payroll")
+                        .WithMany()
+                        .HasForeignKey("PayrollId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Payroll");
                 });
 
             modelBuilder.Entity("CareConnect.Models.Respite", b =>
@@ -3198,11 +3356,6 @@ namespace CareConnect.Migrations
             modelBuilder.Entity("CareConnect.Models.EmployeeOvertime", b =>
                 {
                     b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("CareConnect.Models.Interview", b =>
-                {
-                    b.Navigation("Interviewers");
                 });
 
             modelBuilder.Entity("CareConnect.Models.Shift", b =>

@@ -1,0 +1,119 @@
+﻿@model PayGradeLevelViewModel
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Edit Pay Grade Level";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var gradeId = ViewData["gradeId"];
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Edit Pay Grade Level</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="Setup" asp-action="ListPayGrades">Pay Grades</a></span></li>
+                <li><span><a asp-controller="Setup" asp-action="ListPayGradeLevels" asp-route-gradeId="@protector.Encode(gradeId.ToString())">Pay Grade Levels</a></span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-action="EditPayGradeLevel" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="PayGradeLevelId" />
+                    <input type="hidden" asp-for="PayGradeId" />
+                    <header class="card-header">
+                        <h2 class="card-title">Edit Pay Grade Level</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="PayGradeId"></label>
+                                <input asp-for="PayGrade.Name" type="text" class="form-control" readonly />
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Level"></label>
+                                <input asp-for="Level" type="number" class="form-control" readonly />
+
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="Description"></label>
+                                <input asp-for="Description" type="text" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="CurrencyId"></label>
+                                <select asp-for="CurrencyId" asp-items="ViewBag.CurrencyId" class="form-control">
+                                    <option selected="selected" value="">Please Select Currency</option>
+                                </select>
+                                <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="BasicSalary"></label>
+                                <input id="number_input" asp-for="BasicSalary" asp-format="{0:#,#0.00}" type="text" class="form-control CurrencyInput" />
+                                <span asp-validation-for="BasicSalary" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="HourlyRate"></label>
+                                <input id="number_input" asp-for="HourlyRate" asp-format="{0:#,#0.00}" type="text" class="form-control CurrencyInput" />
+                                <span asp-validation-for="HourlyRate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="OvertimeRate"></label>
+                                <input id="number_input" asp-for="OvertimeRate" asp-format="{0:#,#0.00}" type="text" class="form-control CurrencyInput" />
+                                <span asp-validation-for="OvertimeRate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListPayGradeLevels" asp-route-gradeId="@protector.Encode(gradeId.ToString())">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

@@ -6,6 +6,6 @@ namespace CareConnect.Models.CareConnectViewModels
     {
         public string SourceId { get; set; }
         public string Comment { get; set; }
-        public NoteSource Soure { get; set; }
+        public NoteSource Source { get; set; }
     }
 }

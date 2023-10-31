@@ -14,9 +14,11 @@ namespace CareConnect.Models
         public int OrganizationId { get; set; }
         public Organization Organization { get; set; }
         [ForeignKey("Employee_Department")]
+        [Display(Name = "Department")]
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
         [ForeignKey("Employee_JobTitle")]
+        [Display(Name = "Job Title")]
         public int JobTitleId { get; set; }
         public JobTitle JobTitle { get; set; }
         [Required]
@@ -52,7 +54,7 @@ namespace CareConnect.Models
         [Display(Name = "Date Joined")]
         public DateTime? DateJoined { get; set; }
         public EmployeeType Status { get; set; } = EmployeeType.Contract;
-        [Display(Name = "Contractor Type")]
+        [Display(Name = "Contract Type")]
         public ContractorType? ContractorType { get; set; }
         [Display(Name = "Immigration Status")]
         public ImmigrationStatus ImmigrationStatus { get; set; } = ImmigrationStatus.Citizen;
@@ -60,6 +62,9 @@ namespace CareConnect.Models
         public string SocialInsuranceNumber { get; set; }
         [Display(Name = "Line Manager")]
         public int? LineManagerId { get; set; }
+        [Display(Name = "Pay Grade Level")]
+        public int PayGradeLevelId { get; set; }
+        public PayGradeLevel PayGradeLevel { get; set; }
 
         #region Bank Details
         [Display(Name = "Payment Method")]
@@ -88,6 +93,7 @@ namespace CareConnect.Models
         [Display(Name = "Updated By")]
         public string UpdatedBy { get; set; }
 
+        [Display(Name = "Full Name")]
         public string FullName => $"{this.LastName}, {this.FirstName} {this.MiddleName}";
     }
 }

@@ -12,7 +12,7 @@ namespace CareConnect.Models
         public Employee Employee { get; set; }
         public bool IsAvailable { get; set; } = true;
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         [Display(Name = "Added By")]

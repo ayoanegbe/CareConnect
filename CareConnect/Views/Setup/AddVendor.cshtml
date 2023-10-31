@@ -1,23 +1,23 @@
-﻿@model Vendor
+﻿@model VendorViewModel
 
 @{
     ViewData["Title"] = "Add New Vendor";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section role="main" class="content-body card-margin">
+<section role="main" class="content-body">
     <header class="page-header">
         <h2>Add New Vendor</h2>
 
         <div class="right-wrapper text-right">
             <ol class="breadcrumbs">
                 <li>
-                    <a asp-controller="Setup" asp-action="ListVendors">
-                        <i class="bx bx-radar"></i>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
                     </a>
                 </li>
-                @* <li><span><a asp-controller="Companies" asp-action="Index">Companies</a></span></li>
-                <li><span>New Client</span></li> *@
+                <li><span><a asp-controller="Setup" asp-action="ListVendors">Vendors</a></span></li>
+                <li><span>New Vendor</span></li>
             </ol>
 
             @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
@@ -26,71 +26,56 @@
     <div class="row">
         <div class="col-lg-12">
             <section class="card">
-                <header class="card-header">
-                    <h2 class="card-title">Add New Vendor</h2>
-                </header>
-                @if (ViewBag.Message != null)
-                {
-                    <div class="alert alert-danger alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
-                    </div>
-                }
-                <div class="card-body">
-                    <form asp-action="AddVendor" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <form asp-action="AddVendor" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Vendor</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+                    
                         <div class="row form-group">
                             <div class="col-lg-6">
                                 <label class="col-form-label" asp-for="Name"></label>
-                                <div class="input-group">
-                                    <input asp-for="Name" type="text" class="form-control"/>
-                                    <span asp-validation-for="Name" class="text-danger" />
-                                </div>
+                                <input asp-for="Name" type="text" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-6">
                                 <label class="col-form-label" asp-for="ContactPerson"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="ContactPerson" type="text" class="form-control" />
-                                        <span asp-validation-for="ContactPerson" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="ContactPerson" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPerson" class="text-danger"></span>
                             </div>
 
                         </div>
                         <div class="row form-group">
                             <div class="col-lg-6">
                                 <label class="col-form-label" asp-for="Address"></label>
-                                <div class="input-group">
-                                    <input asp-for="Address" type="text" class="form-control"/>
-                                    <span asp-validation-for="Address" class="text-danger" />
-                                </div>
+                                <input asp-for="Address" type="text" class="form-control" />
+                                <span asp-validation-for="Address" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-3">
                                 <label class="col-form-label" asp-for="City"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="City" type="text" class="form-control" />
-                                        <span asp-validation-for="City" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="City" type="text" class="form-control" />
+                                <span asp-validation-for="City" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-3">
                                 <label class="col-form-label" asp-for="PostCode"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="PostCode" type="text" class="form-control" />
-                                        <span asp-validation-for="PostCode" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="PostCode" type="text" class="form-control" />
+                                <span asp-validation-for="PostCode" class="text-danger"></span>
                             </div>
 
                         </div>
@@ -98,95 +83,70 @@
                         <div class="row form-group">
                             <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="Email"></label>
-                                <div class="input-group">
-                                    <input asp-for="Email" type="text" class="form-control" />
-                                    <span asp-validation-for="Email" class="text-danger" />
-                                </div>
+                                <input asp-for="Email" type="email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="Phone"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="Phone" type="tel" class="form-control" />
-                                        <span asp-validation-for="Phone" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="Phone" type="tel" class="form-control" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
                             </div>
 
-                        </div>
+                            <div class="mb-3 hidden-lg"></div>
 
-                        <div class="row form-group">
-                            <div class="col-lg-2">
+                            <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="PaymentMethod"></label>
-                                <div class="input-group">
-                                    <select asp-for="PaymentMethod" asp-items="Html.GetEnumSelectList<PaymentMethod>()" class="form-control">
-                                        <option selected="selected" value="">Please Select Payment Method</option>
-                                    </select>
-                                    <span asp-validation-for="Address" class="text-danger" />
-                                </div>
+                                <select asp-for="PaymentMethod" id="paymentMethod" asp-items="Html.GetEnumSelectList<PaymentMethod>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Payment Method</option>
+                                </select>
+                                <span asp-validation-for="Address" class="text-danger"></span>
                             </div>
 
-                            <div class="mb-3 hidden-lg"></div>
+                        </div>
 
-                            <div class="col-lg-2">
+                        <div class="row form-group" id="bankInfo">                            
+
+                            <div class="col-lg-3">
                                 <label class="col-form-label" asp-for="BankName"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="BankName" type="text" class="form-control" />
-                                        <span asp-validation-for="BankName" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="BankName" type="text" id="bankName" class="form-control" />
+                                <span asp-validation-for="BankName" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
-                            <div class="col-lg-2">
+                            <div class="col-lg-3">
                                 <label class="col-form-label" asp-for="BankCode"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="BankCode" type="text" class="form-control" />
-                                        <span asp-validation-for="BankCode" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="BankCode" type="number" id="bankCode" class="form-control" />
+                                <span asp-validation-for="BankCode" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
-                            <div class="col-lg-2">
+                            <div class="col-lg-3">
                                 <label class="col-form-label" asp-for="TransitCode"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="TransitCode" type="number" class="form-control" />
-                                        <span asp-validation-for="TransitCode" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="TransitCode" type="number" id="transitCode" class="form-control" />
+                                <span asp-validation-for="TransitCode" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
 
-                            <div class="col-lg-2">
+                            <div class="col-lg-3">
                                 <label class="col-form-label" asp-for="AccountNumber"></label>
-                                <div class="input-group">
-                                    <div class="input-group">
-                                        <input asp-for="AccountNumber" type="number" class="form-control" />
-                                        <span asp-validation-for="AccountNumber" class="text-danger" />
-                                    </div>
-                                </div>
+                                <input asp-for="AccountNumber" type="number" id="accountNumber" class="form-control" />
+                                <span asp-validation-for="AccountNumber" class="text-danger"></span>
                             </div>
                         </div>
 
-                        <footer class="card-footer text-right">
-                            <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
-                            <a class="btn btn-secondary" asp-action="ListVendors">Cancel</a>
-                        </footer>
-                    </form>
-                </div>
-
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListVendors">Cancel</a>
+                    </footer>
+                </form>
             </section>
-
 
         </div>
     </div>
@@ -197,5 +157,31 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        <style>
+            /* Chrome, Safari, Edge, Opera */
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            /* Firefox */
+            input[type=number] {
+                -moz-appearance: textfield;
+            }
+        </style>
+
+        <script type="text/javascript">
+            $('#paymentMethod').bind('change', function () {
+
+                if ($("#paymentMethod").val() != "2") {
+                    $("#bankInfo").hide();
+                }
+                else {
+                    $("#bankInfo").show();
+                }
+            });
+        </script>
     }
 }

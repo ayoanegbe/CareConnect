@@ -15,7 +15,7 @@ namespace CareConnect.Models
         public string Header { get; set; }
         [DataType(DataType.Html)]
         public string Message { get; set; }
-        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public DateTime Date { get; set; } = DateTime.Now;
         public string Owner { get; set; }
     }
 }

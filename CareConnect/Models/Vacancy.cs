@@ -12,9 +12,11 @@ namespace CareConnect.Models
         public int OrganizationId { get; set; }
         public Organization Organization { get; set; }
         [ForeignKey("Vacancy_JobTitle")]
+        [Display(Name = "Job Title")]
         public int JobTitleId { get; set; }
         public JobTitle JobTitle { get; set; }
         [ForeignKey("Vacancy_Department")]
+        [Display(Name = "Department")]
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
         [Required]
@@ -26,7 +28,7 @@ namespace CareConnect.Models
         public string Requirements { get; set; }
         public VacancyStatus Status { get; set; } = VacancyStatus.Open;
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; } = DateTime.Now;
         [Display(Name = "Date Updated")]
         public DateTime? DateUpdated { get; set; }
         [Display(Name = "Added By")]

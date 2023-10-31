@@ -1,0 +1,105 @@
+﻿@model InterviewViewModel
+
+@{
+    ViewData["Title"] = "Add New Interview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Add New Interview</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="EmployeeManagement" asp-action="ListInterviews">Interviews</a></span></li>
+                <li><span>New Interview</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-controller="EmployeeManagement" asp-action="AddInterview" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Interview</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="ApplicantId"></label>
+                                <select asp-for="ApplicantId" data-plugin-selectTwo asp-items="ViewBag.ApplicantId" class="form-control populate">
+                                    <option selected="selected" value="">Please Select Applicant</option>
+                                </select>
+                                <span asp-validation-for="ApplicantId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="InterviewDate"></label>
+                                <input asp-for="InterviewDate" type="date" class="form-control" />
+                                <span asp-validation-for="InterviewDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="InterviewTime"></label>
+                                <input asp-for="InterviewTime" asp-format="hh:mm tt" type="time" class="form-control" />
+                                <span asp-validation-for="InterviewTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-lg-12">
+                                <label class="col-form-label">Pick Interviewers</label>
+                                <select name="InterviewersLists" multiple data-plugin-selectTwo asp-items="ViewBag.EmployeeId" class="form-control populate" data-plugin-options='{ "minimumInputLength": 2 }'>
+                                    <option selected="selected" value="">Please Select Interviewer</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="Note" class="col-lg-2 control-label text-lg-right pt-2"></label>
+                            <div class="col-lg-8">                                
+                                <textarea asp-for="Note" class="summernote" displayReadonly data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }' data-plugin></textarea>
+                                <span asp-validation-for="Note" class="text-danger"></span>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListInterviews">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

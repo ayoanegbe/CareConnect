@@ -8,6 +8,7 @@ namespace CareConnect.Models.CareConnectViewModels
     {
         public int ApplicantId { get; set; }
         [ForeignKey("Applicant_Vacancy")]
+        [Display(Name = "Vacancy")]
         public int VacancyId { get; set; }
         public Vacancy Vacancy { get; set; }
         [ForeignKey("Applicant_Organization")]
@@ -32,12 +33,12 @@ namespace CareConnect.Models.CareConnectViewModels
         [Display(Name = "Cover Letter")]
         public string CoverLetterPath { get; set; }
         [Display(Name = "Date Applied")]
-        public DateTime DateApplied { get; set; } = DateTime.UtcNow;
+        public DateTime DateApplied { get; set; } = DateTime.Now;
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Fresh;
         public IFormFile ResumeFile { get; set; } 
         public IFormFile CoverLetterFile { get; set; }
         public string Token { get; set; }
-
-        public string FullName => $"{this.FirstName} {this.LastName}";
+        [Display(Name = "Full Name")]
+        public string FullName => $"{this.FirstName}, {this.LastName} {this.MiddleName}";
     }
 }

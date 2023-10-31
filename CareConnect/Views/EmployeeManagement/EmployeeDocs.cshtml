@@ -1,0 +1,139 @@
+﻿@model EmployeeViewModel
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Employee Documents";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Add New Documents</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="EmployeeManagement" asp-action="ListEmployees">Employees</a></span></li>
+                <li><span>New Documents</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form >
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="EmployeeId" type="hidden" />
+                    <input asp-for="OrganizationId" type="hidden" />
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Vacancy</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="FullName"></label>
+                                <input asp-for="FullName" type="text" class="form-control" readonly />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="JobTitleId"></label>
+                                <select asp-for="JobTitleId" asp-items="ViewBag.JobTitleId" class="form-control">
+                                    <option selected="selected" value="">Please Select Job Title</option>
+                                </select>
+                                <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="DepartmentId"></label>
+                                <select asp-for="DepartmentId" asp-items="ViewBag.DepartmentId" class="form-control">
+                                    <option selected="selected" value="">Please Select Department</option>
+                                </select>
+                                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                            </div>
+                        </div>                        
+                    </div>                    
+                </form>
+                <section class="card">
+                    <header class="card-header">
+                        <h2 class="card-title">List of Documents</h2>
+                    </header>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <div class="m-0">
+                                    <a asp-controller="EmployeeManagement" asp-action="AddDocument" asp-route-id="@protector.Encode(Model.EmployeeId.ToString())" class="btn btn-primary" style="background-color:cornflowerblue">Add Document<i class="fas fa-plus"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>
+                                        Document Name
+                                    </th>
+                                    <th>
+                                        File Path
+                                    </th>
+                                    <th>
+                                        Date Added
+                                    </th>                                    
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Documents)
+                                {
+                                    <tr>
+                                        <td>@(i++)</td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DocumentName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.FilePath)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DateAdded)
+                                        </td>                                    
+                                        <td>
+                                            <a asp-action="EditDocument" asp-route-id="@protector.Encode(item.EmployeeDocumentId.ToString())" style="color:magenta">Edit</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <footer class="card-footer">
+                        <a class="btn btn-dark" asp-controller="EmployeeManagement" asp-action="ListEmployees"><i class="fas fa-chevron-left"></i> Back</a>
+                    </footer>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

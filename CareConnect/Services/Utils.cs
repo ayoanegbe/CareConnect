@@ -66,31 +66,25 @@ namespace CareConnect.Services
         {
             var key = Encoding.UTF8.GetBytes(keyString);
 
-            using (var aesAlg = Aes.Create())
+            using var aesAlg = Aes.Create();
+            using var encryptor = aesAlg.CreateEncryptor(key, aesAlg.IV);
+            using var msEncrypt = new MemoryStream();
+            using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+            using (var swEncrypt = new StreamWriter(csEncrypt))
             {
-                using (var encryptor = aesAlg.CreateEncryptor(key, aesAlg.IV))
-                {
-                    using (var msEncrypt = new MemoryStream())
-                    {
-                        using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                        using (var swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(text);
-                        }
-
-                        var iv = aesAlg.IV;
-
-                        var decryptedContent = msEncrypt.ToArray();
-
-                        var result = new byte[iv.Length + decryptedContent.Length];
-
-                        Buffer.BlockCopy(iv, 0, result, 0, iv.Length);
-                        Buffer.BlockCopy(decryptedContent, 0, result, iv.Length, decryptedContent.Length);
-
-                        return Convert.ToBase64String(result);
-                    }
-                }
+                swEncrypt.Write(text);
             }
+
+            var iv = aesAlg.IV;
+
+            var decryptedContent = msEncrypt.ToArray();
+
+            var result = new byte[iv.Length + decryptedContent.Length];
+
+            Buffer.BlockCopy(iv, 0, result, 0, iv.Length);
+            Buffer.BlockCopy(decryptedContent, 0, result, iv.Length, decryptedContent.Length);
+
+            return Convert.ToBase64String(result);
         }
 
         /// <summary>
@@ -109,25 +103,17 @@ namespace CareConnect.Services
             Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, iv.Length);
             var key = Encoding.UTF8.GetBytes(keyString);
 
-            using (var aesAlg = Aes.Create())
+            using var aesAlg = Aes.Create();
+            using var decryptor = aesAlg.CreateDecryptor(key, iv);
+            string result;
+            using (var msDecrypt = new MemoryStream(cipher))
             {
-                using (var decryptor = aesAlg.CreateDecryptor(key, iv))
-                {
-                    string result;
-                    using (var msDecrypt = new MemoryStream(cipher))
-                    {
-                        using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                        {
-                            using (var srDecrypt = new StreamReader(csDecrypt))
-                            {
-                                result = srDecrypt.ReadToEnd();
-                            }
-                        }
-                    }
-
-                    return result;
-                }
+                using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using var srDecrypt = new StreamReader(csDecrypt);
+                result = srDecrypt.ReadToEnd();
             }
+
+            return result;
         }
 
         public static string DecryptStringAES(string cipherText)
@@ -172,7 +158,7 @@ namespace CareConnect.Services
             byte[] encrypted;
             // Create a RijndaelManaged object
             // with the specified key and IV.
-            using (var rijAlg = new RijndaelManaged())
+            using (var rijAlg = Aes.Create("AesManaged"))
             {
                 rijAlg.Mode = CipherMode.CBC;
                 rijAlg.Padding = PaddingMode.PKCS7;
@@ -204,7 +190,7 @@ namespace CareConnect.Services
             string plaintext = null;
             // Create an RijndaelManaged object
             // with the specified key and IV.
-            using (var rijAlg = new RijndaelManaged())
+            using (var rijAlg = Aes.Create("AesManaged"))
             {
                 //Settings
                 rijAlg.Mode = CipherMode.CBC;

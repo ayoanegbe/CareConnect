@@ -1,0 +1,108 @@
+﻿@model VacancyViewModel
+
+@{
+    ViewData["Title"] = "Edit Vacancy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Edit Vacancy</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="EmployeeManagement" asp-action="ListVacancies">Vacancies</a></span></li>
+                <li><span>Edit Vacancy</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-action="EditVacancy" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="VacancyId" type="hidden" />
+                    <input asp-for="OrganizationId" type="hidden" />
+                    <header class="card-header">
+                        <h2 class="card-title">Edit Vacancy</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-5">
+                                <label class="col-form-label" asp-for="JobTitleId"></label>
+                                <select asp-for="JobTitleId" asp-items="ViewBag.JobTitleId" class="form-control">
+                                    <option selected="selected" value="">Please Select Job Title</option>
+                                </select>
+                                <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-5">
+                                <label class="col-form-label" asp-for="DepartmentId"></label>
+                                <select asp-for="DepartmentId" asp-items="ViewBag.DepartmentId" class="form-control">
+                                    <option selected="selected" value="">Please Select Department</option>
+                                </select>
+                                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-2">
+                                <label class="col-form-label" asp-for="Status"></label>
+                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<VacancyStatus>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Status</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="JobDescription" class="col-lg-2 control-label text-lg-right pt-2"></label>
+                            <div class="col-lg-8">
+                                <textarea asp-for="JobDescription" class="summernote" displayReadonly data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }' data-plugin></textarea>
+                            </div>
+                            <span asp-validation-for="JobDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group row">
+                            <label asp-for="Requirements" class="col-lg-2 control-label text-lg-right pt-2"></label>
+                            <div class="col-lg-8">
+                                <textarea asp-for="Requirements" class="summernote" displayReadonly data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }' data-plugin></textarea>
+                            </div>
+                            <span asp-validation-for="Requirements" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListVacancies">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
