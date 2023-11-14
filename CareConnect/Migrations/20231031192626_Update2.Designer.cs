@@ -4,6 +4,7 @@ using CareConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CareConnect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231031192626_Update2")]
+    partial class Update2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2216,9 +2218,6 @@ namespace CareConnect.Migrations
 
                     b.Property<string>("AddedBy")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ClosingDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");

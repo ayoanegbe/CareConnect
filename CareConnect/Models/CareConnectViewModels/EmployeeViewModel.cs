@@ -66,16 +66,12 @@ namespace CareConnect.Models.CareConnectViewModels
         #region Bank Details
         [Display(Name = "Payment Method")]
         public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.DirectDeposit;
-        [Required]
         [Display(Name = "Bank Name")]
         public string BankName { get; set; }
-        [Required]
         [Display(Name = "Bank Code")]
         public string BankCode { get; set; }
-        [Required]
         [Display(Name = "Transit Code")]
         public string TransitCode { get; set; }
-        [Required]
         [Display(Name = "Account Number")]
         public string AccountNumber { get; set; }
         public PaymentFrequency PaymentFrequency { get; set; } = PaymentFrequency.Monthly;

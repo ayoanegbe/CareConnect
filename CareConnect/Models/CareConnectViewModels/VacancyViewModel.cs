@@ -26,5 +26,8 @@ namespace CareConnect.Models.CareConnectViewModels
         [DataType(DataType.Html)]
         public string Requirements { get; set; }
         public VacancyStatus Status { get; set; } = VacancyStatus.Open;
+        [Required]
+        [Display(Name = "Closing Date")]
+        public DateTime ClosingDate { get; set; }
     }
 }

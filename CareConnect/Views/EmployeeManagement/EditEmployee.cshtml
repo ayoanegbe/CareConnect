@@ -97,6 +97,43 @@
                         </div>
 
                         <div class="row form-group">
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="JobTitleId"></label>
+                                <select data-plugin-selectTwo asp-for="JobTitleId" asp-items="ViewBag.JobTitleId" class="form-control">
+                                    <option selected="selected" value="">Please Select Job Title</option>
+                                </select>
+                                <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="DateJoined"></label>
+                                <input asp-for="DateJoined" type="date" class="form-control" />
+                                <span asp-validation-for="DateJoined" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="BirthDate"></label>
+                                <input asp-for="BirthDate" type="date" class="form-control" />
+                                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="Gender"></label>
+                                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Gender</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group">
                             <div class="col-lg-6">
                                 <label class="col-form-label" asp-for="Address"></label>
                                 <input asp-for="Address" type="text" class="form-control" />
@@ -119,33 +156,7 @@
                                 <span asp-validation-for="PostCode" class="text-danger"></span>
                             </div>
 
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-lg-4">
-                                <label class="col-form-label" asp-for="Gender"></label>
-                                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control">
-                                    <option selected="selected" value="">Please Select Gender</option>
-                                </select>
-                                <span asp-validation-for="Gender" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3 hidden-lg"></div>
-
-                            <div class="col-lg-4">
-                                <label class="col-form-label" asp-for="BirthDate"></label>
-                                <input asp-for="BirthDate" type="date" class="form-control" />
-                                <span asp-validation-for="BirthDate" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3 hidden-lg"></div>
-
-                            <div class="col-lg-4">
-                                <label class="col-form-label" asp-for="DateJoined"></label>
-                                <input asp-for="DateJoined" type="date" class="form-control" />
-                                <span asp-validation-for="DateJoined" class="text-danger"></span>
-                            </div>
-
-                        </div>
+                        </div>                      
 
                         <div class="row form-group">
                             <div class="col-lg-3">

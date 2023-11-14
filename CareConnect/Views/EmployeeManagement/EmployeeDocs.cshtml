@@ -8,7 +8,7 @@
 
 <section role="main" class="content-body">
     <header class="page-header">
-        <h2>Add New Documents</h2>
+        <h2>Employee Documentation</h2>
 
         <div class="right-wrapper text-right">
             <ol class="breadcrumbs">
@@ -32,7 +32,7 @@
                     <input asp-for="EmployeeId" type="hidden" />
                     <input asp-for="OrganizationId" type="hidden" />
                     <header class="card-header">
-                        <h2 class="card-title">Add New Vacancy</h2>
+                        <h2 class="card-title">Employee Documentation</h2>
                     </header>
                     @if (ViewBag.Message != null)
                     {
@@ -43,16 +43,17 @@
                     <div class="card-body">
 
                         <div class="row form-group">
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="FullName"></label>
                                 <input asp-for="FullName" type="text" class="form-control" readonly />
                                 <span asp-validation-for="FullName" class="text-danger"></span>
                             </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-lg-6">
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="JobTitleId"></label>
-                                <select asp-for="JobTitleId" asp-items="ViewBag.JobTitleId" class="form-control">
+                                <select asp-for="JobTitleId" asp-items="ViewBag.JobTitleId" class="form-control" disabled>
                                     <option selected="selected" value="">Please Select Job Title</option>
                                 </select>
                                 <span asp-validation-for="JobTitleId" class="text-danger"></span>
@@ -60,20 +61,19 @@
 
                             <div class="mb-3 hidden-lg"></div>
 
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
                                 <label class="col-form-label" asp-for="DepartmentId"></label>
-                                <select asp-for="DepartmentId" asp-items="ViewBag.DepartmentId" class="form-control">
+                                <select asp-for="DepartmentId" asp-items="ViewBag.DepartmentId" class="form-control" disabled>
                                     <option selected="selected" value="">Please Select Department</option>
                                 </select>
                                 <span asp-validation-for="DepartmentId" class="text-danger"></span>
                             </div>
-                        </div>                        
+                        </div>
+                      
                     </div>                    
                 </form>
                 <section class="card">
-                    <header class="card-header">
-                        <h2 class="card-title">List of Documents</h2>
-                    </header>
+                    
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-9">
@@ -89,9 +89,7 @@
                                     <th>
                                         Document Name
                                     </th>
-                                    <th>
-                                        File Path
-                                    </th>
+                                    
                                     <th>
                                         Date Added
                                     </th>                                    
@@ -106,14 +104,12 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.DocumentName)
                                         </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.FilePath)
-                                        </td>
+                                        
                                         <td>
                                             @Html.DisplayFor(modelItem => item.DateAdded)
                                         </td>                                    
                                         <td>
-                                            <a asp-action="EditDocument" asp-route-id="@protector.Encode(item.EmployeeDocumentId.ToString())" style="color:magenta">Edit</a>
+                                            <a asp-action="DocView" asp-route-id="@protector.Encode(item.EmployeeDocumentId.ToString())" style="color:magenta">View</a>
                                         </td>
                                     </tr>
                                 }

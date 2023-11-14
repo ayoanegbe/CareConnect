@@ -4,6 +4,8 @@ using CareConnect.Interfaces;
 using CareConnect.Models;
 using CareConnect.Models.CareConnectViewModels;
 using CareConnect.Services;
+using GroupDocs.Viewer.Options;
+using GroupDocs.Viewer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
+using System.IO;
 
 namespace CareConnect.Controllers
 {
@@ -91,7 +94,7 @@ namespace CareConnect.Controllers
 
             EmployeeViewModel employee = new()
             {
-                BirthDate = DateTime.Now.AddYears(-10),
+                BirthDate = DateTime.Now.AddYears(-18),
                 Documents = new List<EmployeeDocument>()
             };
 
@@ -114,6 +117,42 @@ namespace CareConnect.Controllers
                 employeeView.OrganizationId = (int)user.OrganizationId;
             }
 
+            if (employeeView.Status == EmployeeType.Contract)
+            {
+                if (string.IsNullOrEmpty(employeeView.ContractorType.ToString()))
+                {
+                    ViewBag.Message = "Contract Type is required!";
+                    return View(employeeView);
+                }
+            }
+
+            if (employeeView.PaymentMethod == PaymentMethod.DirectDeposit)
+            {
+                if (string.IsNullOrEmpty(employeeView.BankName))
+                {
+                    ViewBag.Message = "Bank name is required for a direct deposit.";
+                    return View(employeeView);
+                }
+
+                if (string.IsNullOrEmpty(employeeView.BankCode))
+                {
+                    ViewBag.Message = "Bank code is required for a direct deposit.";
+                    return View(employeeView);
+                }
+
+                if (string.IsNullOrEmpty(employeeView.TransitCode))
+                {
+                    ViewBag.Message = "Transit code is required for a direct deposit.";
+                    return View(employeeView);
+                }
+
+                if (string.IsNullOrEmpty(employeeView.AccountNumber))
+                {
+                    ViewBag.Message = "Account number is required for a direct deposit.";
+                    return View(employeeView);
+                }
+            }
+
             Employee employee = new()
             {
                 OrganizationId = employeeView.OrganizationId,
@@ -121,7 +160,7 @@ namespace CareConnect.Controllers
                 JobTitleId = employeeView.JobTitleId,
                 PayGradeLevelId = employeeView.PayGradeLevelId,
                 FirstName = employeeView.FirstName,
-                MiddleName = employeeView.LastName,
+                MiddleName = employeeView.MiddleName,
                 LastName = employeeView.LastName,
                 Gender = employeeView.Gender,
                 BirthDate = employeeView.BirthDate,
@@ -158,7 +197,7 @@ namespace CareConnect.Controllers
 
                 await _audit.UpdateAuditTrail((int)user.OrganizationId, employee.GetType().Name, UpdateAction.Create, newValue, user.UserName);
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListEmployees));
             }
             else
             {
@@ -204,7 +243,7 @@ namespace CareConnect.Controllers
                 JobTitleId = employee.JobTitleId,
                 PayGradeLevelId = employee.PayGradeLevelId,
                 FirstName = employee.FirstName,
-                MiddleName = employee.LastName,
+                MiddleName = employee.MiddleName,
                 LastName = employee.LastName,
                 Gender = employee.Gender,
                 BirthDate = employee.BirthDate,
@@ -253,6 +292,42 @@ namespace CareConnect.Controllers
                 return NotFound();
             }
 
+            if (employeeView.Status == EmployeeType.Contract)
+            {
+                if (string.IsNullOrEmpty(employeeView.ContractorType.ToString()))
+                {
+                    ViewBag.Message = "Specify Contract Type for this contractor!";
+                    return View(employeeView);
+                }
+            }
+
+            if (employeeView.PaymentMethod == PaymentMethod.DirectDeposit)
+            {
+                if (string.IsNullOrEmpty(employeeView.BankName))
+                {
+                    ViewBag.Message = "Bank name is required for a direct deposit.";
+                    return View(employeeView);
+                }
+
+                if (string.IsNullOrEmpty(employeeView.BankCode))
+                {
+                    ViewBag.Message = "Bank code is required for a direct deposit.";
+                    return View(employeeView);
+                }
+
+                if (string.IsNullOrEmpty(employeeView.TransitCode))
+                {
+                    ViewBag.Message = "Transit code is required for a direct deposit.";
+                    return View(employeeView);
+                }
+
+                if (string.IsNullOrEmpty(employeeView.AccountNumber))
+                {
+                    ViewBag.Message = "Account number is required for a direct deposit.";
+                    return View(employeeView);
+                }
+            }
+
             var user = await _userManager.GetUserAsync(User);
 
             Employee employee = new()
@@ -262,7 +337,7 @@ namespace CareConnect.Controllers
                 JobTitleId = employeeView.JobTitleId,
                 PayGradeLevelId = employeeView.PayGradeLevelId,
                 FirstName = employeeView.FirstName,
-                MiddleName = employeeView.LastName,
+                MiddleName = employeeView.MiddleName,
                 LastName = employeeView.LastName,
                 Gender = employeeView.Gender,
                 BirthDate = employeeView.BirthDate,
@@ -353,7 +428,7 @@ namespace CareConnect.Controllers
             }
 
             Employee employee = await _context.Employees.FirstOrDefaultAsync(x => x.EmployeeId == num);
-            List<EmployeeDocument> docs = new();
+            List<EmployeeDocument> docs = await _context.EmployeeDocuments.Where(x => x.EmployeeId == num).ToListAsync();
 
             EmployeeViewModel employeeView = new()
             {
@@ -363,7 +438,7 @@ namespace CareConnect.Controllers
                 JobTitleId = employee.JobTitleId,
                 PayGradeLevelId = employee.PayGradeLevelId,
                 FirstName = employee.FirstName,
-                MiddleName = employee.LastName,
+                MiddleName = employee.MiddleName,
                 LastName = employee.LastName,
                 Gender = employee.Gender,
                 BirthDate = employee.BirthDate,
@@ -389,10 +464,12 @@ namespace CareConnect.Controllers
                 Documents = docs
             };
 
+            ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", employee.DepartmentId);
+            ViewData["JobTitleId"] = new SelectList(_context.JobTitles.Where(x => x.OrganizationId == (int)user.OrganizationId), "JobTitleId", "Title", employee.JobTitleId);
+
             return View(employeeView);
         }
-
-        [HttpPost]
+       
         public async Task<IActionResult> AddDocument(string id)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -408,7 +485,7 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            EmployeeDocument document = new()
+            EmployeeDocumentViewModel document = new()
             {
                 EmployeeId = num
             };
@@ -416,6 +493,8 @@ namespace CareConnect.Controllers
             return View(document);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddDocument(string id, [Bind("EmployeeDocumentId,EmployeeId,DocumentName,FilePath,File")] EmployeeDocumentViewModel documentView)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -479,6 +558,46 @@ namespace CareConnect.Controllers
             return View(documentView);
         }
 
+        public async Task<IActionResult> DocView(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            EmployeeDocument employeeDocument = await _context.EmployeeDocuments.FirstOrDefaultAsync(x => x.EmployeeDocumentId == num);
+
+            MemoryStream outputStream = new ();
+
+            FileType fileType = FileType.FromExtension(Path.GetExtension(employeeDocument.FilePath));
+
+            using (Viewer viewer = new(() => GetSourceFileStream(employeeDocument.FilePath), () => new LoadOptions(fileType)))
+            {
+                HtmlViewOptions options = HtmlViewOptions.ForEmbeddedResources(
+                    (pageNumber) => outputStream,
+                    (pageNumber, pageStream) => { });
+
+                viewer.View(options);
+                
+            }
+
+            outputStream.Position = 0;
+
+            return File(outputStream, "text/html");
+        }
+
+        private Stream GetSourceFileStream(string fileName) =>
+            new MemoryStream(GetSourceFileBytesFromDb(fileName));
+
+        private static byte[] GetSourceFileBytesFromDb(string fileName) =>
+            System.IO.File.ReadAllBytes(fileName);
+
         [AllowAnonymous]
         public async Task<IActionResult> ListVacancies()
         {
@@ -491,7 +610,7 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            VacancyViewModel vacancy = new();
+            VacancyViewModel vacancy = new() { ClosingDate = DateTime.Today.AddDays(7) };
 
             if (user.OrganizationId != null)
             {
@@ -506,7 +625,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddVacancy([Bind("VacancyId,JobTitleId,DepartmentId,JobDescription,Requirements,Status")] VacancyViewModel vacancyView)
+        public async Task<IActionResult> AddVacancy([Bind("VacancyId,JobTitleId,DepartmentId,JobDescription,Requirements,Status,ClosingDate")] VacancyViewModel vacancyView)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -524,6 +643,7 @@ namespace CareConnect.Controllers
                 DepartmentId = vacancyView.DepartmentId,
                 Requirements = vacancyView.Requirements,
                 Status = vacancyView.Status,
+                ClosingDate = vacancyView.ClosingDate,
                 AddedBy = user.UserName
             };
 
@@ -581,6 +701,7 @@ namespace CareConnect.Controllers
                 DepartmentId = vacancy.DepartmentId,
                 Requirements = vacancy.Requirements,
                 Status = vacancy.Status,
+                ClosingDate = vacancy.ClosingDate
             };
 
             ViewData["DepartmentId"] = new SelectList(_context.Departments.Where(x => x.OrganizationId == (int)user.OrganizationId), "DepartmentId", "Name", vacancy.DepartmentId);
@@ -591,7 +712,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditVacancy(string id, [Bind("VacancyId,JobTitleId,OrganizationId,DepartmentId,JobDescription,Requirements,Status")] VacancyViewModel vacancyView)
+        public async Task<IActionResult> EditVacancy(string id, [Bind("VacancyId,JobTitleId,OrganizationId,DepartmentId,JobDescription,Requirements,Status,ClosingDate")] VacancyViewModel vacancyView)
         {
             int num = Resolver(id);
             if (num == 0)
@@ -615,6 +736,7 @@ namespace CareConnect.Controllers
                 DepartmentId = vacancyView.DepartmentId,
                 Requirements = vacancyView.Requirements,
                 Status = vacancyView.Status,
+                ClosingDate = vacancyView.ClosingDate,
                 UpdatedBy = user.UserName,
                 DateUpdated = DateTime.Now
             };

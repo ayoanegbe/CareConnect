@@ -337,6 +337,7 @@
     <PackageReference Include="Chart.js" Version="3.7.1" />
     <PackageReference Include="ChartJSCore" Version="3.10.1" />
     <PackageReference Include="DnsClient" Version="1.7.0" />
+    <PackageReference Include="GroupDocs.Viewer" Version="23.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21">
