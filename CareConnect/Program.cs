@@ -1,8 +1,8 @@
-using CareConnect.Data;
-using CareConnect.Interfaces;
-using CareConnect.Models;
-using CareConnect.Repositories;
-using CareConnect.Services;
+using CareConnect.CommonLogic.Data;
+using CareConnect.CommonLogic.Interfaces;
+using CareConnect.CommonLogic.Models;
+using CareConnect.CommonLogic.Repositories;
+using CareConnect.CommonLogic.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;

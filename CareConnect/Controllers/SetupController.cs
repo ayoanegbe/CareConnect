@@ -1,10 +1,10 @@
-﻿using CareConnect.Data;
-using CareConnect.Enums;
-using CareConnect.Interfaces;
-using CareConnect.Models;
-using CareConnect.Models.CareConnectViewModels;
-using CareConnect.Models.DataViewModels;
-using CareConnect.Services;
+﻿using CareConnect.CommonLogic.Data;
+using CareConnect.CommonLogic.Enums;
+using CareConnect.CommonLogic.Interfaces;
+using CareConnect.CommonLogic.Models;
+using CareConnect.CommonLogic.Models.CareConnectViewModels;
+using CareConnect.CommonLogic.Models.DataViewModels;
+using CareConnect.CommonLogic.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

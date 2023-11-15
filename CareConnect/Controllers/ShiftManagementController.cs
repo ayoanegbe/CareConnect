@@ -1,7 +1,7 @@
-﻿using CareConnect.Data;
-using CareConnect.Interfaces;
-using CareConnect.Models;
-using CareConnect.Services;
+﻿using CareConnect.CommonLogic.Data;
+using CareConnect.CommonLogic.Interfaces;
+using CareConnect.CommonLogic.Models;
+using CareConnect.CommonLogic.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

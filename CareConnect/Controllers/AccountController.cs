@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using CareConnect.Data;
-using CareConnect.Models;
-using CareConnect.Models.AccountViewModels;
+using CareConnect.CommonLogic.Data;
+using CareConnect.CommonLogic.Models;
+using CareConnect.CommonLogic.Models.AccountViewModels;
 using Microsoft.EntityFrameworkCore;
-using CareConnect.Interfaces;
+using CareConnect.CommonLogic.Interfaces;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 

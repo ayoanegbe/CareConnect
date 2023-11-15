@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using CareConnect.Models;
-using CareConnect.Models.ManageViewModels;
-using CareConnect.Interfaces;
+using CareConnect.CommonLogic.Models;
+using CareConnect.CommonLogic.Models.ManageViewModels;
+using CareConnect.CommonLogic.Interfaces;
 
 namespace CareConnect.Controllers
 {

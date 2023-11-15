@@ -7,6 +7,7 @@ namespace CareConnect.Background
         private readonly ILogger<Worker> _logger;
         private const string schedule = "0 * * * *"; // every hour
         private readonly CronExpression _cron;
+        private int _executionCount;
 
         public Worker(ILogger<Worker> logger)
         {
@@ -18,10 +19,17 @@ namespace CareConnect.Background
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                ++_executionCount;
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                DateTime timeNow = DateTime.Now;
-                var nextTime = _cron.GetNextOccurrence(timeNow);
-                await Task.Delay(nextTime.Value - timeNow, stoppingToken);
+                //DateTime timeNow = DateTime.Now;
+                //var nextTime = _cron.GetNextOccurrence(timeNow);
+                //await Task.Delay(nextTime.Value - timeNow, stoppingToken);
+                _logger.LogInformation(
+                "{ServiceName} working, execution count: {Count}",
+                "Worket",
+                _executionCount);
+
+                await Task.Delay(10_000, stoppingToken);
             }
         }
     }

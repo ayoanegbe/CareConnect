@@ -1,8 +1,8 @@
-﻿using CareConnect.Data;
-using CareConnect.Interfaces;
-using CareConnect.Models;
-using CareConnect.Models.DataViewModels;
-using CareConnect.Services;
+﻿using CareConnect.CommonLogic.Data;
+using CareConnect.CommonLogic.Interfaces;
+using CareConnect.CommonLogic.Models;
+using CareConnect.CommonLogic.Models.DataViewModels;
+using CareConnect.CommonLogic.Services;
 using ChartJSCore.Helpers;
 using ChartJSCore.Models;
 using Microsoft.AspNetCore.Authorization;

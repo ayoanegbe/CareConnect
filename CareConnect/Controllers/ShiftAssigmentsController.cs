@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CareConnect.Data;
-using CareConnect.Models;
+using CareConnect.CommonLogic.Data;
+using CareConnect.CommonLogic.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CareConnect.Controllers
