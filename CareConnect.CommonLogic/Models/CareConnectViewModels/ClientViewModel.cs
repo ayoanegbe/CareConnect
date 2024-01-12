@@ -45,11 +45,25 @@ namespace CareConnect.CommonLogic.Models.CareConnectViewModels
         [Required]
         [Display(Name = "Emergency Contact Address")]
         public string EmergencyContactAddress { get; set; }
+        [Display(Name = "Emergency Contact Name")]
+        public string EmergencyContactName { get; set; }
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Emergency Contact Email")]
+        public string EmergencyContactEmail { get; set; }
         [Display(Name = "Relationship To Client")]
         public RelationshipType Relationship { get; set; }
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Guadian Phone Number")]
         public string GuadianPhoneNumber { get; set; }
+        [Display(Name = "Contact Person Name")]
+        public string ContactPersonName { get; set; }
+        [Display(Name = "Contact Person Phone")]
+        public string ContactPersonPhone { get; set; }
+        [Display(Name = "Contact Person Address")]
+        public string ContactPersonAddress { get; set; }
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Contact Person Email")]
+        public string ContactPersonEmail { get; set; }
         [Display(Name = "Family Physician")]
         public string FamilyPhysician { get; set; }
         public bool IsActive { get; set; } = true;

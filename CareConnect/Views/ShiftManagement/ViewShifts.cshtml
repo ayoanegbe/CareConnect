@@ -1,0 +1,96 @@
+﻿@model IEnumerable<ShiftRun>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Shifts List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Shifts</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="ShiftManagement" asp-action="ListShifts">Shifts</a></span></li>
+                <li><span>Shifts View</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <section class="card">
+        <header class="card-header">
+            <h2 class="card-title">List of Shifts</h2>
+        </header>
+        <div class="card-body">
+            @* <div class="row">
+                <div class="col-sm-9">
+                    <div class="m-0">
+                        <a asp-controller="ShiftManagement" asp-action="AddShift" class="btn btn-primary" style="background-color:cornflowerblue">Add Shift<i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+            </div> *@
+            <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ShiftDate)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ShiftTime)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.IsAssigned)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Shift.NumbersRequired)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.NumbersAssigned)
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ShiftDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ShiftTime)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IsAssigned)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Shift.NumbersRequired)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NumbersAssigned)
+                            </td>
+
+                            <td>
+                                <a asp-action="AssignShift" asp-route-id="@protector.Encode(item.ShiftRunId.ToString())" style="color:magenta">Assign</a> |
+                                <a asp-action="EditShift" asp-route-id="@protector.Encode(item.ShiftRunId.ToString())" style="color:red">De-Assign</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-controller="ShiftManagement" asp-action="ListShifts"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>

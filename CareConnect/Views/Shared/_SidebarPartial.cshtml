@@ -83,27 +83,27 @@
                             <ul class="nav nav-children">
                                 <li>
                                     <a asp-controller="Setup" asp-action="ListTenants">
-                                        Tenant
+                                        Tenants
                                     </a>
                                 </li>
                                 <li>
                                     <a asp-controller="Setup" asp-action="ListOrganizations">
-                                        Organization
+                                        Organizations
                                     </a>
                                 </li>
                                 <li>
                                     <a asp-controller="Setup" asp-action="ListCurrencies">
-                                        Currency
+                                        Currencies
                                     </a>
                                 </li>
                                 <li>
                                     <a asp-controller="Setup" asp-action="ListSubscriptionRates">
-                                        Subscription Rate
+                                        Subscription Rates
                                     </a>
                                 </li>
                                 <li>
                                     <a asp-controller="Setup" asp-action="ListSubscriptions">
-                                        Subscription
+                                        Subscriptions
                                     </a>
                                 </li>
 
@@ -115,34 +115,61 @@
  
                         <li class="nav-parent">
                             <a class="nav-link" href="#">
-                                <i class="bx bx-target-lock" aria-hidden="true"></i>
+                                <i class="bx bxs-group" aria-hidden="true"></i>
                                 <span>Employee Management</span>
                             </a>
                             <ul class="nav nav-children">
                                 <li>
                                     <a asp-controller="EmployeeManagement" asp-action="ListVacancies">
-                                        Vacancy
+                                        Vacancies
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="EmployeeManagement" asp-action="ListApplications">
+                                        Job Applications
                                     </a>
                                 </li>
                                 <li>
                                     <a asp-controller="EmployeeManagement" asp-action="ListInterviews">
-                                        Interview
+                                        Interviews
                                     </a>
                                 </li>
                                 <li>
                                     <a asp-controller="EmployeeManagement" asp-action="ListEmployees">
-                                        Employee
+                                        Employees
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
-                        <li>
-                            <a class="nav-link" asp-controller="Shifts" asp-action="Create">
-                                <i class="bx bx-loader-circle" aria-hidden="true"></i>
-                                <span>Add New Shift</span>
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                <i class="bx bx-target-lock" aria-hidden="true"></i>
+                                <span>Shift Management</span>
                             </a>
+                            <ul class="nav nav-children">
+                                <li>
+                                    <a asp-controller="ShiftManagement" asp-action="ListShiftPatterns">
+                                        Shift Patterns
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="ShiftManagement" asp-action="ListShifts">
+                                        Shifts
+                                    </a>
+                                </li>
+
+                            </ul>
                         </li>
+
+                        <li class="nav-parent">
+                            <a class="nav-link" href="#">
+                                <i class="bx bx-money" aria-hidden="true"></i>
+                                <span>Payroll Management</span>
+                            </a>
+                            
+                        </li>
+
                     }
                     
                     <li>

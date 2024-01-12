@@ -5,5 +5,6 @@
         Individual = 1,
         PDD = 2,
         FMS = 3,
+        FSCD = 4
     }
 }

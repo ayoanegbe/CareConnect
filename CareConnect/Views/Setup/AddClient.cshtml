@@ -138,23 +138,37 @@
                                 <span asp-validation-for="DateJoined" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                         <div class="row form-group">
                             <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="col-form-label" asp-for="EmergencyContactAddress"></label>
-                                    <input asp-for="EmergencyContactAddress" type="text" class="form-control" />
-                                    <span asp-validation-for="EmergencyContactAddress" class="text-danger"></span>
-                                </div>
+                                <label class="col-form-label" asp-for="ContactPersonName"></label>
+                                <input asp-for="ContactPersonName" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPersonName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="ContactPersonAddress"></label>
+                                <input asp-for="ContactPersonAddress" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPersonAddress" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="row form-group">
-                            
+
                             <div class="col-lg-4">
-                                <label class="col-form-label" asp-for="EmergencyContactPhone"></label>
-                                <input asp-for="EmergencyContactPhone" type="text" class="form-control" />
-                                <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
+                                <label class="col-form-label" asp-for="ContactPersonEmail"></label>
+                                <input asp-for="ContactPersonEmail" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPersonEmail" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="ContactPersonPhone"></label>
+                                <input asp-for="ContactPersonPhone" type="text" class="form-control" />
+                                <span asp-validation-for="ContactPersonPhone" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3 hidden-lg"></div>
@@ -167,14 +181,41 @@
                                 <span asp-validation-for="Relationship" class="text-danger"></span>
                             </div>
 
+                        </div>
+                        
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="EmergencyContactName"></label>
+                                <input asp-for="EmergencyContactName" type="text" class="form-control" />
+                                <span asp-validation-for="EmergencyContactName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="EmergencyContactAddress"></label>
+                                <input asp-for="EmergencyContactAddress" type="text" class="form-control" />
+                                <span asp-validation-for="EmergencyContactAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="EmergencyContactEmail"></label>
+                                <input asp-for="EmergencyContactName" type="text" class="form-control" />
+                                <span asp-validation-for="EmergencyContactName" class="text-danger"></span>
+                            </div>
+
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-4">
-                                <label class="col-form-label" asp-for="GuadianPhoneNumber"></label>
-                                <input asp-for="GuadianPhoneNumber" type="text" class="form-control" />
-                                <span asp-validation-for="GuadianPhoneNumber" class="text-danger"></span>
+                                <label class="col-form-label" asp-for="EmergencyContactPhone"></label>
+                                <input asp-for="EmergencyContactPhone" type="text" class="form-control" />
+                                <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
                             </div>
                         </div>
+
+                        
 
                         <div class="form-group row">
                             <div class="col-lg-6">

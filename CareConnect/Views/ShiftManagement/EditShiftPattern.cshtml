@@ -1,0 +1,95 @@
+﻿@model ShiftPattern
+
+@{
+    ViewData["Title"] = "Edit Shift Pattern";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Edit Shift Pattern</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="ShiftManagement" asp-action="ListShiftPatterns">Shift Patterns</a></span></li>
+                <li><span>Edit Shift Pattern</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-action="EditShiftPattern" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="ShiftPatternId" type="hidden" />
+                    <input asp-for="OrganizationId" type="hidden" />
+                    <header class="card-header">
+                        <h2 class="card-title">Edit Shift Pattern</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="PatternName"></label>
+                                <input asp-for="PatternName" type="text" class="form-control" />
+                                <span asp-validation-for="PatternName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-2">
+                                <label class="col-form-label" asp-for="StartTime"></label>
+                                <input asp-for="StartTime" type="time" class="form-control" />
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-2">
+                                <label class="col-form-label" asp-for="EndTime"></label>
+                                <input asp-for="EndTime" type="time" class="form-control" />
+                                <span asp-validation-for="EndTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="PatternDescription"></label>
+                                <input asp-for="PatternDescription" type="text" class="form-control" />
+                                <span asp-validation-for="PatternDescription" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListShiftPatterns">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

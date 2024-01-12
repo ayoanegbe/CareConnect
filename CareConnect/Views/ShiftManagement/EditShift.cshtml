@@ -1,0 +1,221 @@
+﻿@model ShiftViewModel
+
+@{
+    ViewData["Title"] = "Shift View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    DateTime endDate = DateTime.Today;
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Shift View</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="ShiftManagement" asp-action="ListShiftPatterns">Shifts</a></span></li>
+                <li><span>Shift View</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-controller="ShiftManagement" asp-action="EditShift" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="OrganizationId" />
+                    <input type="hidden" asp-for="ShiftId" />
+                    <header class="card-header">
+                        <h2 class="card-title">Shift View</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="ShiftPatternId"></label>
+                                <select data-plugin-selectTwo asp-for="ShiftPatternId" asp-items="ViewBag.ShiftPatternId" class="form-control">
+                                    <option selected="selected" value="">Please Select Shift Pattern</option>
+                                </select>                                
+                                <span asp-validation-for="ShiftPatternId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="HouseId"></label>
+                                <select data-plugin-selectTwo asp-for="HouseId" asp-items="ViewBag.HouseId" class="form-control">
+                                    <option selected="selected" value="">Please Select House</option>
+                                </select>
+                                <span asp-validation-for="HouseId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="ClientId"></label>
+                                <select data-plugin-selectTwo asp-for="ClientId" asp-items="ViewBag.ClientId" class="form-control">
+                                    <option selected="selected" value="">Please Select Client</option>
+                                </select>
+                                <span asp-validation-for="ClientId" class="text-danger"></span>
+                            </div>
+
+                            
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-lg-2">
+                                <label class="col-form-label" asp-for="StartDate"></label>
+                                <input asp-for="StartDate" type="date" class="form-control" id="startdate" />
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-2">
+                                <label class="col-form-label" asp-for="NumbersRequired"></label>
+                                <input asp-for="NumbersRequired" type="number" class="form-control" min="1" max="10"/>
+                                <span asp-validation-for="NumbersRequired" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-2">
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Perpetual" type="checkbox" onchange="handleEvent(this)" id="checker"/>
+                                    <label asp-for="Perpetual"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" id="weekdays">
+                            <div class="col-lg-3">
+                                <label class="col-form-label" asp-for="EndDate"></label>
+                                <input asp-for="EndDate" type="date" class="form-control" />
+                                <span asp-validation-for="EndDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="form-group row col-lg-9">
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Sunday" type="checkbox" />
+                                    <label asp-for="Sunday" class="pr-3"></label>
+                                </div>
+
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Monday" type="checkbox" />
+                                    <label asp-for="Monday" class="pr-3"></label>
+                                </div>
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Tuesday" type="checkbox" />
+                                    <label asp-for="Tuesday" class="pr-3"></label>
+                                </div>
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Wednesday" type="checkbox" />
+                                    <label asp-for="Wednesday" class="pr-3"></label>
+                                </div>
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Thursday" type="checkbox" />
+                                    <label asp-for="Thursday" class="pr-3"></label>
+                                </div>
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Friday" type="checkbox" />
+                                    <label asp-for="Friday" class="pr-3"></label>
+                                </div>
+                                <div class="checkbox-custom checkbox-default mt-5">
+                                    <input asp-for="Saturday" type="checkbox" />
+                                    <label asp-for="Saturday" class="pr-3"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-2 control-label text-lg-right pt-2">Note</label>
+                            <div class="col-lg-8">
+                                <textarea asp-for="Note" class="summernote" displayReadonly data-plugin-summernote data-plugin-options='{ "height": 200, "codemirror": { "theme": "ambiance" } }' data-plugin></textarea>
+                            </div>
+                            <span asp-validation-for="Note" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        @* <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" /> *@
+                        <a class="btn btn-secondary" asp-action="ListShifts">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+                    <style>
+                        /* Chrome, Safari, Edge, Opera */
+                        input::-webkit-outer-spin-button,
+                        input::-webkit-inner-spin-button {
+                            -webkit-appearance: none;
+                            margin: 0;
+                        }
+
+                        /* Firefox */
+                        input[type=number] {
+                            -moz-appearance: textfield;
+                        }
+                    </style>
+
+                    <script type="text/javascript">
+
+                        window.addEventListener('load', function () {
+                            var model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+                            if (model.Perpetual) {
+                                $("#weekdays").show();
+                            }
+                            else {
+                                $("#weekdays").hide();
+                            }
+                        });
+
+                        function handleEvent(cb) {
+                            if (cb.checked) {
+                                $("#weekdays").show();
+                            }
+                            else {
+                                $("#weekdays").hide();
+                            }
+                        }
+
+                        $(function () {
+                            $('[type="date"]').prop('min', function () {
+                                return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                            });
+                        });
+
+                        $(function () {
+                            $('[type="date"]').prop('max', function () {
+                                var todayDate = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000);
+                                var fDate = todayDate.setDate(todayDate.getDate() + 89)
+                                return new Date(fDate).toISOString().split("T")[0];
+                            });
+                        });
+                    </script>
+    }
+}

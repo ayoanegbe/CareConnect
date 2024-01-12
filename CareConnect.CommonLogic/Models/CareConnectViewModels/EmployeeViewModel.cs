@@ -80,5 +80,6 @@ namespace CareConnect.CommonLogic.Models.CareConnectViewModels
         public List<EmployeeDocument> Documents { get; set; }
         [Display(Name = "Full Name")]
         public string FullName => $"{this.LastName}, {this.FirstName} {this.MiddleName}";
+        public bool IsSelected { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using CareConnect.CommonLogic.Models;
 using CareConnect.CommonLogic.Models.CareConnectViewModels;
 using CareConnect.CommonLogic.Models.DataViewModels;
 using CareConnect.CommonLogic.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,6 +17,7 @@ using System.Text;
 
 namespace CareConnect.Controllers
 {
+    [Authorize]
     public class SetupController : Controller
     {
         private const int DATE_ADD = 1;
@@ -56,7 +58,11 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.Clients.Include(x => x.Customer).Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
+            return View(await _context.Clients
+                        .Where(x => x.OrganizationId == user.OrganizationId)
+                        .Include(x => x.Customer)
+                        .OrderByDescending(x => x.ClientId)
+                        .ToListAsync());
         }
 
         public async Task<IActionResult> AddClient()
@@ -292,7 +298,7 @@ namespace CareConnect.Controllers
         // Currency
         public async Task<IActionResult> ListCurrencies()
         {
-            return View(await _context.Currencies.ToListAsync());
+            return View(await _context.Currencies.OrderByDescending(x => x.CurrencyId).ToListAsync());
         }
 
         public IActionResult AddCurrency()
@@ -426,7 +432,7 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.Customers.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
+            return View(await _context.Customers.Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.CustomerId).ToListAsync());
         }
 
         public IActionResult AddCustomer()
@@ -656,7 +662,7 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.Departments.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
+            return View(await _context.Departments.Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.DepartmentId).ToListAsync());
         }
 
         public IActionResult AddDepartment()
@@ -793,7 +799,7 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.Houses.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
+            return View(await _context.Houses.Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.HouseId).ToListAsync());
         }
 
         public IActionResult AddHouse()
@@ -947,7 +953,7 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.JobTitles.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
+            return View(await _context.JobTitles.Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.JobTitleId).ToListAsync());
         }
 
         public IActionResult AddJobTitle()
@@ -1086,7 +1092,7 @@ namespace CareConnect.Controllers
         // Organization
         public async Task<IActionResult> ListOrganizations()
         {
-            return View(await _context.Organizations.Include(t => t.Tenant).ToListAsync());
+            return View(await _context.Organizations.Include(t => t.Tenant).OrderByDescending(x => x.OrganizationId).ToListAsync());
         }
 
         public IActionResult AddOrganization()
@@ -1246,7 +1252,7 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId).ToListAsync());
+            return View(await _context.PayGrades.Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.PayGradeId).ToListAsync());
         }
 
         public IActionResult AddPayGrade()
@@ -1394,7 +1400,12 @@ namespace CareConnect.Controllers
 
             ViewData["gradeId"] = num;
             ViewData["gradeName"] = payGrade.Name;
-            return View(await _context.PayGradeLevels.Include(x => x.PayGrade).Include(c => c.Currency).Where(x => x.PayGradeId == num).ToListAsync());
+            return View(await _context.PayGradeLevels
+                                .Include(x => x.PayGrade)
+                                .Include(c => c.Currency)
+                                .Where(x => x.PayGradeId == num)
+                                .OrderByDescending(x => x.PayGradeLevelId)
+                                .ToListAsync());
         }
 
         public async Task<IActionResult> AddPayGradeLevel(string gradeId)
@@ -1703,7 +1714,11 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListSubscriptions()
         {
-            return View(await _context.Subscriptions.Include(g => g.Organization).Include(s => s.SubscriptionRate).ToListAsync());
+            return View(await _context.Subscriptions
+                                .Include(g => g.Organization)
+                                .Include(s => s.SubscriptionRate)
+                                .OrderByDescending(x => x.SubscriptionId)
+                                .ToListAsync());
         }
 
         public IActionResult AddSubscription()
@@ -1826,7 +1841,7 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListSubscriptionRates()
         {
-            return View(await _context.SubscriptionsRates.Include(c => c.Currency).ToListAsync());
+            return View(await _context.SubscriptionsRates.Include(c => c.Currency).OrderByDescending(x => x.SubscriptionRateId).ToListAsync());
         }
 
         public IActionResult AddSubscriptionRate()
@@ -1937,7 +1952,7 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListTenants()
         {
-            return View(await _context.Tenants.ToListAsync());
+            return View(await _context.Tenants.OrderByDescending(x => x.TenantId).ToListAsync());
         }
 
         public IActionResult AddTenant()
@@ -2071,7 +2086,9 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListVendors()
         {
-            return View(await _context.Vendors.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Vendors.Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.VendorId).ToListAsync());
         }
 
         public IActionResult AddVendor()

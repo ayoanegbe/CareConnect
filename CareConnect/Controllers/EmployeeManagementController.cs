@@ -19,6 +19,7 @@ using System.IO;
 
 namespace CareConnect.Controllers
 {
+    [Authorize]
     public class EmployeeManagementController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -58,21 +59,7 @@ namespace CareConnect.Controllers
             _fileService = fileService;
             _environment = environment;
             _emailSender = emailSender;
-        }
-        public async Task<IActionResult> Index(string id) // pass organization ID
-        {
-            int num = Resolver(id);
-            if (num == 0)
-            {
-                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
-            }
-
-            return View(
-                await _context.Employees.Where(x => x.OrganizationId == num)
-                .Include(d => d.Department)
-                .Include(j => j.JobTitle)
-                .ToListAsync());
-        }
+        }        
 
         public async Task<IActionResult> ListEmployees()
         {
@@ -84,6 +71,7 @@ namespace CareConnect.Controllers
                 .Include(d => d.Department)
                 .Include(g => g.JobTitle)
                 .Include(p => p.PayGradeLevel)
+                .OrderByDescending(x => x.EmployeeId)
                 .ToListAsync()
                 );
         }
@@ -603,7 +591,12 @@ namespace CareConnect.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(await _context.Vacancies.Where(x => x.OrganizationId == user.OrganizationId).Include(d => d.Department).Include(t => t.JobTitle).ToListAsync());
+            return View(await _context.Vacancies
+                                .Where(x => x.OrganizationId == user.OrganizationId)
+                                .Include(d => d.Department)
+                                .Include(t => t.JobTitle)
+                                .OrderByDescending(x => x.VacancyId)
+                                .ToListAsync());
         }
         
         public async Task<IActionResult> AddVacancy()
@@ -991,23 +984,38 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListApplications()
         {
-            return View(await _context.Applicants.Include(x => x.Vacancy).ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Applicants
+                            .Where(x => x.OrganizationId == user.OrganizationId)
+                            .Include(x => x.Organization)
+                            .Include(x => x.Vacancy)
+                            .Include(x => x.Vacancy.JobTitle)
+                            .OrderByDescending(x => x.ApplicantId)
+                            .ToListAsync());
         }
 
-        public async Task<IActionResult> ListApplications(string searchString) //  encrpt string
+        public async Task<IActionResult> SearchListApplications(string searchString) //  encrpt string
         {
+            var user = await _userManager.GetUserAsync(User);
+
             var applicants = from app in _context.Applicants
+                                .Where(x => x.OrganizationId == user.OrganizationId)
+                                .Include(x => x.Organization)
+                                .Include(x => x.Vacancy)
                              select app;
             if (!string.IsNullOrEmpty(searchString) )
             {
-                applicants = applicants.Where(s => s.FirstName.Contains(searchString) || s.Email.Contains(searchString));
+                applicants = applicants.Where(s => s.FullName.Contains(searchString) || s.Email.Contains(searchString));
             }
 
-            return View(await applicants.ToListAsync());
+            return View(await applicants.OrderByDescending(x => x.ApplicantId).ToListAsync());
         }
 
         public async Task<IActionResult> ViewApplication(string id)
         {
+            var user = await _userManager.GetUserAsync(User);
+
             if (id == null)
             {
                 return NotFound();
@@ -1019,7 +1027,7 @@ namespace CareConnect.Controllers
                 return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
             }
 
-            var applicant = await _context.Applicants
+            var applicant = await _context.Applicants.Where(x => x.OrganizationId == user.OrganizationId).Include(x => x.Vacancy).Include(x => x.Vacancy.JobTitle)
                 .FirstOrDefaultAsync(x => x.ApplicantId == num);
             if (applicant == null)
             {
@@ -1072,7 +1080,13 @@ namespace CareConnect.Controllers
 
         public async Task<IActionResult> ListInterviews()
         {
-            return View(await _context.Interviews.Include(x => x.Applicant).ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Interviews
+                                .Where(x => x.OrganizationId == user.OrganizationId)
+                                .Include(x => x.Applicant)
+                                .OrderByDescending(x => x.InterviewId)
+                                .ToListAsync());
         }
 
         public async Task<IActionResult> AddInterview()

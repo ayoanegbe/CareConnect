@@ -1,0 +1,88 @@
+﻿@model IEnumerable<Applicant>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Job Applications List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Job Applications</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span>Job Applications</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <section class="card">
+        <header class="card-header">
+            <h2 class="card-title">List of Job Applications</h2>
+        </header>
+        <div class="card-body">
+
+            <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.FullName)
+                        </th>
+                        <th>
+                            Job Title
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Email)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Phone)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.DateApplied)
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FullName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Vacancy.JobTitle.Title)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Phone)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateApplied)
+                            </td>
+                            <td>
+                                <a asp-action="ViewApplication" asp-route-id="@protector.Encode(item.ApplicantId.ToString())" style="color:magenta">View</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-controller="Home" asp-action="Index"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>

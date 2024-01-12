@@ -15,11 +15,13 @@ namespace CareConnect.CommonLogic.Models
         public string PatternName { get; set;}
         [Display(Name = "Pattern Description")]
         public string PatternDescription { get; set;}
+        [Required]
         [Display(Name = "Start Time")]
         [DataType(DataType.Time)]
-        public DateTime? StartTime { get; set; }
+        public DateTime StartTime { get; set; }
+        [Required]
         [Display(Name = "End Time")]
         [DataType(DataType.Time)]
-        public DateTime? EndTime { get; set;}
+        public DateTime EndTime { get; set;}
     }
 }

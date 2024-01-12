@@ -109,10 +109,10 @@ namespace CareConnect
                     var dbInitializerLogger = services.GetRequiredService<ILogger<DbInitializer>>();
                     DbInitializer.Initialize(context, userManager, roleManager, dbInitializerLogger, defaultTenant, defaultOrganization).Wait();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError("An error occurred while seeding the database.", ex);
+                    logger.LogError("An error occurred while seeding the database.");
                 }
             }
 

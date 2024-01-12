@@ -51,6 +51,7 @@ namespace CareConnect.CommonLogic.Data
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<ShiftAssigment> ShiftAssigments { get; set; }
         public DbSet<ShiftPattern> ShiftPatterns { get; set; }
+        public DbSet<ShiftRun> ShiftRuns { get; set; }
         public DbSet<ShiftSwapRequest> ShiftSwapRequests { get; set; }
         public DbSet<SupportiveRoomate> SupportiveRoomates { get; set; }
         public DbSet<SmtpSetting> SmtpSettings { get; set; }

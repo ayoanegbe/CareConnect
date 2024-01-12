@@ -24,7 +24,7 @@ namespace CareConnect.Controllers
         // GET: ShiftAssigments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ShiftAssigments.Include(s => s.Shift);
+            var applicationDbContext = _context.ShiftAssigments.Include(s => s.ShiftRun);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -37,7 +37,7 @@ namespace CareConnect.Controllers
             }
 
             var shiftAssigment = await _context.ShiftAssigments
-                .Include(s => s.Shift)
+                .Include(s => s.ShiftRun)
                 .FirstOrDefaultAsync(m => m.ShiftAssigmentId == id);
             if (shiftAssigment == null)
             {
@@ -67,7 +67,7 @@ namespace CareConnect.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ShiftId"] = new SelectList(_context.Shifts, "ShiftId", "Duration", shiftAssigment.ShiftId);
+            ViewData["ShiftId"] = new SelectList(_context.Shifts, "ShiftId", "Duration", shiftAssigment.ShiftRunId);
             return View(shiftAssigment);
         }
 
@@ -84,7 +84,7 @@ namespace CareConnect.Controllers
             {
                 return NotFound();
             }
-            ViewData["ShiftId"] = new SelectList(_context.Shifts, "ShiftId", "Duration", shiftAssigment.ShiftId);
+            ViewData["ShiftId"] = new SelectList(_context.Shifts, "ShiftId", "Duration", shiftAssigment.ShiftRunId);
             return View(shiftAssigment);
         }
 
@@ -120,7 +120,7 @@ namespace CareConnect.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ShiftId"] = new SelectList(_context.Shifts, "ShiftId", "Duration", shiftAssigment.ShiftId);
+            ViewData["ShiftId"] = new SelectList(_context.Shifts, "ShiftId", "Duration", shiftAssigment.ShiftRunId);
             return View(shiftAssigment);
         }
 
@@ -133,7 +133,7 @@ namespace CareConnect.Controllers
             }
 
             var shiftAssigment = await _context.ShiftAssigments
-                .Include(s => s.Shift)
+                .Include(s => s.ShiftRun)
                 .FirstOrDefaultAsync(m => m.ShiftAssigmentId == id);
             if (shiftAssigment == null)
             {

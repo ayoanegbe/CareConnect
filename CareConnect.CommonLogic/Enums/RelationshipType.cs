@@ -9,5 +9,6 @@
         Guardian = 5,
         Doctor = 6,
         Psychiatrist = 7,
+        Trustee = 8,
     }
 }

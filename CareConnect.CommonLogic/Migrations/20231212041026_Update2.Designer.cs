@@ -4,6 +4,7 @@ using CareConnect.CommonLogic.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CareConnect.CommonLogic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231212041026_Update2")]
+    partial class Update2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -361,18 +363,6 @@ namespace CareConnect.CommonLogic.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactPersonAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactPersonEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactPersonName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactPersonPhone")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("CurrencyId")
                         .HasColumnType("int");
 
@@ -392,12 +382,6 @@ namespace CareConnect.CommonLogic.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmergencyContactAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EmergencyContactEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EmergencyContactName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmergencyContactPhone")
@@ -1976,7 +1960,7 @@ namespace CareConnect.CommonLogic.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("ShiftRuns");
+                    b.ToTable("ShiftRun");
                 });
 
             modelBuilder.Entity("CareConnect.CommonLogic.Models.ShiftSwapRequest", b =>

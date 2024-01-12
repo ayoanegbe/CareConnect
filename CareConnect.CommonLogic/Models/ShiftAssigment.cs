@@ -7,22 +7,14 @@ namespace CareConnect.CommonLogic.Models
     {
         [Key]
         public int ShiftAssigmentId { get; set; }
-        [ForeignKey("ShiftAssigment_Shift")]
-        public int ShiftId { get; set; }
-        public Shift Shift { get; set; }
-        [ForeignKey("ShiftAssigment_Employee")]
+        public int ShiftRunId { get; set; }
+        public ShiftRun ShiftRun { get; set; }
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
         [Display(Name = "Date Assigned")]
         public DateTime DateAssigned { get; set; } = DateTime.Now;
-        public string AssignedBy { get; set; }
-        [Required]
-        [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
-        public DateTime StartDate { get; set; }
-        [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
-        public DateTime? EndDate { get; set; }
+        [Display(Name = "Assigned By")]
+        public string AssignedBy { get; set; }        
         [Display(Name = "Declined")]
         public bool IsDeclined { get; set; } = false;
         public DateTime? DateDeclined { get; set; }

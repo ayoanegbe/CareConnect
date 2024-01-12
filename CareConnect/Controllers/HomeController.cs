@@ -267,16 +267,9 @@ namespace CareConnect.Controllers
             return sb.ToString();
         }
 
-
-        
-
-        
-
-        
-
         public async Task<IActionResult> ActivityReport(DateRangeViewModel dateRange)
         {
-            var shifts = await _context.Shifts.Include(x => x.ShiftPattern).Include(x => x.ShiftAssigment).Where(s => s.ShiftPattern.StartTime >= dateRange.StartDate && s.ShiftPattern.EndTime <= dateRange.EndDate && !s.ShiftAssigment.IsDeclined).ToListAsync();
+            var shifts = await _context.Shifts.Include(x => x.ShiftPattern).Where(s => s.ShiftPattern.StartTime >= dateRange.StartDate && s.ShiftPattern.EndTime <= dateRange.EndDate).ToListAsync();
 
             foreach (var shift in shifts)
             {
