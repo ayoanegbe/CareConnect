@@ -29,45 +29,65 @@
                     </li>
                     @if (await UserManager.IsInRoleAsync(user, "Administrator"))
                     {
-                        <li class="nav-parent">
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "Setup" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bx-cog" aria-hidden="true"></i>
                                 <span>Setup</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListHouses">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListHouses" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListHouses">
                                         Houses
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListCustomers">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListCustomers" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListCustomers">
                                         Customers
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListClients">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListClients" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListClients">
                                         Clients
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListDepartments">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListDepartments" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListDepartments">
                                         Departments
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListJobTitles">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListJobTitles" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListJobTitles">
                                         Job Titles
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListPayGrades">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListPayGrades" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListPayGrades">
                                         Pay Grades
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListVendors">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListVendors" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListVendors">
                                         Vendors
+                                    </a>
+                                </li>
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListHolidays" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListHolidays">
+                                        Holidays
+                                    </a>
+                                </li>
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListLeaveSettings" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListLeaveSettings">
+                                        Leave Settings
+                                    </a>
+                                </li>
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListLeaveRequests" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListLeaveRequests">
+                                        Leave Requests
+                                    </a>
+                                </li>
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListLeaveSettings" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListLeaveSettings">
+                                        Leave Settings
                                     </a>
                                 </li>
                             </ul>
@@ -75,86 +95,96 @@
                     }
                     @if (await UserManager.IsInRoleAsync(user, "Super Administrator"))
                     {
-                        <li class="nav-parent">
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "Setup" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bx-cog" aria-hidden="true"></i>
                                 <span>Setup</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListTenants">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListVendors" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListTenants">
                                         Tenants
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListOrganizations">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListOrganizations" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListOrganizations">
                                         Organizations
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListCurrencies">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListCurrencies" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListCurrencies">
                                         Currencies
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListSubscriptionRates">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListSubscriptionRates" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListSubscriptionRates">
                                         Subscription Rates
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Setup" asp-action="ListSubscriptions">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListSubscriptions" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Setup" asp-action="ListSubscriptions">
                                         Subscriptions
                                     </a>
                                 </li>
-
+                                
                             </ul>
                         </li>
                     }
                     @if (await UserManager.IsInRoleAsync(user, "Administrator"))
                     {
- 
-                        <li class="nav-parent">
+
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "EmployeeManagement" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bxs-group" aria-hidden="true"></i>
                                 <span>Employee Management</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="EmployeeManagement" asp-action="ListVacancies">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListVacancies" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="EmployeeManagement" asp-action="ListVacancies">
                                         Vacancies
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="EmployeeManagement" asp-action="ListApplications">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListApplications" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="EmployeeManagement" asp-action="ListApplications">
                                         Job Applications
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="EmployeeManagement" asp-action="ListInterviews">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListInterviews" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="EmployeeManagement" asp-action="ListInterviews">
                                         Interviews
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="EmployeeManagement" asp-action="ListEmployees">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListEmployees" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="EmployeeManagement" asp-action="ListEmployees">
                                         Employees
+                                    </a>
+                                </li>
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListLeaveRequests" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="EmployeeManagement" asp-action="ListLeaveRequests">
+                                        Leave Requests - Admin
+                                    </a>
+                                </li>
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListEmployeeLeaveRequests" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="EmployeeManagement" asp-action="ListEmployeeLeaveRequests">
+                                        Leave Requests
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
-                        <li class="nav-parent">
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "ShiftManagement" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bx-target-lock" aria-hidden="true"></i>
                                 <span>Shift Management</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="ShiftManagement" asp-action="ListShiftPatterns">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListShiftPatterns" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="ShiftManagement" asp-action="ListShiftPatterns">
                                         Shift Patterns
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="ShiftManagement" asp-action="ListShifts">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ListShifts" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="ShiftManagement" asp-action="ListShifts">
                                         Shifts
                                     </a>
                                 </li>
@@ -181,19 +211,19 @@
 
                     @if (await UserManager.IsInRoleAsync(user, "Super Administrator"))
                     {
-                        <li class="nav-parent">
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "Account" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bx-user" aria-hidden="true"></i>
                                 <span>User Management</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Account" asp-action="Register" asp-route-source="superAdmin">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "GetAllUsers" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Account" asp-action="Register" asp-route-source="superAdmin">
                                         New User
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Account" asp-action="GetAllUsers">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "GetAllUsers" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Account" asp-action="GetAllUsers">
                                         Users List
                                     </a>
                                 </li>
@@ -204,33 +234,33 @@
 
                     @if (await UserManager.IsInRoleAsync(user, "Administrator"))
                     {
-                        <li class="nav-parent">
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "Account" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bx-user" aria-hidden="true"></i>
                                 <span>User Management</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Account" asp-action="Register" asp-route-source="admin">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "Register" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Account" asp-action="Register" asp-route-source="admin">
                                         New User
                                     </a>
                                 </li>
-                                <li>
-                                    <a asp-controller="Account" asp-action="UserList">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "UserList" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Account" asp-action="UserList">
                                         Users List
                                     </a>
                                 </li>
 
                             </ul>
                         </li>
-                        <li class="nav-parent">
+                        <li class="nav-parent @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "nav-active nav-expanded" : "")">
                             <a class="nav-link" href="#">
                                 <i class="bx bx-printer" aria-hidden="true"></i>
                                 <span>Reports</span>
                             </a>
                             <ul class="nav nav-children">
-                                <li>
-                                    <a asp-controller="Home" asp-action="ActivityReport">
+                                <li class="@(ViewContext.RouteData.Values["Action"].ToString() == "ActivityReport" ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Home" asp-action="ActivityReport">
                                         Activity Report
                                     </a>
                                 </li>
@@ -257,7 +287,7 @@
 			}
         </script>
 
-
+        
     </div>
 
 </aside>

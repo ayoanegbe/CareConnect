@@ -8,6 +8,8 @@ namespace CareConnect.CommonLogic.Models
     {
         [Key]
         public int CompanyId { get; set; }
+        public int CountryId { get; set; }
+        public Country Country { get; set; }
         [Required]
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; }

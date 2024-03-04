@@ -19,6 +19,7 @@ namespace CareConnect.CommonLogic.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<ClientBudgetHistory> ClientBudgetHistories { get; set; }
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Country> Countries { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Deduction> Deductions { get; set; }
@@ -32,12 +33,16 @@ namespace CareConnect.CommonLogic.Data
         public DbSet<EmployeePreference> EmployeePreferences { get; set; }
         public DbSet<ExpenseReport> ExpenseReports { get; set; }
         public DbSet<FireDrill> FireDrills { get; set; }
+        public DbSet<Holiday> Holidays { get; set; }
         public DbSet<HourlyTimeSheet> HourlyTimeSheets { get; set; }
         public DbSet<House> Houses { get; set; }
         public DbSet<Interview> Interviews { get; set; }
         public DbSet<Interviewer> Interviewers { get; set; }
         public DbSet<JobTitle> JobTitles { get; set; }
         public DbSet<JobTitleHistory> JobTitlesHistories { get; set; }
+        public DbSet<Leave> Leaves { get; set; }
+        public DbSet<LeaveSetting> LeaveSettings { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OvertimeComment> OvertimeComments { get; set; }
         public DbSet<PayGrade> PayGrades { get; set; }

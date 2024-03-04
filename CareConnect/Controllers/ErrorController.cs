@@ -101,7 +101,7 @@ namespace CareConnect.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, "an error has occurred", ex);
+                _logger.Log(LogLevel.Error, $"An error has occurred - {ex}");
 
             }
             return View();

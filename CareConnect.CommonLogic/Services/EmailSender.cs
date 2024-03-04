@@ -69,7 +69,7 @@ namespace CareConnect.CommonLogic.Services
             catch (Exception ex)
             {
                 result = ex.ToString();
-                _logger.LogDebug("Error sending email", result);
+                _logger.Log(LogLevel.Debug, $"Error sending email {result}");
             }
 
             return result;
@@ -124,7 +124,7 @@ namespace CareConnect.CommonLogic.Services
             catch (Exception ex)
             {
                 result = ex.ToString();
-                _logger.LogDebug("Error sending email", result);
+                _logger.Log(LogLevel.Debug, $"Error sending email {result}");
             }
 
             return result;

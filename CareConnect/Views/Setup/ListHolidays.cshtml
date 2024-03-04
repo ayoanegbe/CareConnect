@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Holiday>
+
+@inject CustomIDataProtection protector;
+@{
+    ViewData["Title"] = "Holidays List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Holidays</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span>Holidays</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <section class="card">
+        <header class="card-header">
+            <h2 class="card-title">List of Holidays</h2>
+        </header>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="m-0">
+                        <a asp-controller="Setup" asp-action="AddHoliday" class="btn btn-primary" style="background-color:cornflowerblue">Add Holiday<i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-responsive-md table-striped mb-0" id="datatable-tabletools">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Date)
+                        </th>
+                        
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Date)
+                            </td>
+                            <td>
+                                <a asp-action="EditHoliday" asp-route-id="@protector.Encode(item.HolidayId.ToString())" style="color:magenta">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <footer class="card-footer">
+            <a class="btn btn-dark" asp-controller="Home" asp-action="Index"><i class="fas fa-chevron-left"></i> Back</a>
+        </footer>
+    </section>
+</section>

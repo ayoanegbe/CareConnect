@@ -1,0 +1,77 @@
+﻿@model HolidayViewModel
+
+@{
+    ViewData["Title"] = "Add New Holiday";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Add New Holiday</h2>
+
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                    </a>
+                </li>
+                <li><span><a asp-controller="Setup" asp-action="ListHolidays">Holidays</a></span></li>
+                <li><span>New Holiday</span></li>
+            </ol>
+
+            @*<a class="sidebar-right-toggle" data-open="sidebar-right"><i class="fas fa-chevron-left"></i></a>*@
+        </div>
+    </header>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card">
+                <form asp-action="AddHoliday" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="OrganizationId" />
+                    <header class="card-header">
+                        <h2 class="card-title">Add New Holiday</h2>
+                    </header>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> @ViewBag.Message
+                        </div>
+                    }
+                    <div class="card-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="Name"></label>
+                                <input asp-for="Name" type="text" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-6">
+                                <label class="col-form-label" asp-for="Date"></label>
+                                <input asp-for="Date" type="date" class="form-control" />
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        
+
+                    </div>
+                    <footer class="card-footer text-right">
+                        <input type="submit" value="Save" class="btn btn-primary" style="background-color:cornflowerblue" />
+                        <a class="btn btn-secondary" asp-action="ListHolidays">Cancel</a>
+                    </footer>
+                </form>
+            </section>
+
+        </div>
+    </div>
+
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -373,6 +373,9 @@ namespace CareConnect.CommonLogic.Migrations
                     b.Property<string>("ContactPersonPhone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ContactPersonRelationship")
+                        .HasColumnType("int");
+
                     b.Property<int>("CurrencyId")
                         .HasColumnType("int");
 
@@ -402,6 +405,9 @@ namespace CareConnect.CommonLogic.Migrations
 
                     b.Property<string>("EmergencyContactPhone")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EmergencyContactRelationship")
+                        .HasColumnType("int");
 
                     b.Property<string>("FamilyPhysician")
                         .HasColumnType("nvarchar(max)");
@@ -440,9 +446,6 @@ namespace CareConnect.CommonLogic.Migrations
 
                     b.Property<string>("Psychiatrist")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Relationship")
-                        .HasColumnType("int");
 
                     b.Property<int>("ResidentialType")
                         .HasColumnType("int");
@@ -516,6 +519,9 @@ namespace CareConnect.CommonLogic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
 
@@ -533,7 +539,40 @@ namespace CareConnect.CommonLogic.Migrations
 
                     b.HasKey("CompanyId");
 
+                    b.HasIndex("CountryId");
+
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Country", b =>
+                {
+                    b.Property<int>("CountryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"), 1L, 1);
+
+                    b.Property<string>("AddedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CountryId");
+
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("CareConnect.CommonLogic.Models.Currency", b =>
@@ -1162,6 +1201,43 @@ namespace CareConnect.CommonLogic.Migrations
                     b.ToTable("FireDrills");
                 });
 
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Holiday", b =>
+                {
+                    b.Property<int>("HolidayId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HolidayId"), 1L, 1);
+
+                    b.Property<string>("AddedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HolidayId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("Holidays");
+                });
+
             modelBuilder.Entity("CareConnect.CommonLogic.Models.HourlyTimeSheet", b =>
                 {
                     b.Property<int>("HourlyTimeSheetId")
@@ -1413,6 +1489,153 @@ namespace CareConnect.CommonLogic.Migrations
                     b.HasIndex("JobTitleId");
 
                     b.ToTable("JobTitlesHistories");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Leave", b =>
+                {
+                    b.Property<int>("LeaveId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeaveId"), 1L, 1);
+
+                    b.Property<string>("AddedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateApproved")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LeaveReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LeaveSettingId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RejectReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LeaveId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("LeaveSettingId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("Leaves");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.LeaveSetting", b =>
+                {
+                    b.Property<int>("LeaveSettingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeaveSettingId"), 1L, 1);
+
+                    b.Property<string>("AddedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCarryForward")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPaidLeave")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LeaveDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeaveType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxCarryForward")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PayGradeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LeaveSettingId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("PayGradeId");
+
+                    b.ToTable("LeaveSettings");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Notification", b =>
+                {
+                    b.Property<int>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"), 1L, 1);
+
+                    b.Property<string>("AddedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NotificationId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("CareConnect.CommonLogic.Models.Organization", b =>
@@ -2691,6 +2914,17 @@ namespace CareConnect.CommonLogic.Migrations
                     b.Navigation("Currency");
                 });
 
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Company", b =>
+                {
+                    b.HasOne("CareConnect.CommonLogic.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
             modelBuilder.Entity("CareConnect.CommonLogic.Models.Customer", b =>
                 {
                     b.HasOne("CareConnect.CommonLogic.Models.Organization", "Organization")
@@ -2903,6 +3137,17 @@ namespace CareConnect.CommonLogic.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Holiday", b =>
+                {
+                    b.HasOne("CareConnect.CommonLogic.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("CareConnect.CommonLogic.Models.HourlyTimeSheet", b =>
                 {
                     b.HasOne("CareConnect.CommonLogic.Models.Client", "Client")
@@ -3009,6 +3254,71 @@ namespace CareConnect.CommonLogic.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("JobTitle");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Leave", b =>
+                {
+                    b.HasOne("CareConnect.CommonLogic.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.CommonLogic.Models.LeaveSetting", "LeaveSetting")
+                        .WithMany()
+                        .HasForeignKey("LeaveSettingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.CommonLogic.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LeaveSetting");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.LeaveSetting", b =>
+                {
+                    b.HasOne("CareConnect.CommonLogic.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.CommonLogic.Models.PayGrade", "PayGrade")
+                        .WithMany()
+                        .HasForeignKey("PayGradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("PayGrade");
+                });
+
+            modelBuilder.Entity("CareConnect.CommonLogic.Models.Notification", b =>
+                {
+                    b.HasOne("CareConnect.CommonLogic.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareConnect.CommonLogic.Models.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("CareConnect.CommonLogic.Models.Organization", b =>

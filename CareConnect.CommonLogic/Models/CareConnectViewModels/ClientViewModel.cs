@@ -51,7 +51,9 @@ namespace CareConnect.CommonLogic.Models.CareConnectViewModels
         [Display(Name = "Emergency Contact Email")]
         public string EmergencyContactEmail { get; set; }
         [Display(Name = "Relationship To Client")]
-        public RelationshipType Relationship { get; set; }
+        public RelationshipType EmergencyContactRelationship { get; set; }
+        [Display(Name = "Relationship To Client")]
+        public RelationshipType ContactPersonRelationship { get; set; }
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Guadian Phone Number")]
         public string GuadianPhoneNumber { get; set; }

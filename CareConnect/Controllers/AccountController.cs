@@ -219,7 +219,7 @@ namespace CareConnect.Controllers
                     else
                     {
                         var exception = new Exception($"The role '{model.Role}' could not be set for the user `{model.Email}`");
-                        _logger.Log(LogLevel.Debug, "An error has occurred fetching item", exception);
+                        _logger.Log(LogLevel.Debug, $"An error has occurred fetching item {exception}");
                         throw exception;
                     }
 

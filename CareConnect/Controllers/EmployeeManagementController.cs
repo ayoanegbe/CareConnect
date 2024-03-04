@@ -377,7 +377,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item - {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -758,7 +758,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item - {ex}");
                         return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
                     }
                 }
@@ -1296,7 +1296,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item - {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again. And if the problem persists, " +
                             "contact your system administrator.";
@@ -1314,6 +1314,82 @@ namespace CareConnect.Controllers
             ViewData["ApplicantId"] = new SelectList(_context.Interviews.Where(x => x.OrganizationId == (int)user.OrganizationId), "ApplicantId", "FullName", interview.ApplicantId);
 
             return View(interviewView);
+        }
+
+        public async Task<IActionResult> ListLeaveRequests()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Leaves.Include(x => x.Employee).Where(x => x.OrganizationId == user.OrganizationId).OrderByDescending(x => x.LeaveId).ToListAsync());
+        }
+
+        public async Task<IActionResult> ListEmployeeLeaveRequests()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var employee = await _context.Employees.FirstOrDefaultAsync(x => x.Email == user.Email);
+
+            return View(await _context.Leaves.Include(x => x.Employee).Where(x => x.OrganizationId == user.OrganizationId && x.EmployeeId == employee.EmployeeId).OrderByDescending(x => x.LeaveId).ToListAsync());
+        }
+
+        public async Task<IActionResult> AddLeaveRequest()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var employee = await _context.Employees.Include(x => x.PayGradeLevel).FirstOrDefaultAsync(x => x.Email == user.Email);
+
+            var leaveSettings = await _context.LeaveSettings.Where(x => x.OrganizationId == (int)user.OrganizationId && x.PayGradeId == employee.PayGradeLevel.PayGradeId).ToListAsync();
+            var totalLeaveDays = leaveSettings.Sum(x => x.LeaveDays);
+            var leaveDaysTaken = await _context.Leaves.Include(x => x.Employee).Where(x => x.OrganizationId == (int)user.OrganizationId && x.EmployeeId == employee.EmployeeId && x.Status == ApprovalStatus.Approved).SumAsync(x => x.NumberOfDays);
+
+            var leave = await _context.Leaves.Include(x => x.Employee).Include(x => x.LeaveSetting).Where(x => x.OrganizationId == (int)user.OrganizationId && x.EmployeeId == employee.EmployeeId).FirstOrDefaultAsync();
+            
+            LeaveViewModel leaveView = new () 
+            { 
+                OrganizationId = (int)user.OrganizationId, 
+                EmployeeId = employee.EmployeeId, 
+                LeaveDaysTaken = leaveDaysTaken,
+                LeaveDaysRemaining = totalLeaveDays - leaveDaysTaken,
+                LeaveSettings = leaveSettings,
+            };
+
+            ViewData["LeaveSettingId"] = new SelectList(leaveSettings, "LeaveSettingId", "LeaveType");
+
+            return View(leaveView);
+        }
+
+        public async Task<IActionResult> AddLeaveRequest([Bind("OrganizationId,EmployeeId,LeaveSettingId,StartDate,EndDate,NumberOfDays,LeaveReason,LeaveDaysTaken,LeaveDaysRemaining")] LeaveViewModel leaveView)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var employee = await _context.Employees.Include(x => x.PayGradeLevel).FirstOrDefaultAsync(x => x.Email == user.Email);
+
+            Leave leave = new()
+            {
+                OrganizationId = leaveView.OrganizationId,
+                EmployeeId = leaveView.EmployeeId,
+                LeaveSettingId = leaveView.LeaveSettingId,
+                StartDate = leaveView.StartDate,
+                EndDate = leaveView.EndDate,
+                NumberOfDays = leaveView.NumberOfDays,
+                LeaveReason = leaveView.LeaveReason,
+                DateAdded = DateTime.Now,
+                AddedBy = user.UserName
+            };
+
+            if (ModelState.IsValid)
+            {
+                await _context.AddAsync(leave);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ListEmployeeLeaveRequests));
+            }
+            else
+            {
+                ViewBag.Message = "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.";
+            }
+
+            ViewData["LeaveSettingId"] = new SelectList(_context.LeaveSettings.Where(x => x.OrganizationId == (int)user.OrganizationId && x.PayGradeId == employee.PayGradeLevel.PayGradeId), "LeaveSettingId", "LeaveType", leaveView.LeaveSettingId);
+
+            return View(leaveView);
         }
 
         [HttpPost]
@@ -1398,7 +1474,7 @@ namespace CareConnect.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                _logger.Log(LogLevel.Error, $"An error has occurred fetching item - {ex}");
                 return 0;
             }
         }

@@ -176,11 +176,11 @@
                             <div class="mb-3 hidden-lg"></div>
 
                             <div class="col-lg-4">
-                                <label class="col-form-label" asp-for="Relationship"></label>
-                                <select asp-for="Relationship" asp-items="Html.GetEnumSelectList<RelationshipType>()" class="form-control">
+                                <label class="col-form-label" asp-for="ContactPersonRelationship"></label>
+                                <select asp-for="ContactPersonRelationship" asp-items="Html.GetEnumSelectList<RelationshipType>()" class="form-control">
                                     <option selected="selected" value="">Please Select Relationship</option>
                                 </select>
-                                <span asp-validation-for="Relationship" class="text-danger"></span>
+                                <span asp-validation-for="ContactPersonRelationship" class="text-danger"></span>
                             </div>
 
                         </div>
@@ -214,6 +214,16 @@
                                 <label class="col-form-label" asp-for="EmergencyContactPhone"></label>
                                 <input asp-for="EmergencyContactPhone" type="text" class="form-control" />
                                 <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 hidden-lg"></div>
+
+                            <div class="col-lg-4">
+                                <label class="col-form-label" asp-for="EmergencyContactRelationship"></label>
+                                <select asp-for="EmergencyContactRelationship" asp-items="Html.GetEnumSelectList<RelationshipType>()" class="form-control">
+                                    <option selected="selected" value="">Please Select Relationship</option>
+                                </select>
+                                <span asp-validation-for="EmergencyContactRelationship" class="text-danger"></span>
                             </div>
                         </div>
 

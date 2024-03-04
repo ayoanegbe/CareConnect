@@ -15,5 +15,7 @@ namespace CareConnect.CommonLogic.Models
         [DataType(DataType.Html)]
         public string Message {  get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
+        [Display(Name = "Added By")]
+        public string AddedBy { get; set; }
     }
 }

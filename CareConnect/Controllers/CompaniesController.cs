@@ -260,11 +260,12 @@ namespace CareConnect.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                _logger.Log(LogLevel.Error, $"An error has occurred fetching item - {ex}");
                 return 0;
             }
 
-            
+
+
         }
     }
 }

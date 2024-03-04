@@ -10,9 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.OpenApi.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 
 namespace CareConnect.Controllers
@@ -86,7 +89,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddClient([Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddleName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes")] ClientViewModel clientView)
+        public async Task<IActionResult> AddClient([Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddleName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactName,EmergencyContactPhone,EmergencyContactAddress,EmergencyContactEmail,EmergencyContactRelationship,ContactPersonName,ContactPersonAddress,ContactPersonPhone,ContactPersonEmail,ContactPersonRelationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes")] ClientViewModel clientView)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -120,9 +123,16 @@ namespace CareConnect.Controllers
                 BirthDate = clientView.BirthDate,
                 Phone = clientView.Phone,
                 Email = clientView.Email,
+                EmergencyContactName = clientView.EmergencyContactName,
                 EmergencyContactAddress = clientView.EmergencyContactAddress,
                 EmergencyContactPhone = clientView.EmergencyContactPhone,
-                Relationship = clientView.Relationship,
+                EmergencyContactEmail = clientView.EmergencyContactEmail,
+                EmergencyContactRelationship = clientView.EmergencyContactRelationship,
+                ContactPersonName = clientView.ContactPersonName,
+                ContactPersonAddress = clientView.ContactPersonAddress,
+                ContactPersonPhone = clientView.ContactPersonPhone,
+                ContactPersonEmail = clientView.ContactPersonEmail,
+                ContactPersonRelationship = clientView.ContactPersonRelationship,
                 GuadianPhoneNumber = clientView.GuadianPhoneNumber,
                 FamilyPhysician = clientView.FamilyPhysician,
                 Psychiatrist = clientView.Psychiatrist,
@@ -199,7 +209,7 @@ namespace CareConnect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditClient(string id, [Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddleName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactPhone,EmergencyContactAddress,Relationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes,Comment")] ClientViewModel clientView)
+        public async Task<IActionResult> EditClient(string id, [Bind("ClientId,CustomerId,OrganizationId,HouseId,ResidentialType,FirstName,MiddleName,LastName,Gender,DateJoined,BirthDate,Phone,Email,EmergencyContactName,EmergencyContactPhone,EmergencyContactAddress,EmergencyContactEmail,EmergencyContactRelationship,ContactPersonName,ContactPersonAddress,ContactPersonPhone,ContactPersonEmail,ContactPersonRelationship,GuadianPhoneNumber,FamilyPhysician,Psychiatrist,Budget,CurrencyId,BudgetStartDate,BudgetEndDate,Notes,Comment")] ClientViewModel clientView)
         {
             if (id == null)
             {
@@ -234,9 +244,16 @@ namespace CareConnect.Controllers
                 BirthDate = clientView.BirthDate,
                 Phone = clientView.Phone,
                 Email = clientView.Email,
+                EmergencyContactName = clientView.EmergencyContactName,
                 EmergencyContactAddress = clientView.EmergencyContactAddress,
                 EmergencyContactPhone = clientView.EmergencyContactPhone,
-                Relationship = clientView.Relationship,
+                EmergencyContactEmail = clientView.EmergencyContactEmail,
+                EmergencyContactRelationship = clientView.EmergencyContactRelationship,
+                ContactPersonName = clientView.ContactPersonName,
+                ContactPersonAddress = clientView.ContactPersonAddress,
+                ContactPersonPhone = clientView.ContactPersonPhone,
+                ContactPersonEmail = clientView.ContactPersonEmail,
+                ContactPersonRelationship = clientView.ContactPersonRelationship,
                 GuadianPhoneNumber = clientView.GuadianPhoneNumber,
                 FamilyPhysician = clientView.FamilyPhysician,
                 Psychiatrist = clientView.Psychiatrist,
@@ -273,7 +290,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -409,7 +426,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
 
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
@@ -594,7 +611,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -777,7 +794,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -930,7 +947,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
 
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
@@ -1072,7 +1089,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -1228,7 +1245,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -1370,7 +1387,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -1563,7 +1580,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -1820,7 +1837,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
                     }
                 }
@@ -1930,7 +1947,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -1995,7 +2012,7 @@ namespace CareConnect.Controllers
             }
             catch(Exception ex)
             {
-                _logger.Log(LogLevel.Error, "An error has occurred saving item", ex);
+                _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
 
                 ViewBag.Message = "Unable to save changes. " +
                     "Try again, and if the problem persists, " +
@@ -2058,7 +2075,6 @@ namespace CareConnect.Controllers
             tenant.DateUpdated = DateTime.Now;
             tenant.UpdatedBy = user.UserName;
 
-
             try
             {
                 _context.Update(tenant);
@@ -2073,7 +2089,7 @@ namespace CareConnect.Controllers
                 }
                 else
                 {
-                    _logger.Log(LogLevel.Error, "An error has occurred saving item", ex);
+                    _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
 
                     ViewBag.Message = "Unable to save changes. " +
                         "Try again, and if the problem persists, " +
@@ -2208,7 +2224,7 @@ namespace CareConnect.Controllers
             };
 
             return View(vendorView);
-        }
+        }        
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -2290,7 +2306,7 @@ namespace CareConnect.Controllers
                     }
                     else
                     {
-                        _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                         ViewBag.Message = "Unable to save changes. " +
                             "Try again, and if the problem persists, " +
                             "see your system administrator.";
@@ -2308,6 +2324,322 @@ namespace CareConnect.Controllers
             return View(vendorView);
         }
 
+        public async Task<IActionResult> ListHolidays()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return View(await _context.Holidays.Where(x => x.OrganizationId == user.OrganizationId).OrderBy(x => x.Date).ToListAsync());
+        }
+
+        public async Task<IActionResult> AddHoliday()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            HolidayViewModel holidayView = new() { OrganizationId = (int)user.OrganizationId, Date = DateTime.Now };
+            return View(holidayView);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddHoliday([Bind("HolidayId,OrganizationId,Name,Date")] HolidayViewModel holidayView)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            Holiday holiday = new()
+            {
+                OrganizationId = holidayView.OrganizationId,
+                Name = holidayView.Name,
+                Date = holidayView.Date,
+                DateAdded = DateTime.Now,
+                AddedBy = user.UserName
+            };
+
+            if (ModelState.IsValid)
+            {
+                await _context.AddAsync(holiday);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ListHolidays));
+            }
+            else
+            {
+                ViewBag.Message = "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.";
+            }
+
+            return View(holidayView);
+        }
+
+        public async Task<IActionResult> EditHoliday(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            var holiday = await _context.Holidays.FirstOrDefaultAsync(x => x.HolidayId == num);
+            if (holiday == null)
+            {
+                return NotFound();
+            }
+
+            HolidayViewModel holidayView = new()
+            {
+                HolidayId = holiday.HolidayId,
+                OrganizationId = holiday.OrganizationId,
+                Name = holiday.Name,
+                Date = holiday.Date,
+            };
+
+            return View(holidayView);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditHoliday(string id, [Bind("HolidayId,OrganizationId,Name,Date")] HolidayViewModel holidayView)
+        {
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            if (num != holidayView.HolidayId)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            Holiday holiday = new()
+            {
+                HolidayId = holidayView.HolidayId,
+                OrganizationId = holidayView.OrganizationId,
+                Name = holidayView.Name,
+                Date = holidayView.Date,
+                DateUpdated = DateTime.Now,
+                UpdatedBy = user.UserName
+            };
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(holiday);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListHolidays));
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    if (!HolidayExists(holiday.HolidayId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
+                    }
+                }
+
+            }
+            else
+            {
+                ViewBag.Message = "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.";
+            }
+
+            return View(holidayView);
+        }
+
+        public async Task<IActionResult> ListLeaveSettings()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            List<LeaveSetting> leaveSettings = await _context.LeaveSettings.Include(x => x.PayGrade).Where(x => x.OrganizationId == user.OrganizationId).OrderBy(x => x.LeaveType).ToListAsync();
+
+            return View(leaveSettings);
+        }
+
+        public async Task<IActionResult> AddLeaveSetting()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            LeaveSettingViewModel leaveSettingView = new() { OrganizationId = (int)user.OrganizationId };
+
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name");
+
+            return View(leaveSettingView);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddLeaveSetting([Bind("LeaveSettingId,PayGradeId,OrganizationId,LeaveType,LeaveDays,IsCarryForward,IsPaidLeave,MaxCarryForward")] LeaveSettingViewModel leaveSettingView)
+        {
+
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name", leaveSettingView.PayGradeId);
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (LeaveSettingExists(leaveSettingView.OrganizationId, leaveSettingView.LeaveType, leaveSettingView.PayGradeId))
+            {
+                ViewBag.Message = $"{leaveSettingView.LeaveType} leave exists for this pay grade. ";
+                return View(leaveSettingView);
+            }
+
+            if (!leaveSettingView.IsCarryForward)
+                leaveSettingView.MaxCarryForward = 0;
+
+            LeaveSetting leaveSetting = new()
+            {
+                OrganizationId = leaveSettingView.OrganizationId,
+                PayGradeId = leaveSettingView.PayGradeId,
+                LeaveType = leaveSettingView.LeaveType,
+                LeaveDays = leaveSettingView.LeaveDays,
+                IsCarryForward = leaveSettingView.IsCarryForward,
+                IsPaidLeave = leaveSettingView.IsPaidLeave,
+                MaxCarryForward = leaveSettingView.MaxCarryForward,
+                DateAdded = DateTime.Now,
+                AddedBy = user.UserName
+            };
+
+            if (ModelState.IsValid)
+            {
+                await _context.AddAsync(leaveSetting);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ListLeaveSettings));
+            }
+            else
+            {
+                ViewBag.Message = "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.";
+            }
+
+            return View(leaveSettingView);
+        }
+
+        public async Task<IActionResult> EditLeaveSetting(string id)
+        {            
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            var leaveSetting = await _context.LeaveSettings.Include(x => x.PayGrade).FirstOrDefaultAsync(x => x.LeaveSettingId == num);
+            if (leaveSetting == null)
+            {
+                return NotFound();
+            }
+            
+
+            LeaveSettingViewModel leaveSettingView = new()
+            {
+                LeaveSettingId = leaveSetting.LeaveSettingId,
+                PayGradeId = leaveSetting.PayGradeId,
+                OrganizationId = leaveSetting.OrganizationId,
+                LeaveType = leaveSetting.LeaveType,
+                LeaveDays = leaveSetting.LeaveDays,
+                IsCarryForward = leaveSetting.IsCarryForward,
+                IsPaidLeave = leaveSetting.IsPaidLeave,
+                MaxCarryForward = leaveSetting.MaxCarryForward,
+                PayGrade = leaveSetting.PayGrade
+            };
+
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name", leaveSettingView.PayGradeId);
+            ViewData["MaxCarryForward"] = leaveSetting.MaxCarryForward;
+
+            return View(leaveSettingView);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditLeaveSetting(string id, [Bind("LeaveSettingId,PayGradeId,OrganizationId,LeaveType,LeaveDays,IsCarryForward,IsPaidLeave,MaxCarryForward")] LeaveSettingViewModel leaveSettingView)
+        {
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "Name", leaveSettingView.PayGradeId);
+
+            int num = Resolver(id);
+            if (num == 0)
+            {
+                return RedirectToAction(nameof(ErrorController.Error), new { Controller = "Error", Action = "Error", code = 500 });
+            }
+
+            if (num != leaveSettingView.LeaveSettingId)
+            {
+                return NotFound();
+            }
+
+            if (!leaveSettingView.IsCarryForward)
+                leaveSettingView.MaxCarryForward = 0;
+
+            var user = await _userManager.GetUserAsync(User);
+
+            LeaveSetting leaveSetting = new()
+            {
+                LeaveSettingId = leaveSettingView.LeaveSettingId,
+                PayGradeId = leaveSettingView.PayGradeId,
+                OrganizationId = leaveSettingView.OrganizationId,
+                LeaveType = leaveSettingView.LeaveType,
+                LeaveDays = leaveSettingView.LeaveDays,
+                IsCarryForward = leaveSettingView.IsCarryForward,
+                IsPaidLeave = leaveSettingView.IsPaidLeave,
+                MaxCarryForward = leaveSettingView.MaxCarryForward,
+                DateUpdated = DateTime.Now,
+                UpdatedBy = user.UserName
+            };
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(leaveSetting);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListLeaveSettings));
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    if (!LeaveSettingExists(leaveSetting.LeaveSettingId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
+                        ViewBag.Message = "Unable to save changes. " +
+                            "Try again, and if the problem persists, " +
+                            "see your system administrator.";
+                    }
+                }
+
+            }
+            else
+            {
+                ViewBag.Message = "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.";
+            }
+
+            return View(leaveSettingView);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SmtpSettings(string id)
         {
             ViewData["Title"] = "SMTP Settings";
@@ -2467,6 +2799,11 @@ namespace CareConnect.Controllers
             return _context.SubscriptionsRates.Any(s => s.SubscriptionRateId == id);
         }
 
+        private bool HolidayExists(int id)
+        {
+            return _context.Holidays.Any(h => h.HolidayId == id);
+        }
+
         private bool TenantExists(int id)
         {
             return _context.Tenants.Any(t => t.TenantId == id);
@@ -2475,6 +2812,16 @@ namespace CareConnect.Controllers
         private bool VendorExits(int id) 
         {
             return _context.Vendors.Any(v => v.VendorId == id);
+        }
+
+        private bool LeaveSettingExists(int id)
+        {
+            return _context.LeaveSettings.Any(l => l.LeaveSettingId == id);
+        }
+
+        private bool LeaveSettingExists(int organizationId, LeaveType leaveType, int payGradeId)
+        {
+            return _context.LeaveSettings.Any(l => l.OrganizationId == organizationId && l.LeaveType == leaveType && l.PayGradeId == payGradeId);
         }
 
         private int Resolver(string id)
@@ -2487,9 +2834,10 @@ namespace CareConnect.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, "An error has occurred fetching item", ex);
+                _logger.Log(LogLevel.Error, $"An error has occurred fetching item {ex}");
                 return 0;
             }
         }
+       
     }
 }
